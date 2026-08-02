@@ -33,6 +33,9 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(
     page.getByRole("button", { name: /현재 .* 테마/ }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /현재 .* 테마/ }).locator("svg"),
+  ).toHaveCount(0);
   await page.getByLabel("이름", { exact: true }).fill("김하우");
   await page.getByLabel("이메일", { exact: true }).fill("student@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
@@ -61,9 +64,21 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   if (testInfo.project.name === "mobile") {
     await expect(page.getByTestId("student-mobile-nav")).toBeVisible();
     await expect(page.getByTestId("student-desktop-nav")).toBeHidden();
+    await expect(
+      page
+        .getByTestId("student-mobile-nav")
+        .locator("[data-menu-icon]")
+        .first(),
+    ).toBeVisible();
   } else {
     await expect(page.getByTestId("student-desktop-nav")).toBeVisible();
     await expect(page.getByTestId("student-mobile-nav")).toBeHidden();
+    await expect(
+      page
+        .getByTestId("student-desktop-nav")
+        .locator("[data-menu-icon]")
+        .first(),
+    ).toBeHidden();
   }
   expect(
     await page.evaluate(
@@ -72,7 +87,9 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   ).toBe(true);
   await page.getByRole("link", { name: "질문 연습 시작하기" }).click();
   await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
-  await expect(page.getByText("예상 질문 퀘스트", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("예상 질문 퀘스트", { exact: true }),
+  ).toBeVisible();
   const forbiddenApi = await page.request.get("/api/question-rules");
   expect(forbiddenApi.status()).toBe(403);
   await page.goto("/applications/demo/not-a-step");
@@ -93,7 +110,7 @@ test("비로그인 보호 경로는 원래 목적지를 보존해 로그인으�
   await expect(page.getByRole("heading", { name: "로그인" })).toBeVisible();
 });
 
-test("전문가 역할과 학생 라우트 경계를 지킨다", async ({ page }) => {
+test("전문가 역할과 학생 라우트 경계를 지킨다", async ({ page }, testInfo) => {
   await page.goto("/signup");
   await expect(
     page.getByRole("button", { name: /현재 .* 테마/ }),
@@ -108,6 +125,17 @@ test("전문가 역할과 학생 라우트 경계를 지킨다", async ({ page }
   await expect(
     page.getByRole("heading", { name: "좋은 기준이, 좋은 질문을 만듭니다" }),
   ).toBeVisible();
+  if (testInfo.project.name === "mobile") {
+    await expect(page.getByTestId("expert-mobile-nav")).toBeVisible();
+    await expect(
+      page.getByTestId("expert-mobile-nav").locator("[data-menu-icon]").first(),
+    ).toBeVisible();
+  } else {
+    await expect(page.getByTestId("expert-desktop-nav")).toBeVisible();
+    await expect(
+      page.getByTestId("expert-desktop-nav").locator("[data-menu-icon]"),
+    ).toHaveCount(0);
+  }
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/admin$/);
   await page.goto("/admin/not-a-section");

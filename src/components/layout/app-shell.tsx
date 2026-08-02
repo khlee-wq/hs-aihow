@@ -5,11 +5,9 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   BookOpenText,
-  ChevronRight,
   ClipboardCheck,
   FileText,
   Gauge,
-  GraduationCap,
   LayoutDashboard,
   MessageSquareText,
   Mic2,
@@ -143,7 +141,11 @@ function StudentShell({
                   )}
                 >
                   <Icon
-                    className={cn("size-3.5", active && "text-[var(--brand)]")}
+                    data-menu-icon
+                    className={cn(
+                      "size-3.5 lg:hidden",
+                      active && "text-[var(--brand)]",
+                    )}
                     strokeWidth={active ? 2.4 : 1.9}
                   />
                   <span className="hidden lg:inline">{label}</span>
@@ -156,10 +158,11 @@ function StudentShell({
             <ThemeToggle />
             <Link
               href="/settings"
-              className="grid size-9 place-items-center text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+              className="inline-flex min-h-9 items-center justify-center px-2.5 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
               aria-label="설정"
             >
-              <Settings className="size-[17px]" />
+              <Settings className="size-[17px] sm:hidden" />
+              <span className="hidden sm:inline">설정</span>
             </Link>
             <Link
               href="/settings"
@@ -195,7 +198,11 @@ function StudentShell({
               )}
               aria-current={active ? "page" : undefined}
             >
-              <Icon className="size-[18px]" strokeWidth={active ? 2.6 : 1.9} />
+              <Icon
+                data-menu-icon
+                className="size-[18px]"
+                strokeWidth={active ? 2.6 : 1.9}
+              />
               {label}
             </Link>
           );
@@ -223,24 +230,26 @@ function ExpertShell({
         <div className="mt-6 px-3">
           <span className="eyebrow">Expert operations</span>
         </div>
-        <nav className="mt-3 grid gap-1" aria-label="전문가 메뉴">
-          {adminNav.map(({ href, label, icon: Icon }) => {
+        <nav
+          className="mt-3 grid gap-1"
+          aria-label="전문가 메뉴"
+          data-testid="expert-desktop-nav"
+        >
+          {adminNav.map(({ href, label }) => {
             const active = isActive(pathname, href);
             return (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  "flex min-h-11 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-bold transition-colors",
+                  "flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 text-sm font-bold transition-colors",
                   active
                     ? "bg-[var(--brand-soft)] text-[var(--brand)]"
                     : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className="size-[18px]" strokeWidth={2.2} />
                 {label}
-                {active ? <ChevronRight className="ml-auto size-4" /> : null}
               </Link>
             );
           })}
@@ -250,7 +259,6 @@ function ExpertShell({
             href="/settings"
             className="flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
           >
-            <Settings className="size-[18px]" />
             설정
           </Link>
           <div className="flex items-center gap-3 px-3 py-2">
@@ -271,8 +279,7 @@ function ExpertShell({
           <div className="md:hidden">
             <Logo compact />
           </div>
-          <div className="hidden items-center gap-2 text-xs font-bold text-[var(--text-secondary)] md:flex">
-            <GraduationCap className="size-4 text-[var(--brand)]" />
+          <div className="hidden items-center text-xs font-bold text-[var(--text-secondary)] md:flex">
             2027학년도 운영 기준
           </div>
           <div className="ml-auto flex items-center gap-2">
@@ -289,6 +296,7 @@ function ExpertShell({
         <nav
           className="app-navigation no-scrollbar sticky top-16 z-20 flex gap-1 overflow-x-auto border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_94%,transparent)] px-3 py-2 backdrop-blur-xl md:hidden"
           aria-label="모바일 전문가 메뉴"
+          data-testid="expert-mobile-nav"
         >
           {adminNav.map(({ href, label, icon: Icon }) => {
             const active = isActive(pathname, href);
@@ -304,7 +312,7 @@ function ExpertShell({
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className="size-4" />
+                <Icon data-menu-icon className="size-4" />
                 {label}
               </Link>
             );
