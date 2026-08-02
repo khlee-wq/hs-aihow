@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import {
   ArrowUpRight,
   CalendarDays,
@@ -16,50 +15,56 @@ import {
 import Link from "next/link";
 import { JourneyOrbit } from "@/components/motion/journey-orbit";
 import { Progress } from "@/components/ui/progress";
-import { PageSkeleton } from "@/components/ui/skeleton";
 import { deriveProgress, journeySteps } from "@/lib/mock-data";
-import { cn, sleep } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
+import { type DashboardSnapshot, nextStepCopy } from "./dashboard-model";
 import {
-  dashboardSnapshot,
-  nextStepCopy,
-  readinessSignals,
-  weeklyActivity,
-} from "./dashboard-model";
+  DashboardInlineSkeleton,
+  DashboardMetricSkeleton,
+  ReadinessDataSkeleton,
+  WeeklyActivityDataSkeleton,
+} from "./dashboard-data-skeleton";
 
 const metricLabels = ["전체 준비", "완료 단계", "이번 주", "면접까지"];
 
-export function StudentDashboard({ name }: { name: string }) {
+export function StudentDashboard({
+  name,
+  snapshot: data,
+}: {
+  name?: string;
+  snapshot?: DashboardSnapshot;
+}) {
   const completed = useAppStore((state) => state.completedSteps);
-  const { data, isPending } = useQuery({
-    queryKey: ["student-dashboard"],
-    queryFn: async () => {
-      await sleep(520);
-      return dashboardSnapshot;
-    },
-  });
-
-  if (isPending || !data) return <PageSkeleton type="dashboard" />;
-
   const progress = deriveProgress(completed);
   const nextStep =
     journeySteps.find((step) => !completed.includes(step.id)) ??
     journeySteps[journeySteps.length - 1];
   const nextCopy = nextStepCopy[nextStep.id];
   const metrics = [
-    { value: `${progress}%`, note: "현재 기준" },
+    { value: `${progress}%`, note: "현재 기준", loading: false },
     {
       value: `${completed.length}/${journeySteps.length}`,
       note: `${journeySteps.length - completed.length}개 남음`,
+      loading: false,
     },
-    { value: `${data.practiceMinutes}m`, note: `+${data.weeklyDelta}분` },
-    { value: `D-${data.daysLeft}`, note: "속도 적정" },
+    {
+      value: data ? `${data.practiceMinutes}m` : "",
+      note: data ? `+${data.weeklyDelta}분` : "",
+      loading: !data,
+    },
+    {
+      value: data ? `D-${data.daysLeft}` : "",
+      note: data ? "속도 적정" : "",
+      loading: !data,
+    },
   ];
 
   return (
     <div
       className="space-y-8 float-in md:space-y-10"
       data-testid="student-dashboard"
+      aria-busy={!data}
     >
       <header
         className="grid gap-7 border-b border-[var(--border)] pb-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
@@ -71,11 +76,12 @@ export function StudentDashboard({ name }: { name: string }) {
             Prep control · 2027
           </p>
           <h1 className="mt-4 max-w-4xl break-keep text-balance text-[clamp(1.85rem,4vw,3rem)] font-bold leading-[1.08] tracking-[-.052em]">
-            {name}님, 다음은 {nextStep.title}입니다.
+            {name ? name : <DashboardInlineSkeleton className="w-[5.5em]" />}
+            님, 다음은 {nextStep.title}입니다.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
             현재 데이터에서 가장 영향이 큰 한 가지부터 제안합니다. 마지막
-            동기화는 {data.savedAt}입니다.
+            동기화는 {data ? data.savedAt : <DashboardInlineSkeleton />}입니다.
           </p>
         </div>
         <div
@@ -88,14 +94,16 @@ export function StudentDashboard({ name }: { name: string }) {
             </p>
             <p className="mt-1.5 flex items-center gap-2 font-bold">
               <CalendarDays className="size-3.5 text-[var(--warning)]" />
-              D-{data.daysLeft}
+              {data ? `D-${data.daysLeft}` : <DashboardInlineSkeleton />}
             </p>
           </div>
           <div className="px-4 py-3.5">
             <p className="font-mono text-[9px] uppercase tracking-[.12em] text-[var(--text-tertiary)]">
               Workspace
             </p>
-            <p className="mt-1.5 truncate font-bold">{data.schoolShort}</p>
+            <p className="mt-1.5 truncate font-bold">
+              {data ? data.schoolShort : <DashboardInlineSkeleton />}
+            </p>
           </div>
         </div>
       </header>
@@ -114,14 +122,18 @@ export function StudentDashboard({ name }: { name: string }) {
             <p className="font-mono text-[9px] font-bold uppercase tracking-[.12em] text-[var(--text-tertiary)]">
               0{index + 1} · {metricLabels[index]}
             </p>
-            <div className="mt-3 flex items-end justify-between gap-2">
-              <strong className="text-2xl font-bold tracking-[-.045em]">
-                {metric.value}
-              </strong>
-              <span className="pb-0.5 text-[10px] font-bold text-[var(--text-secondary)]">
-                {metric.note}
-              </span>
-            </div>
+            {metric.loading ? (
+              <DashboardMetricSkeleton />
+            ) : (
+              <div className="mt-3 flex items-end justify-between gap-2">
+                <strong className="text-2xl font-bold tracking-[-.045em]">
+                  {metric.value}
+                </strong>
+                <span className="pb-0.5 text-[10px] font-bold text-[var(--text-secondary)]">
+                  {metric.note}
+                </span>
+              </div>
+            )}
           </div>
         ))}
       </section>
@@ -223,31 +235,35 @@ export function StudentDashboard({ name }: { name: string }) {
             </span>
           </div>
 
-          <div className="mt-6 space-y-5">
-            {readinessSignals.map((signal) => (
-              <div key={signal.label}>
-                <div className="mb-2 flex items-center justify-between text-xs">
-                  <span className="font-bold">{signal.label}</span>
-                  <span className="font-mono text-[10px] text-[var(--text-secondary)]">
-                    {signal.value} · {signal.state}
-                  </span>
+          {data ? (
+            <div className="mt-6 space-y-5">
+              {data.readinessSignals.map((signal) => (
+                <div key={signal.label}>
+                  <div className="mb-2 flex items-center justify-between text-xs">
+                    <span className="font-bold">{signal.label}</span>
+                    <span className="font-mono text-[10px] text-[var(--text-secondary)]">
+                      {signal.value} · {signal.state}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-[var(--surface-muted)]">
+                    <div
+                      className={cn(
+                        "h-full",
+                        signal.value >= 80
+                          ? "bg-[var(--success)]"
+                          : signal.value >= 60
+                            ? "bg-[var(--warning)]"
+                            : "bg-[var(--brand)]",
+                      )}
+                      style={{ width: `${signal.value}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-1.5 bg-[var(--surface-muted)]">
-                  <div
-                    className={cn(
-                      "h-full",
-                      signal.value >= 80
-                        ? "bg-[var(--success)]"
-                        : signal.value >= 60
-                          ? "bg-[var(--warning)]"
-                          : "bg-[var(--brand)]",
-                    )}
-                    style={{ width: `${signal.value}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <ReadinessDataSkeleton />
+          )}
 
           <div className="mt-6 border-t border-[var(--border)] pt-4">
             <p className="flex items-center gap-2 text-xs font-bold">
@@ -276,7 +292,8 @@ export function StudentDashboard({ name }: { name: string }) {
             </h2>
           </div>
           <p className="text-xs text-[var(--text-secondary)]" data-motion-item>
-            {data.school} 통합 패키지 · {completed.length}개 완료
+            {data ? data.school : <DashboardInlineSkeleton className="w-28" />}{" "}
+            통합 패키지 · {completed.length}개 완료
           </p>
         </div>
 
@@ -361,41 +378,49 @@ export function StudentDashboard({ name }: { name: string }) {
               </p>
               <h2 className="mt-2 text-lg font-bold">집중 기록</h2>
             </div>
-            <p className="text-right">
-              <strong className="text-xl tracking-[-.04em]">
-                {data.practiceMinutes}분
-              </strong>
-              <span className="ml-2 text-[10px] font-bold text-[var(--success)]">
-                +{data.weeklyDelta}분
-              </span>
-            </p>
-          </div>
-          <div
-            className="mt-5 grid h-20 grid-cols-7 items-end gap-2"
-            aria-label="최근 7일 연습 기록"
-          >
-            {weeklyActivity.map((item, index) => (
-              <div
-                key={item.day}
-                className="grid h-full grid-rows-[1fr_auto] gap-2"
-              >
-                <div className="flex items-end bg-[var(--surface-muted)]">
-                  <span
-                    className={cn(
-                      "w-full bg-[var(--brand-soft)]",
-                      index === weeklyActivity.length - 1 &&
-                        "bg-[var(--brand)]",
-                    )}
-                    style={{ height: `${item.value}%` }}
-                    aria-hidden
-                  />
-                </div>
-                <span className="text-center font-mono text-[9px] text-[var(--text-tertiary)]">
-                  {item.day}
+            {data ? (
+              <p className="text-right">
+                <strong className="text-xl tracking-[-.04em]">
+                  {data.practiceMinutes}분
+                </strong>
+                <span className="ml-2 text-[10px] font-bold text-[var(--success)]">
+                  +{data.weeklyDelta}분
                 </span>
-              </div>
-            ))}
+              </p>
+            ) : (
+              <DashboardInlineSkeleton className="h-6 w-24" />
+            )}
           </div>
+          {data ? (
+            <div
+              className="mt-5 grid h-20 grid-cols-7 items-end gap-2"
+              aria-label="최근 7일 연습 기록"
+            >
+              {data.weeklyActivity.map((item, index) => (
+                <div
+                  key={item.day}
+                  className="grid h-full grid-rows-[1fr_auto] gap-2"
+                >
+                  <div className="flex items-end bg-[var(--surface-muted)]">
+                    <span
+                      className={cn(
+                        "w-full bg-[var(--brand-soft)]",
+                        index === data.weeklyActivity.length - 1 &&
+                          "bg-[var(--brand)]",
+                      )}
+                      style={{ height: `${item.value}%` }}
+                      aria-hidden
+                    />
+                  </div>
+                  <span className="text-center font-mono text-[9px] text-[var(--text-tertiary)]">
+                    {item.day}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <WeeklyActivityDataSkeleton />
+          )}
         </div>
 
         <Link

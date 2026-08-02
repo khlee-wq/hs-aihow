@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   ArrowLeft,
   ArrowRight,
@@ -30,7 +30,6 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { PageSkeleton } from "@/components/ui/skeleton";
 import { analysisPoints, journeySteps, questions } from "@/lib/mock-data";
 import { cn, sleep } from "@/lib/utils";
 import { type JourneyStep, useAppStore } from "@/stores/app-store";
@@ -42,14 +41,6 @@ export function StudentWorkspace({ step }: { step: string }) {
     ? (step as JourneyStep)
     : "essay";
   const completed = useAppStore((state) => state.completedSteps);
-  const { isPending } = useQuery({
-    queryKey: ["workspace", normalizedStep],
-    queryFn: async () => {
-      await sleep(460);
-      return { ok: true };
-    },
-  });
-  if (isPending) return <PageSkeleton type="workspace" />;
   const meta = journeySteps.find((item) => item.id === normalizedStep)!;
   return (
     <div className="grid gap-6 xl:grid-cols-[13rem_minmax(0,1fr)]">

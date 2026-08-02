@@ -103,14 +103,13 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
           const items = section.querySelectorAll("[data-motion-item]");
           gsap.fromTo(
             items.length ? items : section,
-            { autoAlpha: 0, y: 28 },
+            { y: 18 },
             {
-              autoAlpha: 1,
               y: 0,
-              duration: 0.72,
+              duration: 0.62,
               stagger: 0.08,
               ease: "power3.out",
-              clearProps: "transform,opacity,visibility",
+              clearProps: "transform",
               scrollTrigger: { trigger: section, start: "top 84%", once: true },
             },
           );

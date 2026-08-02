@@ -7,6 +7,19 @@ export type DashboardSnapshot = {
   savedAt: string;
   practiceMinutes: number;
   weeklyDelta: number;
+  readinessSignals: ReadinessSignal[];
+  weeklyActivity: WeeklyActivity[];
+};
+
+export type ReadinessSignal = {
+  label: string;
+  value: number;
+  state: string;
+};
+
+export type WeeklyActivity = {
+  day: string;
+  value: number;
 };
 
 export const dashboardSnapshot: DashboardSnapshot = {
@@ -16,6 +29,20 @@ export const dashboardSnapshot: DashboardSnapshot = {
   savedAt: "오늘 오전 10:24",
   practiceMinutes: 48,
   weeklyDelta: 16,
+  readinessSignals: [
+    { label: "경험 근거", value: 84, state: "안정" },
+    { label: "답변 구조", value: 61, state: "보완" },
+    { label: "말하기 반복", value: 48, state: "시작" },
+  ],
+  weeklyActivity: [
+    { day: "월", value: 28 },
+    { day: "화", value: 44 },
+    { day: "수", value: 20 },
+    { day: "목", value: 62 },
+    { day: "금", value: 38 },
+    { day: "토", value: 78 },
+    { day: "오늘", value: 52 },
+  ],
 };
 
 export const nextStepCopy: Record<
@@ -56,19 +83,3 @@ export const nextStepCopy: Record<
     reason: "완료한 연습에서 반복된 핵심 근거를 압축할 차례입니다.",
   },
 };
-
-export const readinessSignals = [
-  { label: "경험 근거", value: 84, state: "안정" },
-  { label: "답변 구조", value: 61, state: "보완" },
-  { label: "말하기 반복", value: 48, state: "시작" },
-] as const;
-
-export const weeklyActivity = [
-  { day: "월", value: 28 },
-  { day: "화", value: 44 },
-  { day: "수", value: 20 },
-  { day: "목", value: 62 },
-  { day: "금", value: 38 },
-  { day: "토", value: 78 },
-  { day: "오늘", value: 52 },
-] as const;

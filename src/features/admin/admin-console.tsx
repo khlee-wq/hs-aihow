@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   Activity,
   Check,
@@ -26,7 +26,6 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/status-state";
-import { PageSkeleton } from "@/components/ui/skeleton";
 import { inputClass, textareaClass } from "@/components/ui/field";
 import { cn, sleep } from "@/lib/utils";
 import { QuestionRulesPanel } from "./question-rules/question-rules-panel";
@@ -55,14 +54,6 @@ export function AdminConsole({ section }: { section: string }) {
   const normalized = validSections.has(section as AdminSection)
     ? (section as AdminSection)
     : "home";
-  const { isPending } = useQuery({
-    queryKey: ["admin", normalized],
-    queryFn: async () => {
-      await sleep(520);
-      return true;
-    },
-  });
-  if (isPending) return <PageSkeleton type="admin" />;
   if (normalized === "home") return <AdminHome />;
   if (normalized === "reviews") return <Reviews />;
   if (normalized === "questions") return <QuestionRulesPanel />;
