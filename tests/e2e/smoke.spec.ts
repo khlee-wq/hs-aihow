@@ -28,7 +28,7 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
   expect(pageErrors).toEqual([]);
 });
 
-test("학생이 가입하고 준비 화면으로 진입한다", async ({ page }) => {
+test("학생이 가입하고 준비 화면으로 진입한다", async ({ page }, testInfo) => {
   await page.goto("/signup?plan=all");
   await expect(
     page.getByRole("button", { name: /현재 .* 테마/ }),
@@ -40,11 +40,24 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page })
 
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
-    page.getByRole("heading", { name: "김하우님, 오늘도 한 걸음만 가볼까요?" }),
+    page.getByRole("heading", { name: "김하우님, 다음은 질문 연습입니다." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /이어서 준비하기/ }),
+    page.getByRole("link", { name: "질문 연습 시작하기" }),
   ).toBeVisible();
+  await expect(page.getByTestId("student-shell")).toBeVisible();
+  await expect(page.getByTestId("student-dashboard")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "준비 과정" })).toBeVisible();
+  await expect(
+    page.getByRole("progressbar", { name: "전체 준비 진행률" }),
+  ).toBeVisible();
+  if (testInfo.project.name === "mobile") {
+    await expect(page.getByTestId("student-mobile-nav")).toBeVisible();
+    await expect(page.getByTestId("student-desktop-nav")).toBeHidden();
+  } else {
+    await expect(page.getByTestId("student-desktop-nav")).toBeVisible();
+    await expect(page.getByTestId("student-mobile-nav")).toBeHidden();
+  }
   const forbiddenApi = await page.request.get("/api/question-rules");
   expect(forbiddenApi.status()).toBe(403);
   await page.goto("/admin/questions");

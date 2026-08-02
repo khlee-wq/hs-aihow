@@ -51,6 +51,11 @@ const adminNav = [
   { href: "/admin/metrics", label: "운영 지표", icon: BarChart3 },
 ];
 
+function isActive(pathname: string, href: string) {
+  if (href === "/admin" || href === "/dashboard") return pathname === href;
+  return pathname.startsWith(href);
+}
+
 export function AppShell({
   children,
   session,
@@ -61,7 +66,146 @@ export function AppShell({
   role: "student" | "expert";
 }) {
   const pathname = usePathname();
-  const nav = role === "student" ? studentNav : adminNav;
+
+  if (role === "student") {
+    return (
+      <StudentShell pathname={pathname} session={session}>
+        {children}
+      </StudentShell>
+    );
+  }
+
+  return (
+    <ExpertShell pathname={pathname} session={session}>
+      {children}
+    </ExpertShell>
+  );
+}
+
+function StudentShell({
+  children,
+  pathname,
+  session,
+}: {
+  children: React.ReactNode;
+  pathname: string;
+  session: DemoSession;
+}) {
+  return (
+    <div
+      className="min-h-[100svh] bg-[var(--canvas)]"
+      data-testid="student-shell"
+    >
+      <header className="app-navigation sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_92%,transparent)] backdrop-blur-xl">
+        <div className="mx-auto flex h-[4.5rem] max-w-[76rem] items-center gap-4 px-[var(--space-page)]">
+          <Link
+            href="/dashboard"
+            className="shrink-0 leading-none"
+            aria-label="AIHOW 학생 홈"
+          >
+            <span className="block text-[.94rem] font-black tracking-[-.045em]">
+              AIHOW
+            </span>
+            <span className="mt-1 hidden text-[.56rem] font-extrabold tracking-[.16em] text-[var(--text-tertiary)] sm:block">
+              INTERVIEW
+            </span>
+          </Link>
+
+          <div className="hidden h-5 w-px bg-[var(--border)] xl:block" />
+          <div className="hidden items-center gap-2 text-[.72rem] font-bold text-[var(--text-secondary)] xl:flex">
+            <GraduationCap className="size-3.5 text-[var(--brand)]" />
+            민사고 통합 패키지
+          </div>
+
+          <nav
+            className="ml-auto hidden items-center gap-1 md:flex"
+            aria-label="학생 메뉴"
+            data-testid="student-desktop-nav"
+          >
+            {studentNav.map(({ href, label, icon: Icon }) => {
+              const active = isActive(pathname, href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-label={label}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-bold transition-colors",
+                    active
+                      ? "bg-[var(--text-primary)] text-[var(--canvas)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
+                  )}
+                >
+                  <Icon className="size-4" strokeWidth={active ? 2.4 : 1.9} />
+                  <span className="hidden lg:inline">{label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-1 md:ml-2">
+            <ThemeToggle />
+            <Link
+              href="/settings"
+              className="grid size-10 place-items-center rounded-full text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+              aria-label="설정"
+            >
+              <Settings className="size-[17px]" />
+            </Link>
+            <Link
+              href="/settings"
+              className="ml-1 hidden size-8 place-items-center rounded-full bg-[var(--mint-soft)] text-xs font-black text-[var(--success)] sm:grid"
+              aria-label={`${session.name} 프로필`}
+            >
+              {session.name.slice(0, 1)}
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <main className="px-[var(--space-page)] pb-28 pt-8 md:pb-14 md:pt-12">
+        <div className="mx-auto max-w-[70rem]">{children}</div>
+      </main>
+
+      <nav
+        className="app-navigation fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_94%,transparent)] px-1 pb-[max(.35rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[var(--shadow-md)] backdrop-blur-xl md:hidden"
+        aria-label="모바일 학생 메뉴"
+        data-testid="student-mobile-nav"
+      >
+        {studentNav.map(({ href, label, icon: Icon }) => {
+          const active = isActive(pathname, href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "grid min-h-12 place-items-center gap-0.5 rounded-[var(--radius-sm)] text-[10px] font-bold",
+                active
+                  ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                  : "text-[var(--text-tertiary)]",
+              )}
+              aria-current={active ? "page" : undefined}
+            >
+              <Icon className="size-[18px]" strokeWidth={active ? 2.6 : 1.9} />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
+  );
+}
+
+function ExpertShell({
+  children,
+  pathname,
+  session,
+}: {
+  children: React.ReactNode;
+  pathname: string;
+  session: DemoSession;
+}) {
   return (
     <div className="min-h-[100svh] bg-[var(--canvas)] md:grid md:grid-cols-[15.5rem_1fr]">
       <aside className="app-navigation sticky top-0 hidden h-[100svh] flex-col border-r border-[var(--border)] bg-[var(--surface)] p-4 md:flex">
@@ -69,19 +213,11 @@ export function AppShell({
           <Logo />
         </div>
         <div className="mt-6 px-3">
-          <span className="eyebrow">
-            {role === "student" ? "Student journey" : "Expert operations"}
-          </span>
+          <span className="eyebrow">Expert operations</span>
         </div>
-        <nav
-          className="mt-3 grid gap-1"
-          aria-label={role === "student" ? "학생 메뉴" : "전문가 메뉴"}
-        >
-          {nav.map(({ href, label, icon: Icon }) => {
-            const active =
-              href === "/admin" || href === "/dashboard"
-                ? pathname === href
-                : pathname.startsWith(href);
+        <nav className="mt-3 grid gap-1" aria-label="전문가 메뉴">
+          {adminNav.map(({ href, label, icon: Icon }) => {
+            const active = isActive(pathname, href);
             return (
               <Link
                 key={href}
@@ -116,7 +252,7 @@ export function AppShell({
             <div className="min-w-0">
               <p className="truncate text-sm font-bold">{session.name}</p>
               <p className="truncate text-xs text-[var(--text-tertiary)]">
-                {role === "student" ? "학생·학부모" : "전문가"}
+                전문가
               </p>
             </div>
           </div>
@@ -129,9 +265,7 @@ export function AppShell({
           </div>
           <div className="hidden items-center gap-2 text-xs font-bold text-[var(--text-secondary)] md:flex">
             <GraduationCap className="size-4 text-[var(--brand)]" />
-            {role === "student"
-              ? "민사고 통합 패키지 · 준비 중"
-              : "2027학년도 운영 기준"}
+            2027학년도 운영 기준
           </div>
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
@@ -144,68 +278,34 @@ export function AppShell({
             </Link>
           </div>
         </header>
-        {role === "expert" ? (
-          <nav
-            className="app-navigation no-scrollbar sticky top-16 z-20 flex gap-1 overflow-x-auto border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_94%,transparent)] px-3 py-2 backdrop-blur-xl md:hidden"
-            aria-label="모바일 전문가 메뉴"
-          >
-            {adminNav.map(({ href, label, icon: Icon }) => {
-              const active =
-                href === "/admin"
-                  ? pathname === href
-                  : pathname.startsWith(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-xs font-bold",
-                    active
-                      ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                      : "text-[var(--text-secondary)]",
-                  )}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <Icon className="size-4" />
-                  {label}
-                </Link>
-              );
-            })}
-          </nav>
-        ) : null}
-        <main className="px-[var(--space-page)] py-7 pb-28 md:py-10 md:pb-12">
-          <div className="mx-auto max-w-[74rem]">{children}</div>
-        </main>
-      </div>
-      {role === "student" ? (
         <nav
-          className="app-navigation fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_94%,transparent)] px-1 pb-[max(.45rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl md:hidden"
-          aria-label="모바일 학생 메뉴"
+          className="app-navigation no-scrollbar sticky top-16 z-20 flex gap-1 overflow-x-auto border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_94%,transparent)] px-3 py-2 backdrop-blur-xl md:hidden"
+          aria-label="모바일 전문가 메뉴"
         >
-          {studentNav.map(({ href, label, icon: Icon }) => {
-            const active =
-              href === "/dashboard"
-                ? pathname === href
-                : pathname.startsWith(href);
+          {adminNav.map(({ href, label, icon: Icon }) => {
+            const active = isActive(pathname, href);
             return (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  "grid min-h-12 place-items-center gap-0.5 rounded-[var(--radius-xs)] text-[10px] font-bold",
+                  "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-xs font-bold",
                   active
-                    ? "text-[var(--brand)]"
-                    : "text-[var(--text-tertiary)]",
+                    ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                    : "text-[var(--text-secondary)]",
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className={cn("size-5", active && "stroke-[2.7]")} />
+                <Icon className="size-4" />
                 {label}
               </Link>
             );
           })}
         </nav>
-      ) : null}
+        <main className="px-[var(--space-page)] py-7 pb-28 md:py-10 md:pb-12">
+          <div className="mx-auto max-w-[74rem]">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }
