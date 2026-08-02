@@ -96,25 +96,30 @@ function StudentShell({
       className="min-h-[100svh] bg-[var(--canvas)]"
       data-testid="student-shell"
     >
-      <header className="app-navigation sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_92%,transparent)] backdrop-blur-xl">
-        <div className="mx-auto flex h-[4.5rem] max-w-[76rem] items-center gap-4 px-[var(--space-page)]">
+      <header className="app-navigation sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_94%,transparent)] backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-[80rem] items-center gap-4 px-[var(--space-page)]">
           <Link
             href="/dashboard"
-            className="shrink-0 leading-none"
+            className="flex shrink-0 items-center gap-2.5 leading-none"
             aria-label="AIHOW 학생 홈"
           >
-            <span className="block text-[.94rem] font-black tracking-[-.045em]">
-              AIHOW
+            <span className="grid size-7 place-items-center bg-[var(--text-primary)] text-[10px] font-black text-[var(--canvas)]">
+              A
             </span>
-            <span className="mt-1 hidden text-[.56rem] font-extrabold tracking-[.16em] text-[var(--text-tertiary)] sm:block">
-              INTERVIEW
+            <span>
+              <span className="block text-[.9rem] font-black tracking-[-.045em]">
+                AIHOW
+              </span>
+              <span className="mt-1 hidden font-mono text-[.5rem] font-bold tracking-[.14em] text-[var(--text-tertiary)] sm:block">
+                PREP OS
+              </span>
             </span>
           </Link>
 
-          <div className="hidden h-5 w-px bg-[var(--border)] xl:block" />
-          <div className="hidden items-center gap-2 text-[.72rem] font-bold text-[var(--text-secondary)] xl:flex">
-            <GraduationCap className="size-3.5 text-[var(--brand)]" />
-            민사고 통합 패키지
+          <div className="hidden h-6 w-px bg-[var(--border)] xl:block" />
+          <div className="hidden items-center gap-2 text-[.7rem] font-bold text-[var(--text-secondary)] xl:flex">
+            <span className="size-1.5 rounded-full bg-[var(--success)]" />
+            민사고 · 2027
           </div>
 
           <nav
@@ -131,31 +136,34 @@ function StudentShell({
                   aria-label={label}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-bold transition-colors",
+                    "relative inline-flex min-h-10 items-center gap-2 px-3 text-xs font-bold transition-colors after:absolute after:inset-x-3 after:-bottom-3 after:h-px after:origin-center after:scale-x-0 after:bg-[var(--brand)] after:transition-transform",
                     active
-                      ? "bg-[var(--text-primary)] text-[var(--canvas)]"
-                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
+                      ? "text-[var(--text-primary)] after:scale-x-100"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
                   )}
                 >
-                  <Icon className="size-4" strokeWidth={active ? 2.4 : 1.9} />
+                  <Icon
+                    className={cn("size-3.5", active && "text-[var(--brand)]")}
+                    strokeWidth={active ? 2.4 : 1.9}
+                  />
                   <span className="hidden lg:inline">{label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          <div className="ml-auto flex items-center gap-1 md:ml-2">
+          <div className="ml-auto flex items-center gap-0.5 border-l border-[var(--border)] pl-2 md:ml-2">
             <ThemeToggle />
             <Link
               href="/settings"
-              className="grid size-10 place-items-center rounded-full text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+              className="grid size-9 place-items-center text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
               aria-label="설정"
             >
               <Settings className="size-[17px]" />
             </Link>
             <Link
               href="/settings"
-              className="ml-1 hidden size-8 place-items-center rounded-full bg-[var(--mint-soft)] text-xs font-black text-[var(--success)] sm:grid"
+              className="ml-1 hidden size-8 place-items-center border border-[var(--border)] bg-[var(--mint-soft)] text-xs font-black text-[var(--success)] sm:grid"
               aria-label={`${session.name} 프로필`}
             >
               {session.name.slice(0, 1)}
@@ -164,12 +172,12 @@ function StudentShell({
         </div>
       </header>
 
-      <main className="px-[var(--space-page)] pb-28 pt-8 md:pb-14 md:pt-12">
-        <div className="mx-auto max-w-[70rem]">{children}</div>
+      <main className="px-[var(--space-page)] pb-28 pt-7 md:pb-14 md:pt-9">
+        <div className="mx-auto max-w-[72rem]">{children}</div>
       </main>
 
       <nav
-        className="app-navigation fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_94%,transparent)] px-1 pb-[max(.35rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[var(--shadow-md)] backdrop-blur-xl md:hidden"
+        className="app-navigation fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 border border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_94%,transparent)] px-1 pb-[max(.35rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[var(--shadow-md)] backdrop-blur-xl md:hidden"
         aria-label="모바일 학생 메뉴"
         data-testid="student-mobile-nav"
       >
@@ -180,10 +188,10 @@ function StudentShell({
               key={href}
               href={href}
               className={cn(
-                "grid min-h-12 place-items-center gap-0.5 rounded-[var(--radius-sm)] text-[10px] font-bold",
+                "grid min-h-12 place-items-center gap-0.5 border-t-2 text-[10px] font-bold",
                 active
-                  ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                  : "text-[var(--text-tertiary)]",
+                  ? "border-[var(--brand)] bg-[var(--brand-soft)] text-[var(--brand)]"
+                  : "border-transparent text-[var(--text-tertiary)]",
               )}
               aria-current={active ? "page" : undefined}
             >

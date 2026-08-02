@@ -21,36 +21,46 @@ export function PageSkeleton({
   if (type === "dashboard")
     return (
       <div
-        className="space-y-12"
+        className="space-y-8 md:space-y-10"
         aria-label="페이지를 불러오는 중"
         role="status"
       >
-        <div className="grid gap-6 border-b border-[var(--border)] pb-9 md:grid-cols-[minmax(0,1fr)_12rem]">
+        <div className="grid gap-6 border-b border-[var(--border)] pb-7 md:grid-cols-[minmax(0,1fr)_17rem]">
           <div className="space-y-4">
-            <Skeleton className="h-3 w-20" />
-            <Skeleton className="h-12 max-w-2xl" />
-            <Skeleton className="h-5 max-w-md" />
+            <Skeleton className="h-3 w-36 rounded-none" />
+            <Skeleton className="h-11 max-w-2xl rounded-none" />
+            <Skeleton className="h-4 max-w-lg rounded-none" />
           </div>
-          <div className="space-y-3 border-l-2 border-[var(--border)] pl-4">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-10 w-28" />
+          <div className="grid grid-cols-2 border border-[var(--border)]">
+            <Skeleton className="h-16 rounded-none border-r border-[var(--border)]" />
+            <Skeleton className="h-16 rounded-none" />
           </div>
         </div>
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(17rem,.65fr)]">
-          <Skeleton className="h-72 rounded-[var(--radius-xl)]" />
-          <Skeleton className="h-72 rounded-[var(--radius-xl)]" />
+        <div className="grid grid-cols-2 border border-[var(--border)] lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton
+              key={index}
+              className="h-20 rounded-none border-r border-[var(--border)] last:border-r-0"
+            />
+          ))}
+        </div>
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(19rem,.65fr)]">
+          <Skeleton className="h-80 rounded-none" />
+          <Skeleton className="h-80 rounded-none" />
         </div>
         <div className="space-y-4">
-          <Skeleton className="h-7 w-32" />
-          <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)]">
+          <Skeleton className="h-7 w-32 rounded-none" />
+          <div className="grid overflow-hidden border border-[var(--border)] md:grid-cols-5">
             {Array.from({ length: 5 }).map((_, index) => (
               <Skeleton
                 key={index}
-                className="h-[5.5rem] rounded-none border-b border-[var(--border)] last:border-b-0"
+                className="h-20 rounded-none border-b border-r border-[var(--border)] last:border-r-0 md:h-[8.5rem] md:border-b-0"
               />
             ))}
           </div>
+          <Skeleton className="h-7 rounded-none" />
         </div>
+        <Skeleton className="h-40 rounded-none" />
         <span className="sr-only">콘텐츠를 불러오고 있습니다.</span>
       </div>
     );

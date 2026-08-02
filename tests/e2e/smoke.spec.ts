@@ -47,6 +47,13 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   ).toBeVisible();
   await expect(page.getByTestId("student-shell")).toBeVisible();
   await expect(page.getByTestId("student-dashboard")).toBeVisible();
+  await expect(page.getByText("AI briefing", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "이번 주 준비 신호" }),
+  ).toBeVisible();
+  await expect(
+    page.locator("[data-testid=student-dashboard] [data-lottie-orbit] svg"),
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "준비 과정" })).toBeVisible();
   await expect(
     page.getByRole("progressbar", { name: "전체 준비 진행률" }),
@@ -58,6 +65,14 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
     await expect(page.getByTestId("student-desktop-nav")).toBeVisible();
     await expect(page.getByTestId("student-mobile-nav")).toBeHidden();
   }
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.getByRole("link", { name: "질문 연습 시작하기" }).click();
+  await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
+  await expect(page.getByText("예상 질문 퀘스트", { exact: true })).toBeVisible();
   const forbiddenApi = await page.request.get("/api/question-rules");
   expect(forbiddenApi.status()).toBe(403);
   await page.goto("/admin/questions");
