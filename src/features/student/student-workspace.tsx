@@ -34,12 +34,8 @@ import { analysisPoints, journeySteps, questions } from "@/lib/mock-data";
 import { cn, sleep } from "@/lib/utils";
 import { type JourneyStep, useAppStore } from "@/stores/app-store";
 
-const validSteps = new Set<JourneyStep>(journeySteps.map((item) => item.id));
-
-export function StudentWorkspace({ step }: { step: string }) {
-  const normalizedStep = validSteps.has(step as JourneyStep)
-    ? (step as JourneyStep)
-    : "essay";
+export function StudentWorkspace({ step }: { step: JourneyStep }) {
+  const normalizedStep = step;
   const completed = useAppStore((state) => state.completedSteps);
   const meta = journeySteps.find((item) => item.id === normalizedStep)!;
   return (
@@ -919,7 +915,7 @@ function CheatSheetStep() {
       {saved ? (
         <div
           role="status"
-          className="no-print fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[var(--surface-inverse)] px-5 py-3 text-xs font-bold text-[var(--text-inverse)] shadow-[var(--shadow-md)]"
+          className="no-print fixed bottom-24 left-1/2 z-50 -translate-x-1/2 bg-[var(--surface-inverse)] px-5 py-3 text-xs font-bold text-[var(--text-inverse)]"
         >
           파이널 노트를 저장했어요
         </div>

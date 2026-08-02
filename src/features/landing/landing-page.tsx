@@ -1,22 +1,74 @@
 import Link from "next/link";
-import { ArrowRight, BookOpenCheck, BrainCircuit, Check, ChevronRight, FileCheck2, Fingerprint, MessageCircleQuestion, Mic2, Play, ShieldCheck, Sparkles, UserRoundCheck } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpenCheck,
+  BrainCircuit,
+  Check,
+  ChevronRight,
+  FileCheck2,
+  Fingerprint,
+  MessageCircleQuestion,
+  Mic2,
+  Play,
+  ShieldCheck,
+  Sparkles,
+  UserRoundCheck,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { JourneyOrbit } from "@/components/motion/journey-orbit";
 
 const products = [
-  { title: "자소서 코칭", tag: "글을 다듬는 준비", description: "초안의 소재와 논리를 이해하고, 내 언어로 완성해요.", features: ["자소서 구조 진단", "핵심 소재 맵", "전문가 영상 가이드"], tone: "mint" },
-  { title: "면접 훈련", tag: "말로 바꾸는 준비", description: "자소서 근거에서 시작한 질문에 답하며 실전 감각을 만들어요.", features: ["학교별 예상 질문", "꼬리질문 퀘스트", "음성 모의면접"], tone: "blue" },
-  { title: "통합 패키지", tag: "쓰고, 생각하고, 말하기", description: "자소서에서 면접 직전 한 장까지 하나의 과정으로 연결해요.", features: ["모든 코칭·훈련", "진행 이력 연결", "1페이지 파이널 노트"], tone: "coral" },
+  {
+    title: "자소서 코칭",
+    tag: "글을 다듬는 준비",
+    description: "초안의 소재와 논리를 이해하고, 내 언어로 완성해요.",
+    features: ["자소서 구조 진단", "핵심 소재 맵", "전문가 영상 가이드"],
+    tone: "mint",
+  },
+  {
+    title: "면접 훈련",
+    tag: "말로 바꾸는 준비",
+    description: "자소서 근거에서 시작한 질문에 답하며 실전 감각을 만들어요.",
+    features: ["학교별 예상 질문", "꼬리질문 퀘스트", "음성 모의면접"],
+    tone: "blue",
+  },
+  {
+    title: "통합 패키지",
+    tag: "쓰고, 생각하고, 말하기",
+    description: "자소서에서 면접 직전 한 장까지 하나의 과정으로 연결해요.",
+    features: ["모든 코칭·훈련", "진행 이력 연결", "1페이지 파이널 노트"],
+    tone: "coral",
+  },
 ];
 
 const journey = [
-  { icon: FileCheck2, title: "자소서 확인", text: "업로드한 원문과 추출 결과를 먼저 직접 확인해요." },
-  { icon: BrainCircuit, title: "핵심 분석", text: "답변의 근거가 될 소재와 논리 포인트를 찾습니다." },
-  { icon: MessageCircleQuestion, title: "질문 훈련", text: "예상 질문부터 꼬리질문까지 한 단계씩 답해요." },
-  { icon: Mic2, title: "실전 연습", text: "원하는 면접관 방식으로 말하는 연습을 반복해요." },
-  { icon: BookOpenCheck, title: "파이널 노트", text: "면접 직전 볼 핵심 답변을 한 장으로 정리해요." },
+  {
+    icon: FileCheck2,
+    title: "자소서 확인",
+    text: "업로드한 원문과 추출 결과를 먼저 직접 확인해요.",
+  },
+  {
+    icon: BrainCircuit,
+    title: "핵심 분석",
+    text: "답변의 근거가 될 소재와 논리 포인트를 찾습니다.",
+  },
+  {
+    icon: MessageCircleQuestion,
+    title: "질문 훈련",
+    text: "예상 질문부터 꼬리질문까지 한 단계씩 답해요.",
+  },
+  {
+    icon: Mic2,
+    title: "실전 연습",
+    text: "원하는 면접관 방식으로 말하는 연습을 반복해요.",
+  },
+  {
+    icon: BookOpenCheck,
+    title: "파이널 노트",
+    text: "면접 직전 볼 핵심 답변을 한 장으로 정리해요.",
+  },
 ];
 
 export function LandingPage() {
@@ -27,30 +79,405 @@ export function LandingPage() {
         <div className="page-wrap grid items-center gap-14 lg:grid-cols-[1.05fr_.95fr]">
           <div className="float-in" data-motion-hero>
             <p className="eyebrow mb-6">AIHOW Interview</p>
-            <h1 className="display text-balance">자소서가 끝나면,<br /><span className="text-[var(--brand)]">말할 준비</span>가 시작됩니다.</h1>
-            <p className="mt-7 max-w-xl text-base leading-8 text-[var(--text-secondary)] sm:text-lg">전문가의 기준과 나의 실제 자소서를 연결해, 예상 질문부터 음성 면접과 한 장의 파이널 노트까지 준비하세요.</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row"><Link className={cn(buttonVariants({ size: "lg" }), "group")} href="/signup">내 준비 시작하기 <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" /></Link><Link className={buttonVariants({ variant: "secondary", size: "lg" })} href="#journey"><Play className="size-4 fill-current" />준비 과정 보기</Link></div>
-            <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs font-bold text-[var(--text-secondary)]"><span className="flex items-center gap-2"><Check className="size-4 text-[var(--success)]" />학생이 직접 완성</span><span className="flex items-center gap-2"><Check className="size-4 text-[var(--success)]" />전문가 기준 기반</span><span className="flex items-center gap-2"><Check className="size-4 text-[var(--success)]" />자료 보관 상태 확인</span></div>
+            <h1 className="display text-balance">
+              자소서가 끝나면,
+              <br />
+              <span className="text-[var(--brand)]">말할 준비</span>가
+              시작됩니다.
+            </h1>
+            <p className="mt-7 max-w-xl text-base leading-8 text-[var(--text-secondary)] sm:text-lg">
+              전문가의 기준과 나의 실제 자소서를 연결해, 예상 질문부터 음성
+              면접과 한 장의 파이널 노트까지 준비하세요.
+            </p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link
+                className={cn(buttonVariants({ size: "lg" }), "group")}
+                href="/signup"
+              >
+                내 준비 시작하기{" "}
+                <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
+                className={buttonVariants({ variant: "secondary", size: "lg" })}
+                href="#journey"
+              >
+                <Play className="size-4 fill-current" />
+                준비 과정 보기
+              </Link>
+            </div>
+            <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs font-bold text-[var(--text-secondary)]">
+              <span className="flex items-center gap-2">
+                <Check className="size-4 text-[var(--success)]" />
+                학생이 직접 완성
+              </span>
+              <span className="flex items-center gap-2">
+                <Check className="size-4 text-[var(--success)]" />
+                전문가 기준 기반
+              </span>
+              <span className="flex items-center gap-2">
+                <Check className="size-4 text-[var(--success)]" />
+                자료 보관 상태 확인
+              </span>
+            </div>
           </div>
           <HeroPreview />
         </div>
       </section>
 
-      <section className="border-y border-[var(--border)] bg-[var(--surface)] py-8" data-motion-reveal><div className="page-wrap grid gap-6 text-center sm:grid-cols-3"><Role icon={Sparkles} title="AI는" text="근거를 정리하고 질문해요" /><Role icon={UserRoundCheck} title="전문가는" text="판단 기준을 설계해요" /><Role icon={Fingerprint} title="학생은" text="생각하고 직접 완성해요" /></div></section>
+      <section
+        className="border-y border-[var(--border)] bg-[var(--surface)] py-8"
+        data-motion-reveal
+      >
+        <div className="page-wrap grid gap-6 text-center sm:grid-cols-3">
+          <Role icon={Sparkles} title="AI는" text="근거를 정리하고 질문해요" />
+          <Role
+            icon={UserRoundCheck}
+            title="전문가는"
+            text="판단 기준을 설계해요"
+          />
+          <Role
+            icon={Fingerprint}
+            title="학생은"
+            text="생각하고 직접 완성해요"
+          />
+        </div>
+      </section>
 
-      <section id="products" className="scroll-mt-24 py-24 lg:py-32" data-motion-reveal><div className="page-wrap"><SectionIntro eyebrow="Choose your path" title="지금 필요한 준비부터 시작하세요" text="각 상품은 독립적으로 사용할 수 있고, 통합 패키지에서는 앞 단계의 결과가 다음 준비로 자연스럽게 이어집니다." /><div className="mt-12 grid gap-5 lg:grid-cols-3">{products.map((product, index) => <Card key={product.title} data-motion-item className={cn("relative flex flex-col overflow-hidden p-7", index === 2 && "border-[color-mix(in_srgb,var(--coral)_45%,var(--border))]")}><div className={cn("absolute inset-x-0 top-0 h-1.5", product.tone === "mint" ? "bg-[var(--mint)]" : product.tone === "coral" ? "bg-[var(--coral)]" : "bg-[var(--brand)]")} /><p className="mt-2 text-xs font-extrabold text-[var(--text-tertiary)]">{product.tag}</p><h3 className="mt-3 text-2xl font-black tracking-[-.04em]">{product.title}</h3><p className="mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]">{product.description}</p><ul className="mt-7 grid gap-3">{product.features.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm font-bold"><span className="grid size-5 place-items-center rounded-full bg-[var(--mint-soft)]"><Check className="size-3 text-[var(--success)]" /></span>{feature}</li>)}</ul><Link href={`/signup?plan=${index === 0 ? "essay" : index === 1 ? "interview" : "all"}`} className="mt-8 inline-flex items-center gap-1 text-sm font-extrabold text-[var(--brand)]">이 과정으로 시작하기 <ChevronRight className="size-4" /></Link></Card>)}</div></div></section>
+      <section
+        id="products"
+        className="scroll-mt-24 py-24 lg:py-32"
+        data-motion-reveal
+      >
+        <div className="page-wrap">
+          <SectionIntro
+            eyebrow="Choose your path"
+            title="지금 필요한 준비부터 시작하세요"
+            text="각 상품은 독립적으로 사용할 수 있고, 통합 패키지에서는 앞 단계의 결과가 다음 준비로 자연스럽게 이어집니다."
+          />
+          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            {products.map((product, index) => (
+              <Card
+                key={product.title}
+                data-motion-item
+                className={cn(
+                  "relative flex flex-col overflow-hidden p-7",
+                  index === 2 &&
+                    "border-[color-mix(in_srgb,var(--coral)_45%,var(--border))]",
+                )}
+              >
+                <div
+                  className={cn(
+                    "absolute inset-x-0 top-0 h-1.5",
+                    product.tone === "mint"
+                      ? "bg-[var(--mint)]"
+                      : product.tone === "coral"
+                        ? "bg-[var(--coral)]"
+                        : "bg-[var(--brand)]",
+                  )}
+                />
+                <p className="mt-2 text-xs font-extrabold text-[var(--text-tertiary)]">
+                  {product.tag}
+                </p>
+                <h3 className="mt-3 text-2xl font-black tracking-[-.04em]">
+                  {product.title}
+                </h3>
+                <p className="mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]">
+                  {product.description}
+                </p>
+                <ul className="mt-7 grid gap-3">
+                  {product.features.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-center gap-2 text-sm font-bold"
+                    >
+                      <span className="grid size-5 place-items-center rounded-full bg-[var(--mint-soft)]">
+                        <Check className="size-3 text-[var(--success)]" />
+                      </span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={`/signup?plan=${index === 0 ? "essay" : index === 1 ? "interview" : "all"}`}
+                  className="mt-8 inline-flex items-center gap-1 text-sm font-extrabold text-[var(--brand)]"
+                >
+                  이 과정으로 시작하기 <ChevronRight className="size-4" />
+                </Link>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <section id="journey" className="scroll-mt-24 bg-[var(--surface-inverse)] py-24 text-[var(--text-inverse)] lg:py-32" data-motion-reveal><div className="page-wrap"><SectionIntro eyebrow="One clear journey" title="한 화면에, 지금 할 일 하나" text="무엇을 물어볼지 고민하는 채팅이 아닙니다. 완료한 결과가 다음 단계의 준비물이 되는 명확한 경로입니다." inverse /><div className="mt-14 grid gap-3 lg:grid-cols-5">{journey.map(({ icon: Icon, title, text }, index) => <div key={title} data-motion-item className="relative rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,var(--text-inverse)_9%,transparent)] p-5"><div className="mb-8 flex items-center justify-between"><span className="text-xs font-black opacity-50">0{index + 1}</span><Icon className="size-5 text-[var(--mint)]" /></div><h3 className="font-extrabold">{title}</h3><p className="mt-2 text-sm leading-6 opacity-65">{text}</p>{index < journey.length - 1 ? <ChevronRight className="absolute -right-4 top-1/2 z-10 hidden size-5 opacity-40 lg:block" /> : null}</div>)}</div></div></section>
+      <section
+        id="journey"
+        className="scroll-mt-24 bg-[var(--surface-inverse)] py-24 text-[var(--text-inverse)] lg:py-32"
+        data-motion-reveal
+      >
+        <div className="page-wrap">
+          <SectionIntro
+            eyebrow="One clear journey"
+            title="한 화면에, 지금 할 일 하나"
+            text="무엇을 물어볼지 고민하는 채팅이 아닙니다. 완료한 결과가 다음 단계의 준비물이 되는 명확한 경로입니다."
+            inverse
+          />
+          <div className="mt-14 grid gap-3 lg:grid-cols-5">
+            {journey.map(({ icon: Icon, title, text }, index) => (
+              <div
+                key={title}
+                data-motion-item
+                className="relative rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,var(--text-inverse)_9%,transparent)] p-5"
+              >
+                <div className="mb-8 flex items-center justify-between">
+                  <span className="text-xs font-black opacity-50">
+                    0{index + 1}
+                  </span>
+                  <Icon className="size-5 text-[var(--mint)]" />
+                </div>
+                <h3 className="font-extrabold">{title}</h3>
+                <p className="mt-2 text-sm leading-6 opacity-65">{text}</p>
+                {index < journey.length - 1 ? (
+                  <ChevronRight className="absolute -right-4 top-1/2 z-10 hidden size-5 opacity-40 lg:block" />
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <section id="experts" className="scroll-mt-24 py-24 lg:py-32"><div className="page-wrap grid items-center gap-14 lg:grid-cols-2"><div><SectionIntro eyebrow="Human-guided AI" title="좋은 질문은, 좋은 기준에서 시작됩니다" text="원장·소장·컨설턴트가 학교별 판단 기준과 질문 규칙을 직접 등록하고, AI 결과를 검수합니다." /><div className="mt-8 grid gap-4"><ExpertPoint icon={MessageCircleQuestion} title="질문 기준과 꼬리질문 규칙" text="학교·학년도·전형과 자소서 근거를 함께 연결합니다." /><ExpertPoint icon={ShieldCheck} title="승인 상태와 변경 이력" text="전문가가 제공 범위를 알고 직접 검수할 수 있습니다." /><ExpertPoint icon={Play} title="필요한 순간의 짧은 영상" text="긴 강의보다 구체적인 코칭 지점에 가이드를 제공합니다." /></div></div><ExpertConsole /></div></section>
+      <section id="experts" className="scroll-mt-24 py-24 lg:py-32">
+        <div className="page-wrap grid items-center gap-14 lg:grid-cols-2">
+          <div>
+            <SectionIntro
+              eyebrow="Human-guided AI"
+              title="좋은 질문은, 좋은 기준에서 시작됩니다"
+              text="원장·소장·컨설턴트가 학교별 판단 기준과 질문 규칙을 직접 등록하고, AI 결과를 검수합니다."
+            />
+            <div className="mt-8 grid gap-4">
+              <ExpertPoint
+                icon={MessageCircleQuestion}
+                title="질문 기준과 꼬리질문 규칙"
+                text="학교·학년도·전형과 자소서 근거를 함께 연결합니다."
+              />
+              <ExpertPoint
+                icon={ShieldCheck}
+                title="승인 상태와 변경 이력"
+                text="전문가가 제공 범위를 알고 직접 검수할 수 있습니다."
+              />
+              <ExpertPoint
+                icon={Play}
+                title="필요한 순간의 짧은 영상"
+                text="긴 강의보다 구체적인 코칭 지점에 가이드를 제공합니다."
+              />
+            </div>
+          </div>
+          <ExpertConsole />
+        </div>
+      </section>
 
-      <section className="pb-24 lg:pb-32"><div className="page-wrap rounded-[var(--radius-xl)] bg-[var(--brand)] px-6 py-14 text-center text-white sm:px-12 lg:py-20"><p className="text-xs font-black uppercase tracking-[.14em] text-white/65">Ready when you are</p><h2 className="mx-auto mt-4 max-w-3xl text-balance text-3xl font-black tracking-[-.05em] sm:text-5xl">면접 직전의 한 장까지,<br />오늘 첫 질문부터 준비하세요.</h2><p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/75">데모 단계에서는 어떤 이메일로 가입해도 전체 인터페이스를 바로 확인할 수 있습니다.</p><Link href="/signup" className={cn(buttonVariants({ variant: "secondary", size: "lg" }), "mt-8 border-transparent bg-white text-[var(--brand-on-white)] hover:bg-white/90")}>무료로 둘러보기 <ArrowRight className="size-5" /></Link></div></section>
+      <section className="pb-24 lg:pb-32">
+        <div className="page-wrap rounded-[var(--radius-xl)] bg-[var(--brand)] px-6 py-14 text-center text-white sm:px-12 lg:py-20">
+          <p className="text-xs font-black uppercase tracking-[.14em] text-white/65">
+            Ready when you are
+          </p>
+          <h2 className="mx-auto mt-4 max-w-3xl text-balance text-3xl font-black tracking-[-.05em] sm:text-5xl">
+            면접 직전의 한 장까지,
+            <br />
+            오늘 첫 질문부터 준비하세요.
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/75">
+            데모 단계에서는 어떤 이메일로 가입해도 전체 인터페이스를 바로 확인할
+            수 있습니다.
+          </p>
+          <Link
+            href="/signup"
+            className={cn(
+              buttonVariants({ variant: "secondary", size: "lg" }),
+              "mt-8 border-transparent bg-white text-[var(--brand-on-white)] hover:bg-white/90",
+            )}
+          >
+            무료로 둘러보기 <ArrowRight className="size-5" />
+          </Link>
+        </div>
+      </section>
     </>
   );
 }
 
-function SectionIntro({ eyebrow, title, text, inverse = false }: { eyebrow: string; title: string; text: string; inverse?: boolean }) { return <div className="max-w-2xl"><p className={cn("eyebrow", inverse && "text-[var(--mint)]")}>{eyebrow}</p><h2 className="heading-xl mt-4 text-balance">{title}</h2><p className={cn("mt-5 text-base leading-8", inverse ? "text-white/65" : "text-[var(--text-secondary)]")}>{text}</p></div>; }
-function Role({ icon: Icon, title, text }: { icon: typeof Sparkles; title: string; text: string }) { return <div className="flex items-center justify-center gap-3"><Icon className="size-5 text-[var(--brand)]" /><p className="text-sm"><strong>{title}</strong> <span className="text-[var(--text-secondary)]">{text}</span></p></div>; }
-function ExpertPoint({ icon: Icon, title, text }: { icon: typeof Sparkles; title: string; text: string }) { return <div className="flex gap-4 rounded-[var(--radius-md)] p-2"><div className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--brand-soft)] text-[var(--brand)]"><Icon className="size-5" /></div><div><h3 className="font-extrabold">{title}</h3><p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">{text}</p></div></div>; }
-function HeroPreview() { return <div className="relative mx-auto w-full max-w-[33rem] lg:mr-0" data-motion-float><div className="absolute -inset-5 -z-10 rotate-3 rounded-[var(--radius-xl)] bg-[var(--mint-soft)]" /><Card className="overflow-hidden p-0 shadow-[var(--shadow-md)]"><div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4"><div className="flex items-center gap-2"><span className="size-2.5 rounded-full bg-[var(--coral)]" /><span className="size-2.5 rounded-full bg-[var(--warning)]" /><span className="size-2.5 rounded-full bg-[var(--mint)]" /></div><span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-tertiary)]">Today’s practice</span></div><div className="p-6 sm:p-8"><div className="flex items-start justify-between gap-4"><div><p className="eyebrow">오늘의 질문 2/5</p><h3 className="mt-3 text-xl font-black leading-snug">지원 학교의 교육 철학과<br />내 경험을 연결해 설명해 보세요.</h3></div><div data-lottie-orbit className="grid size-14 shrink-0 place-items-center rounded-full bg-[var(--brand-soft)]"><JourneyOrbit className="size-14" /></div></div><div className="mt-7 rounded-[var(--radius-md)] bg-[var(--surface-muted)] p-4"><p className="text-xs font-black text-[var(--brand)]">자소서 근거</p><p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">“과학 동아리에서 결과보다 실험 설계의 과정을 기록했습니다…”</p></div><div className="mt-5 h-28 rounded-[var(--radius-md)] border border-[var(--border)] p-4 text-sm text-[var(--text-tertiary)]">내 생각을 먼저 적어 보세요.</div><div className="mt-5 flex items-center justify-between"><span className="text-xs font-bold text-[var(--text-secondary)]">자동 저장됨</span><span className="rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 py-3 text-xs font-black text-white">답변 저장</span></div></div></Card><div className="absolute -bottom-5 -left-5 hidden items-center gap-3 rounded-[var(--radius-md)] bg-[var(--surface)] p-4 shadow-[var(--shadow-md)] sm:flex"><span className="grid size-10 place-items-center rounded-full bg-[var(--mint-soft)] text-[var(--success)]"><Check /></span><div><p className="text-xs font-black">준비 진행률</p><p className="text-[11px] text-[var(--text-secondary)]">오늘 한 단계 완료했어요</p></div></div></div>; }
-function ExpertConsole() { return <Card className="relative overflow-hidden bg-[var(--surface-inverse)] p-6 text-[var(--text-inverse)] shadow-[var(--shadow-md)]"><div className="flex items-center justify-between"><div><p className="text-xs font-black text-[var(--mint)]">EXPERT CONSOLE</p><h3 className="mt-2 text-xl font-black">질문 기준 검수</h3></div><span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">검수 대기 12</span></div><div className="mt-8 grid gap-3">{["지원 동기 · 자소서 근거 연결", "협업 경험 · 역할 구체성", "탐구 과정 · 실패 이후 수정"].map((item, index) => <div key={item} className="rounded-[var(--radius-md)] bg-white/[.07] p-4"><div className="flex items-center gap-3"><span className="grid size-8 place-items-center rounded-full bg-[var(--brand)] text-xs font-black">{index + 1}</span><p className="text-sm font-bold">{item}</p><span className="ml-auto text-[10px] font-bold text-white/50">2027 · 민사고</span></div><div className="mt-4 h-1.5 rounded-full bg-white/10"><div className="h-full rounded-full bg-[var(--mint)]" style={{ width: `${82 - index * 13}%` }} /></div></div>)}</div><div className="mt-6 flex items-center justify-between border-t border-white/10 pt-5 text-xs"><span className="text-white/50">최근 기준 업데이트 8분 전</span><span className="font-black text-[var(--mint)]">운영 화면 보기 →</span></div></Card>; }
+function SectionIntro({
+  eyebrow,
+  title,
+  text,
+  inverse = false,
+}: {
+  eyebrow: string;
+  title: string;
+  text: string;
+  inverse?: boolean;
+}) {
+  return (
+    <div className="max-w-2xl">
+      <p className={cn("eyebrow", inverse && "text-[var(--mint)]")}>
+        {eyebrow}
+      </p>
+      <h2 className="heading-xl mt-4 text-balance">{title}</h2>
+      <p
+        className={cn(
+          "mt-5 text-base leading-8",
+          inverse ? "text-white/65" : "text-[var(--text-secondary)]",
+        )}
+      >
+        {text}
+      </p>
+    </div>
+  );
+}
+function Role({
+  icon: Icon,
+  title,
+  text,
+}: {
+  icon: typeof Sparkles;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="flex items-center justify-center gap-3">
+      <Icon className="size-5 text-[var(--brand)]" />
+      <p className="text-sm">
+        <strong>{title}</strong>{" "}
+        <span className="text-[var(--text-secondary)]">{text}</span>
+      </p>
+    </div>
+  );
+}
+function ExpertPoint({
+  icon: Icon,
+  title,
+  text,
+}: {
+  icon: typeof Sparkles;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="flex gap-4 rounded-[var(--radius-md)] p-2">
+      <div className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--brand-soft)] text-[var(--brand)]">
+        <Icon className="size-5" />
+      </div>
+      <div>
+        <h3 className="font-extrabold">{title}</h3>
+        <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+          {text}
+        </p>
+      </div>
+    </div>
+  );
+}
+function HeroPreview() {
+  return (
+    <div
+      className="relative mx-auto w-full max-w-[33rem] lg:mr-0"
+      data-motion-float
+    >
+      <div className="absolute -inset-5 -z-10 rotate-3 rounded-[var(--radius-xl)] bg-[var(--mint-soft)]" />
+      <Card className="overflow-hidden p-0 shadow-[var(--shadow-md)]">
+        <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
+          <div className="flex items-center gap-2">
+            <span className="size-2.5 rounded-full bg-[var(--coral)]" />
+            <span className="size-2.5 rounded-full bg-[var(--warning)]" />
+            <span className="size-2.5 rounded-full bg-[var(--mint)]" />
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-tertiary)]">
+            Today’s practice
+          </span>
+        </div>
+        <div className="p-6 sm:p-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">오늘의 질문 2/5</p>
+              <h3 className="mt-3 text-xl font-black leading-snug">
+                지원 학교의 교육 철학과
+                <br />내 경험을 연결해 설명해 보세요.
+              </h3>
+            </div>
+            <div
+              data-lottie-orbit
+              className="grid size-14 shrink-0 place-items-center rounded-full bg-[var(--brand-soft)]"
+            >
+              <JourneyOrbit className="size-14" />
+            </div>
+          </div>
+          <div className="mt-7 rounded-[var(--radius-md)] bg-[var(--surface-muted)] p-4">
+            <p className="text-xs font-black text-[var(--brand)]">
+              자소서 근거
+            </p>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              “과학 동아리에서 결과보다 실험 설계의 과정을 기록했습니다…”
+            </p>
+          </div>
+          <div className="mt-5 h-28 rounded-[var(--radius-md)] border border-[var(--border)] p-4 text-sm text-[var(--text-tertiary)]">
+            내 생각을 먼저 적어 보세요.
+          </div>
+          <div className="mt-5 flex items-center justify-between">
+            <span className="text-xs font-bold text-[var(--text-secondary)]">
+              자동 저장됨
+            </span>
+            <span className="rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 py-3 text-xs font-black text-white">
+              답변 저장
+            </span>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+function ExpertConsole() {
+  return (
+    <Card className="relative overflow-hidden bg-[var(--surface-inverse)] p-6 text-[var(--text-inverse)] shadow-[var(--shadow-md)]">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs font-black text-[var(--mint)]">
+            EXPERT CONSOLE
+          </p>
+          <h3 className="mt-2 text-xl font-black">질문 기준 검수</h3>
+        </div>
+        <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">
+          검수 대기 12
+        </span>
+      </div>
+      <div className="mt-8 grid gap-3">
+        {[
+          "지원 동기 · 자소서 근거 연결",
+          "협업 경험 · 역할 구체성",
+          "탐구 과정 · 실패 이후 수정",
+        ].map((item, index) => (
+          <div
+            key={item}
+            className="rounded-[var(--radius-md)] bg-white/[.07] p-4"
+          >
+            <div className="flex items-center gap-3">
+              <span className="grid size-8 place-items-center rounded-full bg-[var(--brand)] text-xs font-black">
+                {index + 1}
+              </span>
+              <p className="text-sm font-bold">{item}</p>
+              <span className="ml-auto text-[10px] font-bold text-white/50">
+                2027 · 민사고
+              </span>
+            </div>
+            <div className="mt-4 h-1.5 rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-[var(--mint)]"
+                style={{ width: `${82 - index * 13}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-5 text-xs">
+        <span className="text-white/50">최근 기준 업데이트 8분 전</span>
+        <span className="font-black text-[var(--mint)]">운영 화면 보기 →</span>
+      </div>
+    </Card>
+  );
+}

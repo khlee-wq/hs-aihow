@@ -16,10 +16,11 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field, inputClass } from "@/components/ui/field";
-import { EmptyState } from "@/components/ui/status-state";
+import { EmptyState, ErrorState } from "@/components/ui/status-state";
 import { cn } from "@/lib/utils";
 import {
   questionRuleInputSchema,
+  questionRulesResponseSchema,
   type QuestionRule,
   type QuestionRuleInput,
   type QuestionRuleStatus,
@@ -66,7 +67,10 @@ export function QuestionRulesPanel() {
   const [message, setMessage] = useState("");
   const rulesQuery = useQuery({
     queryKey: ["question-rules"],
-    queryFn: () => api<{ rules: QuestionRule[] }>("/api/question-rules"),
+    queryFn: async () =>
+      questionRulesResponseSchema.parse(
+        await api<unknown>("/api/question-rules"),
+      ),
   });
   const filtered = useMemo(() => {
     const rules = rulesQuery.data?.rules ?? [];
@@ -125,7 +129,7 @@ export function QuestionRulesPanel() {
 
       {message ? (
         <p
-          className="flex items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--mint-soft)] px-4 py-3 text-sm font-bold text-[var(--success)]"
+          className="flex items-center gap-2 bg-[var(--mint-soft)] px-4 py-3 text-sm font-bold text-[var(--success)]"
           role="status"
         >
           <Check className="size-4" />
@@ -135,9 +139,10 @@ export function QuestionRulesPanel() {
       {rulesQuery.isPending ? (
         <QuestionRulesListSkeleton />
       ) : rulesQuery.isError ? (
-        <EmptyState
+        <ErrorState
           title="질문 기준을 불러오지 못했어요"
-          description={rulesQuery.error.message}
+          description="네트워크 상태를 확인한 뒤 다시 시도해 주세요. 작성 중인 입력은 유지됩니다."
+          retry={() => void rulesQuery.refetch()}
         />
       ) : filtered.length ? (
         <div className="grid gap-3" data-motion-list>
@@ -188,10 +193,20 @@ export function QuestionRulesPanel() {
             </Card>
           ))}
         </div>
-      ) : (
+      ) : query ? (
         <EmptyState
           title="검색 결과가 없어요"
-          description="다른 기준명이나 학교로 검색해 보세요."
+          description="검색어를 지우거나 다른 기준명·학교로 찾아보세요."
+        />
+      ) : (
+        <EmptyState
+          title="등록된 질문 기준이 없어요"
+          description="첫 질문 기준을 등록하면 학교·전형별 검수 흐름을 시작할 수 있습니다."
+          action={
+            <Button onClick={() => setEditing("create")}>
+              <Plus className="size-4" />첫 기준 등록
+            </Button>
+          }
         />
       )}
 
@@ -340,7 +355,7 @@ function QuestionRuleDialog({
           {save.error || remove.error ? (
             <p
               role="alert"
-              className="rounded-[var(--radius-sm)] bg-[var(--coral-soft)] p-3 text-sm font-bold text-[var(--danger)]"
+              className="bg-[var(--coral-soft)] p-3 text-sm font-bold text-[var(--danger)]"
             >
               {save.error?.message ?? remove.error?.message}
             </p>

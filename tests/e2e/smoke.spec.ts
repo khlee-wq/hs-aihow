@@ -75,6 +75,10 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(page.getByText("예상 질문 퀘스트", { exact: true })).toBeVisible();
   const forbiddenApi = await page.request.get("/api/question-rules");
   expect(forbiddenApi.status()).toBe(403);
+  await page.goto("/applications/demo/not-a-step");
+  await expect(
+    page.getByRole("heading", { name: "이 경로는 아직 준비되지 않았어요" }),
+  ).toBeVisible();
   await page.goto("/admin/questions");
   await expect(page).toHaveURL(/\/dashboard$/);
 });
@@ -106,6 +110,10 @@ test("전문가 역할과 학생 라우트 경계를 지킨다", async ({ page }
   ).toBeVisible();
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/admin$/);
+  await page.goto("/admin/not-a-section");
+  await expect(
+    page.getByRole("heading", { name: "이 경로는 아직 준비되지 않았어요" }),
+  ).toBeVisible();
 });
 
 test("전문가가 질문 기준을 생성·수정·삭제한다", async ({ page }, testInfo) => {

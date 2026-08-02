@@ -44,4 +44,38 @@ describe("StudentDashboard loading boundaries", () => {
     expect(screen.getByText("48m")).toBeVisible();
     expect(screen.getAllByText("D-42")).toHaveLength(2);
   });
+
+  it("shows explicit no-data fallbacks without replacing the page layout", () => {
+    render(<StudentDashboard name="김하우" snapshot={null} />);
+
+    expect(screen.getByTestId("student-dashboard")).toHaveAttribute(
+      "aria-busy",
+      "false",
+    );
+    expect(screen.queryByTestId("dashboard-metric-skeleton")).toBeNull();
+    expect(screen.getByText("아직 준비 신호가 없어요")).toBeVisible();
+    expect(screen.getByText("아직 집중 기록이 없어요")).toBeVisible();
+    expect(
+      screen.getByText("지원 학교 미등록", { exact: false }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "질문 연습 시작하기" }),
+    ).toBeVisible();
+  });
+
+  it("handles empty server collections as no data instead of blank regions", () => {
+    render(
+      <StudentDashboard
+        name="김하우"
+        snapshot={{
+          ...dashboardSnapshot,
+          readinessSignals: [],
+          weeklyActivity: [],
+        }}
+      />,
+    );
+
+    expect(screen.getByText("아직 준비 신호가 없어요")).toBeVisible();
+    expect(screen.getByText("아직 집중 기록이 없어요")).toBeVisible();
+  });
 });

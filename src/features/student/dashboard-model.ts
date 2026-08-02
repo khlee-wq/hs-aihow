@@ -1,28 +1,31 @@
+import { z } from "zod";
 import type { JourneyStep } from "@/stores/app-store";
 
-export type DashboardSnapshot = {
-  school: string;
-  schoolShort: string;
-  daysLeft: number;
-  savedAt: string;
-  practiceMinutes: number;
-  weeklyDelta: number;
-  readinessSignals: ReadinessSignal[];
-  weeklyActivity: WeeklyActivity[];
-};
+const readinessSignalSchema = z.object({
+  label: z.string().trim().min(1),
+  value: z.number().min(0).max(100),
+  state: z.string().trim().min(1),
+});
 
-export type ReadinessSignal = {
-  label: string;
-  value: number;
-  state: string;
-};
+const weeklyActivitySchema = z.object({
+  day: z.string().trim().min(1),
+  value: z.number().min(0).max(100),
+});
 
-export type WeeklyActivity = {
-  day: string;
-  value: number;
-};
+export const dashboardSnapshotSchema = z.object({
+  school: z.string().trim().min(1),
+  schoolShort: z.string().trim().min(1),
+  daysLeft: z.number().int().nonnegative(),
+  savedAt: z.string().trim().min(1),
+  practiceMinutes: z.number().int().nonnegative(),
+  weeklyDelta: z.number().int(),
+  readinessSignals: z.array(readinessSignalSchema),
+  weeklyActivity: z.array(weeklyActivitySchema),
+});
 
-export const dashboardSnapshot: DashboardSnapshot = {
+export type DashboardSnapshot = z.infer<typeof dashboardSnapshotSchema>;
+
+export const dashboardSnapshot = dashboardSnapshotSchema.parse({
   school: "민족사관고등학교",
   schoolShort: "민사고",
   daysLeft: 42,
@@ -43,7 +46,7 @@ export const dashboardSnapshot: DashboardSnapshot = {
     { day: "토", value: 78 },
     { day: "오늘", value: 52 },
   ],
-};
+});
 
 export const nextStepCopy: Record<
   JourneyStep,

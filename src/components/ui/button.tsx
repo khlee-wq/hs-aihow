@@ -8,27 +8,48 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-[var(--brand)] text-white hover:bg-[var(--brand-strong)] shadow-[var(--shadow-sm)]",
-        secondary: "bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--border-strong)]",
-        ghost: "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
-        inverse: "bg-[var(--text-primary)] text-[var(--canvas)] hover:opacity-90",
+        primary: "bg-[var(--brand)] text-white hover:bg-[var(--brand-strong)]",
+        secondary:
+          "bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--border-strong)]",
+        ghost:
+          "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
+        inverse:
+          "bg-[var(--text-primary)] text-[var(--canvas)] hover:opacity-90",
         danger: "bg-[var(--coral-soft)] text-[var(--danger)] hover:opacity-80",
       },
-      size: { sm: "min-h-9 px-3 text-xs", md: "min-h-11 px-5", lg: "min-h-13 px-7 text-base" },
+      size: {
+        sm: "min-h-9 px-3 text-xs",
+        md: "min-h-11 px-5",
+        lg: "min-h-13 px-7 text-base",
+      },
       full: { true: "w-full" },
     },
     defaultVariants: { variant: "primary", size: "md" },
   },
 );
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof buttonVariants> & { loading?: boolean };
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & { loading?: boolean };
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className, children, loading, disabled, variant, size, full, ...props }, ref) => (
-  <button ref={ref} className={cn(buttonVariants({ variant, size, full }), className)} disabled={disabled || loading} aria-busy={loading || undefined} {...props}>
-    {loading ? <LoaderCircle aria-hidden className="size-4 animate-spin" /> : null}
-    {children}
-  </button>
-));
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    { className, children, loading, disabled, variant, size, full, ...props },
+    ref,
+  ) => (
+    <button
+      ref={ref}
+      className={cn(buttonVariants({ variant, size, full }), className)}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
+      {loading ? (
+        <LoaderCircle aria-hidden className="size-4 animate-spin" />
+      ) : null}
+      {children}
+    </button>
+  ),
+);
 Button.displayName = "Button";
 
 export { buttonVariants };

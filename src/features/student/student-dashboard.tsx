@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { JourneyOrbit } from "@/components/motion/journey-orbit";
 import { Progress } from "@/components/ui/progress";
+import { EmptyState } from "@/components/ui/status-state";
 import { deriveProgress, journeySteps } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
@@ -33,8 +34,9 @@ export function StudentDashboard({
   snapshot: data,
 }: {
   name?: string;
-  snapshot?: DashboardSnapshot;
+  snapshot?: DashboardSnapshot | null;
 }) {
+  const isLoading = data === undefined;
   const completed = useAppStore((state) => state.completedSteps);
   const progress = deriveProgress(completed);
   const nextStep =
@@ -49,14 +51,14 @@ export function StudentDashboard({
       loading: false,
     },
     {
-      value: data ? `${data.practiceMinutes}m` : "",
-      note: data ? `+${data.weeklyDelta}분` : "",
-      loading: !data,
+      value: data ? `${data.practiceMinutes}m` : "—",
+      note: data ? `+${data.weeklyDelta}분` : "데이터 없음",
+      loading: isLoading,
     },
     {
-      value: data ? `D-${data.daysLeft}` : "",
-      note: data ? "속도 적정" : "",
-      loading: !data,
+      value: data ? `D-${data.daysLeft}` : "—",
+      note: data ? "속도 적정" : "일정 미등록",
+      loading: isLoading,
     },
   ];
 
@@ -64,7 +66,7 @@ export function StudentDashboard({
     <div
       className="space-y-8 float-in md:space-y-10"
       data-testid="student-dashboard"
-      aria-busy={!data}
+      aria-busy={isLoading}
     >
       <header
         className="grid gap-7 border-b border-[var(--border)] pb-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
@@ -80,8 +82,20 @@ export function StudentDashboard({
             님, 다음은 {nextStep.title}입니다.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            현재 데이터에서 가장 영향이 큰 한 가지부터 제안합니다. 마지막
-            동기화는 {data ? data.savedAt : <DashboardInlineSkeleton />}입니다.
+            {isLoading ? (
+              <>
+                현재 데이터에서 가장 영향이 큰 한 가지부터 제안합니다. 마지막
+                동기화는 <DashboardInlineSkeleton />
+                입니다.
+              </>
+            ) : data ? (
+              <>
+                현재 데이터에서 가장 영향이 큰 한 가지부터 제안합니다. 마지막
+                동기화는 {data.savedAt}입니다.
+              </>
+            ) : (
+              "아직 연결된 준비 데이터가 없습니다. 첫 단계를 시작하면 이 화면에 학습 신호가 쌓입니다."
+            )}
           </p>
         </div>
         <div
@@ -94,7 +108,13 @@ export function StudentDashboard({
             </p>
             <p className="mt-1.5 flex items-center gap-2 font-bold">
               <CalendarDays className="size-3.5 text-[var(--warning)]" />
-              {data ? `D-${data.daysLeft}` : <DashboardInlineSkeleton />}
+              {isLoading ? (
+                <DashboardInlineSkeleton />
+              ) : data ? (
+                `D-${data.daysLeft}`
+              ) : (
+                "미등록"
+              )}
             </p>
           </div>
           <div className="px-4 py-3.5">
@@ -102,7 +122,13 @@ export function StudentDashboard({
               Workspace
             </p>
             <p className="mt-1.5 truncate font-bold">
-              {data ? data.schoolShort : <DashboardInlineSkeleton />}
+              {isLoading ? (
+                <DashboardInlineSkeleton />
+              ) : data ? (
+                data.schoolShort
+              ) : (
+                "미등록"
+              )}
             </p>
           </div>
         </div>
@@ -235,7 +261,9 @@ export function StudentDashboard({
             </span>
           </div>
 
-          {data ? (
+          {isLoading ? (
+            <ReadinessDataSkeleton />
+          ) : data && data.readinessSignals.length ? (
             <div className="mt-6 space-y-5">
               {data.readinessSignals.map((signal) => (
                 <div key={signal.label}>
@@ -262,7 +290,11 @@ export function StudentDashboard({
               ))}
             </div>
           ) : (
-            <ReadinessDataSkeleton />
+            <EmptyState
+              className="mt-6 min-h-40"
+              title="아직 준비 신호가 없어요"
+              description="자소서 확인이나 질문 연습을 완료하면 판단 근거가 이곳에 표시됩니다."
+            />
           )}
 
           <div className="mt-6 border-t border-[var(--border)] pt-4">
@@ -271,8 +303,9 @@ export function StudentDashboard({
               AI 해석
             </p>
             <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
-              근거 선택은 안정적입니다. 오늘은 답변 구조를 한 번 만들고 소리
-              내어 말하는 것까지 완료하세요.
+              {data
+                ? "근거 선택은 안정적입니다. 오늘은 답변 구조를 한 번 만들고 소리 내어 말하는 것까지 완료하세요."
+                : "첫 준비 데이터를 연결하면 다음 행동의 이유와 보완 순서를 설명해 드립니다."}
             </p>
           </div>
         </aside>
@@ -292,7 +325,13 @@ export function StudentDashboard({
             </h2>
           </div>
           <p className="text-xs text-[var(--text-secondary)]" data-motion-item>
-            {data ? data.school : <DashboardInlineSkeleton className="w-28" />}{" "}
+            {isLoading ? (
+              <DashboardInlineSkeleton className="w-28" />
+            ) : data ? (
+              data.school
+            ) : (
+              "지원 학교 미등록"
+            )}{" "}
             통합 패키지 · {completed.length}개 완료
           </p>
         </div>
@@ -378,7 +417,9 @@ export function StudentDashboard({
               </p>
               <h2 className="mt-2 text-lg font-bold">집중 기록</h2>
             </div>
-            {data ? (
+            {isLoading ? (
+              <DashboardInlineSkeleton className="h-6 w-24" />
+            ) : data ? (
               <p className="text-right">
                 <strong className="text-xl tracking-[-.04em]">
                   {data.practiceMinutes}분
@@ -388,10 +429,14 @@ export function StudentDashboard({
                 </span>
               </p>
             ) : (
-              <DashboardInlineSkeleton className="h-6 w-24" />
+              <p className="text-right text-xs font-bold text-[var(--text-tertiary)]">
+                기록 없음
+              </p>
             )}
           </div>
-          {data ? (
+          {isLoading ? (
+            <WeeklyActivityDataSkeleton />
+          ) : data && data.weeklyActivity.length ? (
             <div
               className="mt-5 grid h-20 grid-cols-7 items-end gap-2"
               aria-label="최근 7일 연습 기록"
@@ -419,7 +464,11 @@ export function StudentDashboard({
               ))}
             </div>
           ) : (
-            <WeeklyActivityDataSkeleton />
+            <EmptyState
+              className="mt-5 min-h-36"
+              title="아직 집중 기록이 없어요"
+              description="연습을 완료하면 최근 7일 기록이 여기에 표시됩니다."
+            />
           )}
         </div>
 
