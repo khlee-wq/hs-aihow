@@ -169,6 +169,62 @@ body {
   background-position: -1px -1px;
 }
 
+.liquid-bottom-nav {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);
+  border-radius: 1.1rem;
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+  box-shadow:
+    0 12px 34px color-mix(in srgb, var(--surface-inverse) 14%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 58%, transparent);
+  backdrop-filter: blur(22px) saturate(145%);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+}
+
+.liquid-bottom-nav::before {
+  position: absolute;
+  inset: 0.2rem 1.25rem auto;
+  height: 1px;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, white 72%, transparent),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.liquid-nav-item {
+  border-radius: 0.8rem;
+  transition:
+    color 220ms var(--ease-standard),
+    background 220ms var(--ease-standard),
+    transform 220ms var(--ease-standard),
+    box-shadow 220ms var(--ease-standard);
+}
+
+.liquid-nav-item[aria-current="page"] {
+  background: color-mix(in srgb, var(--brand-soft) 74%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 44%, transparent),
+    0 3px 12px color-mix(in srgb, var(--brand) 9%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .student-desktop-nav-link:hover {
+    transform: translateY(-1px);
+  }
+
+  .student-desktop-nav-link:not([aria-current="page"]):hover::after {
+    transform: scaleX(0.72);
+  }
+
+  .expert-desktop-nav-link:hover {
+    transform: translateX(2px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

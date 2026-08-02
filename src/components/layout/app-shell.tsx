@@ -121,11 +121,11 @@ function StudentShell({
           </div>
 
           <nav
-            className="ml-auto hidden items-center gap-1 md:flex"
+            className="ml-auto hidden items-center gap-1 lg:flex"
             aria-label="학생 메뉴"
             data-testid="student-desktop-nav"
           >
-            {studentNav.map(({ href, label, icon: Icon }) => {
+            {studentNav.map(({ href, label }) => {
               const active = isActive(pathname, href);
               return (
                 <Link
@@ -134,27 +134,19 @@ function StudentShell({
                   aria-label={label}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative inline-flex min-h-10 items-center gap-2 px-3 text-xs font-bold transition-colors after:absolute after:inset-x-3 after:-bottom-3 after:h-px after:origin-center after:scale-x-0 after:bg-[var(--brand)] after:transition-transform",
+                    "student-desktop-nav-link relative inline-flex min-h-10 items-center px-3.5 text-[13px] font-semibold tracking-[-.015em] transition-[color,transform] after:absolute after:inset-x-3.5 after:-bottom-3 after:h-px after:origin-center after:scale-x-0 after:bg-[var(--brand)] after:transition-transform after:duration-300",
                     active
                       ? "text-[var(--text-primary)] after:scale-x-100"
                       : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
                   )}
                 >
-                  <Icon
-                    data-menu-icon
-                    className={cn(
-                      "size-3.5 lg:hidden",
-                      active && "text-[var(--brand)]",
-                    )}
-                    strokeWidth={active ? 2.4 : 1.9}
-                  />
-                  <span className="hidden lg:inline">{label}</span>
+                  <span>{label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          <div className="ml-auto flex items-center gap-0.5 border-l border-[var(--border)] pl-2 md:ml-2">
+          <div className="ml-auto flex items-center gap-0.5 border-l border-[var(--border)] pl-2 lg:ml-2">
             <ThemeToggle />
             <Link
               href="/settings"
@@ -175,12 +167,12 @@ function StudentShell({
         </div>
       </header>
 
-      <main className="px-[var(--space-page)] pb-28 pt-7 md:pb-14 md:pt-9">
+      <main className="px-[var(--space-page)] pb-28 pt-7 lg:pb-14 lg:pt-9">
         <div className="mx-auto max-w-[72rem]">{children}</div>
       </main>
 
       <nav
-        className="app-navigation fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 border border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_94%,transparent)] px-1 pb-[max(.35rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[var(--shadow-md)] backdrop-blur-xl md:hidden"
+        className="liquid-bottom-nav app-navigation fixed inset-x-3 bottom-[max(.65rem,env(safe-area-inset-bottom))] z-40 grid grid-cols-5 px-1.5 py-1.5 lg:hidden"
         aria-label="모바일 학생 메뉴"
         data-testid="student-mobile-nav"
       >
@@ -191,19 +183,20 @@ function StudentShell({
               key={href}
               href={href}
               className={cn(
-                "grid min-h-12 place-items-center gap-0.5 border-t-2 text-[10px] font-bold",
-                active
-                  ? "border-[var(--brand)] bg-[var(--brand-soft)] text-[var(--brand)]"
-                  : "border-transparent text-[var(--text-tertiary)]",
+                "liquid-nav-item relative grid min-h-[3.35rem] place-items-center gap-0.5 text-[9.5px] font-semibold tracking-[-.01em]",
+                active ? "text-[var(--brand)]" : "text-[var(--text-tertiary)]",
               )}
               aria-current={active ? "page" : undefined}
             >
               <Icon
                 data-menu-icon
-                className="size-[18px]"
+                className={cn(
+                  "size-[17px] transition-transform duration-300",
+                  active && "-translate-y-px",
+                )}
                 strokeWidth={active ? 2.6 : 1.9}
               />
-              {label}
+              <span>{label}</span>
             </Link>
           );
         })}
@@ -242,9 +235,9 @@ function ExpertShell({
                 key={href}
                 href={href}
                 className={cn(
-                  "flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 text-sm font-bold transition-colors",
+                  "expert-desktop-nav-link relative flex min-h-11 items-center rounded-[var(--radius-sm)] px-4 text-[13px] font-semibold tracking-[-.01em] transition-[color,background,transform] before:absolute before:left-0 before:h-5 before:w-0.5 before:origin-center before:scale-y-0 before:bg-[var(--brand)] before:transition-transform before:duration-300",
                   active
-                    ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                    ? "bg-[color-mix(in_srgb,var(--brand-soft)_68%,transparent)] text-[var(--brand)] before:scale-y-100"
                     : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
                 )}
                 aria-current={active ? "page" : undefined}
@@ -257,7 +250,7 @@ function ExpertShell({
         <div className="mt-auto grid gap-2 border-t border-[var(--border)] pt-4">
           <Link
             href="/settings"
-            className="flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+            className="expert-desktop-nav-link flex min-h-10 items-center rounded-[var(--radius-sm)] px-4 text-[13px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
           >
             설정
           </Link>

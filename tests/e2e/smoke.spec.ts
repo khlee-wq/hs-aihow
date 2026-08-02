@@ -70,15 +70,36 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
         .locator("[data-menu-icon]")
         .first(),
     ).toBeVisible();
+    const mobileNavStyle = await page
+      .getByTestId("student-mobile-nav")
+      .evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          backdropFilter: style.backdropFilter,
+          borderRadius: Number.parseFloat(style.borderRadius),
+        };
+      });
+    expect(mobileNavStyle.backdropFilter).not.toBe("none");
+    expect(mobileNavStyle.borderRadius).toBeGreaterThanOrEqual(16);
   } else {
     await expect(page.getByTestId("student-desktop-nav")).toBeVisible();
     await expect(page.getByTestId("student-mobile-nav")).toBeHidden();
     await expect(
-      page
-        .getByTestId("student-desktop-nav")
-        .locator("[data-menu-icon]")
-        .first(),
-    ).toBeHidden();
+      page.getByTestId("student-desktop-nav").locator("[data-menu-icon]"),
+    ).toHaveCount(0);
+    const essayMenu = page
+      .getByTestId("student-desktop-nav")
+      .getByRole("link", { name: "자소서" });
+    await essayMenu.hover();
+    await expect
+      .poll(() =>
+        essayMenu.evaluate((element) => getComputedStyle(element).transform),
+      )
+      .not.toBe("none");
+    await page.setViewportSize({ width: 900, height: 900 });
+    await expect(page.getByTestId("student-desktop-nav")).toBeHidden();
+    await expect(page.getByTestId("student-mobile-nav")).toBeVisible();
+    await page.setViewportSize({ width: 1280, height: 720 });
   }
   expect(
     await page.evaluate(
