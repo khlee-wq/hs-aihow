@@ -14,11 +14,16 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
     }),
   ).toBeVisible();
   await expect(page.locator("[data-lottie-orbit] svg")).toBeVisible();
+  await expect(page.locator("[data-motion-satellite]")).toHaveCount(3);
+  await expect(page.locator("[data-motion-drop]")).toHaveCount(3);
   await page.waitForTimeout(1_000);
   const transform = await page
     .locator("[data-motion-float]")
     .evaluate((element) => getComputedStyle(element).transform);
   expect(transform).not.toBe("none");
+  await page.locator("[data-motion-drop-group]").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(900);
+  await expect(page.locator("[data-motion-drop]").first()).toBeVisible();
   expect(
     consoleErrors.filter((message) =>
       /hydration|hydrated|server rendered html/i.test(message),

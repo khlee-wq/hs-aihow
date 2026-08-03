@@ -76,15 +76,16 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
         if (floatingItems.length) {
           gsap.fromTo(
             floatingItems,
-            { autoAlpha: 0, y: 30, rotate: 1.5 },
+            { autoAlpha: 0, y: -72, rotate: -3, scale: 0.96 },
             {
               autoAlpha: 1,
               y: 0,
               rotate: 0,
-              duration: 1,
+              scale: 1,
+              duration: 1.08,
               delay: 0.16,
-              ease: "power4.out",
-              clearProps: "opacity,visibility,rotate",
+              ease: "back.out(1.35)",
+              clearProps: "opacity,visibility,rotate,scale",
             },
           );
           gsap.to(floatingItems, {
@@ -93,6 +94,102 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
             repeat: -1,
             yoyo: true,
             ease: "sine.inOut",
+          });
+        }
+
+        const satellites = Array.from(
+          root.current?.querySelectorAll<HTMLElement>(
+            "[data-motion-satellite]",
+          ) ?? [],
+        );
+        if (satellites.length) {
+          gsap.fromTo(
+            satellites,
+            {
+              autoAlpha: 0,
+              y: (index) => -110 - index * 18,
+              rotate: (index) => (index % 2 ? 8 : -8),
+              scale: 0.82,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              rotate: (index) => (index - 1) * 2.5,
+              scale: 1,
+              duration: 0.92,
+              delay: 0.42,
+              stagger: 0.13,
+              ease: "back.out(1.7)",
+            },
+          );
+          satellites.forEach((satellite, index) => {
+            gsap.to(satellite, {
+              y: index % 2 ? 7 : -7,
+              rotate: index % 2 ? "+=1.4" : "-=1.4",
+              duration: 2.6 + index * 0.35,
+              delay: 1.25 + index * 0.12,
+              repeat: -1,
+              yoyo: true,
+              ease: "sine.inOut",
+            });
+          });
+        }
+
+        Array.from(
+          root.current?.querySelectorAll<HTMLElement>(
+            "[data-motion-drop-group]",
+          ) ?? [],
+        ).forEach((group) => {
+          const cards = Array.from(
+            group.querySelectorAll<HTMLElement>("[data-motion-drop]"),
+          );
+          if (!cards.length) return;
+          gsap.fromTo(
+            cards,
+            {
+              autoAlpha: 0,
+              y: (index) => -62 - index * 18,
+              rotate: (index) => (index - 1) * 4,
+              scale: 0.94,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              rotate: 0,
+              scale: 1,
+              duration: 0.88,
+              stagger: 0.12,
+              ease: "back.out(1.35)",
+              clearProps: "transform,opacity,visibility",
+              scrollTrigger: {
+                trigger: group,
+                start: "top 82%",
+                once: true,
+              },
+            },
+          );
+        });
+
+        if (window.matchMedia("(min-width: 1024px)").matches) {
+          Array.from(
+            root.current?.querySelectorAll<HTMLElement>(
+              "[data-motion-parallax]",
+            ) ?? [],
+          ).forEach((item) => {
+            gsap.fromTo(
+              item,
+              { y: 34 },
+              {
+                y: -28,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: item,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 0.8,
+                },
+              },
+            );
           });
         }
 

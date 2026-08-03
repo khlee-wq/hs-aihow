@@ -154,11 +154,14 @@ export function LandingPage() {
             title="지금 필요한 준비부터 시작하세요"
             text="각 상품은 독립적으로 사용할 수 있고, 통합 패키지에서는 앞 단계의 결과가 다음 준비로 자연스럽게 이어집니다."
           />
-          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+          <div
+            className="mt-12 grid gap-5 lg:grid-cols-3"
+            data-motion-drop-group
+          >
             {products.map((product, index) => (
               <Card
                 key={product.title}
-                data-motion-item
+                data-motion-drop
                 className={cn(
                   "relative flex flex-col overflow-hidden p-7",
                   index === 2 &&
@@ -245,7 +248,11 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="experts" className="scroll-mt-24 py-24 lg:py-32">
+      <section
+        id="experts"
+        className="scroll-mt-24 overflow-hidden py-24 lg:py-32"
+        data-motion-reveal
+      >
         <div className="page-wrap grid items-center gap-14 lg:grid-cols-2">
           <div>
             <SectionIntro
@@ -271,7 +278,9 @@ export function LandingPage() {
               />
             </div>
           </div>
-          <ExpertConsole />
+          <div data-motion-parallax>
+            <ExpertConsole />
+          </div>
         </div>
       </section>
 
@@ -361,7 +370,7 @@ function ExpertPoint({
   text: string;
 }) {
   return (
-    <div className="flex gap-4 rounded-[var(--radius-md)] p-2">
+    <div className="flex gap-4 rounded-[var(--radius-md)] p-2" data-motion-item>
       <div className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--brand-soft)] text-[var(--brand)]">
         <Icon className="size-5" />
       </div>
@@ -380,6 +389,29 @@ function HeroPreview() {
       className="relative mx-auto w-full max-w-[33rem] lg:mr-0"
       data-motion-float
     >
+      <div
+        className="pointer-events-none absolute -left-10 top-16 z-20 hidden rounded-[var(--radius-sm)] bg-[var(--surface)] px-4 py-3 shadow-[var(--shadow-md)] sm:block"
+        data-motion-satellite
+      >
+        <p className="text-[10px] font-black text-[var(--brand)]">01 · 근거</p>
+        <p className="mt-1 text-xs font-extrabold">자소서에서 찾기</p>
+      </div>
+      <div
+        className="pointer-events-none absolute -right-8 top-[42%] z-20 hidden rounded-[var(--radius-sm)] bg-[var(--surface-inverse)] px-4 py-3 text-[var(--text-inverse)] shadow-[var(--shadow-md)] sm:block"
+        data-motion-satellite
+      >
+        <p className="text-[10px] font-black text-[var(--mint)]">02 · 질문</p>
+        <p className="mt-1 text-xs font-extrabold">꼬리까지 연결</p>
+      </div>
+      <div
+        className="pointer-events-none absolute -bottom-5 left-12 z-20 hidden rounded-[var(--radius-sm)] bg-[var(--coral-soft)] px-4 py-3 shadow-[var(--shadow-md)] sm:block"
+        data-motion-satellite
+      >
+        <p className="text-[10px] font-black text-[var(--coral)]">
+          03 · 말하기
+        </p>
+        <p className="mt-1 text-xs font-extrabold">음성으로 반복</p>
+      </div>
       <div className="absolute -inset-5 -z-10 rotate-3 rounded-[var(--radius-xl)] bg-[var(--mint-soft)]" />
       <Card className="overflow-hidden p-0 shadow-[var(--shadow-md)]">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
