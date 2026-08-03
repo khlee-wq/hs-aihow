@@ -165,6 +165,37 @@ test("전문가 역할과 학생 라우트 경계를 지킨다", async ({ page }
   ).toBeVisible();
 });
 
+test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", async ({ page }) => {
+  await page.goto("/signup");
+  await page.getByRole("radio", { name: "전문가" }).click();
+  await page.getByLabel("이름", { exact: true }).fill("김소장");
+  await page.getByLabel("이메일", { exact: true }).fill("prompt@example.com");
+  await page.getByPlaceholder("4자 이상").fill("demo1234");
+  await page.getByRole("button", { name: "가입하고 시작하기" }).click();
+  await expect(page).toHaveURL(/\/admin$/);
+
+  await page.goto("/admin/prompts");
+  await expect(
+    page.getByRole("heading", { name: "코칭 설계실" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /04 모의면접/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "모의면접의 판단 방식을 정합니다" }),
+  ).toBeVisible();
+
+  const expertAnswer = page.getByLabel("학생에게 적용할 최종 코칭 답변");
+  await expertAnswer.fill("소장님이 직접 수정한 모의면접 코칭 기준입니다.");
+  await expect(page.getByText("전문가 수정됨")).toBeVisible();
+  await page.getByRole("button", { name: "승인하고 적용" }).click();
+  await expect(page.getByRole("status")).toContainText("승인했습니다");
+
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("전문가가 질문 기준을 생성·수정·삭제한다", async ({ page }, testInfo) => {
   const title = `브라우저 CRUD ${testInfo.project.name} ${Date.now()}`;
   await page.goto("/signup");

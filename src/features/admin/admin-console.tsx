@@ -1,22 +1,16 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
 import {
   Activity,
-  Check,
   ChevronRight,
-  CircleAlert,
   Clock3,
-  Eye,
   FileCheck2,
   MessageCircleQuestion,
   PencilLine,
   Play,
   Plus,
-  Save,
   School,
   Search,
-  Sparkles,
   TrendingUp,
   UserRoundCheck,
   Users,
@@ -26,8 +20,9 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/status-state";
-import { inputClass, textareaClass } from "@/components/ui/field";
-import { cn, sleep } from "@/lib/utils";
+import { inputClass } from "@/components/ui/field";
+import { cn } from "@/lib/utils";
+import { PromptStudio } from "./prompt-studio/prompt-studio";
 import { QuestionRulesPanel } from "./question-rules/question-rules-panel";
 
 type AdminSection =
@@ -57,7 +52,7 @@ export function AdminConsole({ section }: { section: string }) {
   if (normalized === "home") return <AdminHome />;
   if (normalized === "reviews") return <Reviews />;
   if (normalized === "questions") return <QuestionRulesPanel />;
-  if (normalized === "prompts") return <Prompts />;
+  if (normalized === "prompts") return <PromptStudio />;
   if (normalized === "videos") return <Videos />;
   if (normalized === "schools") return <Schools />;
   if (normalized === "users") return <UsersPanel />;
@@ -386,111 +381,6 @@ function Reviews() {
           />
         )}
       </Card>
-    </div>
-  );
-}
-
-function Prompts() {
-  const [prompt, setPrompt] = useState(
-    "당신은 고입 면접 코치입니다. 학생의 자소서 근거와 승인된 전문가 기준만 사용해 질문을 생성하세요. 학생 대신 답변을 작성하지 말고, 생각을 구체화하는 한 가지 질문을 제시하세요.",
-  );
-  const [saved, setSaved] = useState(false);
-  const save = useMutation({
-    mutationFn: async () => {
-      await sleep(600);
-      return true;
-    },
-    onSuccess: () => setSaved(true),
-  });
-  return (
-    <div className="space-y-7 float-in">
-      <PageHeader
-        eyebrow="Prompt workspace"
-        title="코칭 프롬프트"
-        description="학생 경험을 대필하지 않고, 승인된 기준 안에서 생각을 끌어내는 코칭 규칙을 관리합니다."
-        action={
-          <div className="flex gap-2">
-            <Button variant="secondary">
-              <Eye className="size-4" />
-              미리보기
-            </Button>
-            <Button loading={save.isPending} onClick={() => save.mutate()}>
-              <Save className="size-4" />
-              임시 저장
-            </Button>
-          </div>
-        }
-      />
-      <div className="grid gap-5 xl:grid-cols-[1.2fr_.8fr]">
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-black">예상 질문 생성 · v12</p>
-              <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                마지막 승인 v11 · 김소장
-              </p>
-            </div>
-            <span className="rounded-full bg-[var(--warning-soft)] px-3 py-1.5 text-[10px] font-black text-[var(--warning)]">
-              초안
-            </span>
-          </div>
-          <label className="mt-6 block text-xs font-extrabold" htmlFor="prompt">
-            시스템 지침
-          </label>
-          <textarea
-            id="prompt"
-            value={prompt}
-            onChange={(event) => {
-              setPrompt(event.target.value);
-              setSaved(false);
-            }}
-            className={cn(textareaClass, "mt-2 min-h-80 font-mono text-xs")}
-          />
-          <div className="mt-3 flex items-center justify-between text-xs text-[var(--text-tertiary)]">
-            <span>{prompt.length}자 · 자동 저장 준비</span>
-            {saved ? (
-              <span className="flex items-center gap-1 font-bold text-[var(--success)]">
-                <Check className="size-3" />
-                임시 저장됨
-              </span>
-            ) : null}
-          </div>
-        </Card>
-        <aside className="space-y-5">
-          <Card>
-            <div className="flex items-center gap-2 font-black">
-              <Sparkles className="size-5 text-[var(--brand)]" />
-              구조화된 입력
-            </div>
-            <div className="mt-5 grid gap-2">
-              {[
-                "studentEssayEvidence",
-                "schoolCriteria",
-                "questionRule",
-                "previousAnswers",
-                "followUpDepth",
-              ].map((item) => (
-                <code
-                  key={item}
-                  className="rounded-[var(--radius-xs)] bg-[var(--surface-muted)] px-3 py-2 text-xs text-[var(--brand)]"
-                >{`{{${item}}}`}</code>
-              ))}
-            </div>
-          </Card>
-          <Card>
-            <div className="flex items-center gap-2 font-black">
-              <CircleAlert className="size-5 text-[var(--warning)]" />
-              출력 안전 규칙
-            </div>
-            <ul className="mt-4 grid gap-3 text-xs leading-6 text-[var(--text-secondary)]">
-              <li>• 자소서 원문 전체를 출력하지 않음</li>
-              <li>• 승인되지 않은 학교 지식을 단정하지 않음</li>
-              <li>• 학생 대신 모범 답안을 완성하지 않음</li>
-              <li>• 질문 근거와 규칙 ID를 함께 기록</li>
-            </ul>
-          </Card>
-        </aside>
-      </div>
     </div>
   );
 }
