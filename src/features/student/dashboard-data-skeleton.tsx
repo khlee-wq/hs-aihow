@@ -3,9 +3,10 @@ import { cn } from "@/lib/utils";
 
 export function DashboardInlineSkeleton({ className }: { className?: string }) {
   return (
-    <Skeleton
+    <span
+      aria-hidden
       className={cn(
-        "inline-block h-[1em] w-16 rounded-[.2rem] align-middle",
+        "skeleton inline-block h-[1em] w-16 rounded-[.2rem] align-middle",
         className,
       )}
     />

@@ -13,7 +13,7 @@ afterEach(() => cleanup());
 describe("StudentDashboard loading boundaries", () => {
   it("keeps the page structure and only skeletonizes server data slots", () => {
     useAppStore.setState({ completedSteps: ["essay", "analysis"] });
-    render(<StudentDashboard />);
+    const { container } = render(<StudentDashboard />);
 
     expect(screen.getByTestId("student-dashboard")).toHaveAttribute(
       "aria-busy",
@@ -29,6 +29,7 @@ describe("StudentDashboard loading boundaries", () => {
     expect(screen.getAllByTestId("dashboard-metric-skeleton")).toHaveLength(2);
     expect(screen.getByTestId("readiness-data-skeleton")).toBeVisible();
     expect(screen.getByTestId("weekly-activity-skeleton")).toBeVisible();
+    expect(container.querySelector("p div, h1 div")).toBeNull();
   });
 
   it("removes data skeletons after the server snapshot arrives", () => {
