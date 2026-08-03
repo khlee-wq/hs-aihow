@@ -45,7 +45,7 @@ export function PublicHeader() {
           </Link>
           <Link
             href="/signup"
-            className="hairline-top inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-md)] bg-[var(--brand)] px-3 text-sm font-bold text-white shadow-[0_10px_24px_color-mix(in_srgb,var(--brand)_22%,transparent)] sm:px-4"
+            className="hairline-top inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-md)] bg-[var(--brand)] px-3 text-sm font-bold text-[var(--text-on-brand)] shadow-[0_10px_24px_color-mix(in_srgb,var(--brand)_22%,transparent)] sm:px-4"
           >
             시작하기 <ArrowRight className="size-4" />
           </Link>

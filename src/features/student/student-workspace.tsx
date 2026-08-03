@@ -261,7 +261,7 @@ function EssayStep() {
         <Link
           href="/applications/demo/analysis"
           onClick={() => completeStep("essay")}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-white"
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-[var(--text-on-brand)]"
         >
           내용 확인 완료 <ArrowRight className="size-4" />
         </Link>
@@ -274,7 +274,7 @@ function AnalysisStep() {
   const completeStep = useAppStore((state) => state.completeStep);
   return (
     <div className="space-y-5">
-      <Card className="border-0 bg-[var(--surface-inverse)] text-[var(--text-inverse)]">
+      <Card className="surface-contrast border-0">
         <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-[var(--mint)]">
@@ -363,7 +363,7 @@ function AnalysisStep() {
         <Link
           href="/applications/demo/practice"
           onClick={() => completeStep("analysis")}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-white"
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-[var(--text-on-brand)]"
         >
           질문 연습 시작 <ArrowRight className="size-4" />
         </Link>
@@ -484,7 +484,7 @@ function PracticeStep() {
                   href="/applications/demo/mock-interview"
                   onClick={() => completeStep("practice")}
                   className={cn(
-                    "inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 text-sm font-bold text-white",
+                    "inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]",
                     !saved && "pointer-events-none opacity-50",
                   )}
                 >
@@ -604,7 +604,7 @@ function MockInterviewStep() {
   if (phase === "select")
     return (
       <div className="space-y-5">
-        <Card className="border-0 bg-[var(--surface-inverse)] text-[var(--text-inverse)]">
+        <Card className="surface-contrast border-0">
           <p className="text-xs font-black text-[var(--mint)]">
             INTERVIEW MODE
           </p>
@@ -696,7 +696,7 @@ function MockInterviewStep() {
             <Link
               href="/applications/demo/cheat-sheet"
               onClick={() => completeStep("mock-interview")}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 text-sm font-bold text-white"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]"
             >
               파이널 노트 보기 <ArrowRight className="size-4" />
             </Link>
@@ -705,7 +705,7 @@ function MockInterviewStep() {
       </div>
     );
   return (
-    <Card className="relative min-h-[34rem] overflow-hidden border-0 bg-[var(--surface-inverse)] p-6 text-center text-[var(--text-inverse)] sm:p-10">
+    <Card className="surface-contrast relative min-h-[34rem] overflow-hidden border-0 p-6 text-center sm:p-10">
       <button
         onClick={() => setPhase("select")}
         className="absolute left-5 top-5 inline-flex items-center gap-1 text-xs font-bold opacity-60"
@@ -915,7 +915,7 @@ function CheatSheetStep() {
       {saved ? (
         <div
           role="status"
-          className="no-print fixed bottom-24 left-1/2 z-50 -translate-x-1/2 bg-[var(--surface-inverse)] px-5 py-3 text-xs font-bold text-[var(--text-inverse)]"
+          className="surface-contrast no-print fixed bottom-24 left-1/2 z-50 -translate-x-1/2 px-5 py-3 text-xs font-bold"
         >
           파이널 노트를 저장했어요
         </div>

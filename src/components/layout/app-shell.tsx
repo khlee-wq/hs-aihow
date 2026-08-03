@@ -103,7 +103,7 @@ function StudentShell({
             className="flex shrink-0 items-center gap-2.5 leading-none"
             aria-label="AIHOW 학생 홈"
           >
-            <span className="grid size-7 place-items-center rounded-[var(--radius-xs)] bg-[var(--brand)] text-[10px] font-black text-white shadow-[0_6px_14px_color-mix(in_srgb,var(--brand)_24%,transparent)]">
+            <span className="grid size-7 place-items-center rounded-[var(--radius-xs)] bg-[var(--brand)] text-[10px] font-black text-[var(--text-on-brand)] shadow-[0_6px_14px_color-mix(in_srgb,var(--brand)_24%,transparent)]">
               A
             </span>
             <span>

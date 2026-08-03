@@ -9,7 +9,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -34,7 +33,6 @@ export function AuthForm({
   nextPath?: string;
   plan?: string;
 }) {
-  const router = useRouter();
   const [serverError, setServerError] = useState("");
   const {
     register,
@@ -74,8 +72,9 @@ export function AuthForm({
         );
         return;
       }
-      router.push(payload.redirect);
-      router.refresh();
+      // 인증 응답의 Set-Cookie가 반영된 뒤 보호 경로를 서버에서 다시 판정하도록
+      // 전체 이동을 사용합니다. App Router 전환과 쿠키 갱신이 경합하는 것을 막습니다.
+      window.location.assign(payload.redirect);
     } catch {
       setServerError("네트워크 연결을 확인한 뒤 다시 시도해 주세요.");
     }

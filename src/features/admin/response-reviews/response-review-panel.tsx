@@ -208,7 +208,7 @@ export function ResponseReviewPanel() {
                     className={cn(
                       "min-h-9 shrink-0 rounded-[var(--radius-xs)] px-3 text-[11px] font-black",
                       filter === item
-                        ? "bg-[var(--brand)] text-white"
+                        ? "bg-[var(--brand)] text-[var(--text-on-brand)]"
                         : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]",
                     )}
                   >
@@ -362,7 +362,7 @@ export function ResponseReviewPanel() {
             </section>
 
             <section
-              className="rounded-[var(--radius-md)] bg-[var(--surface-inverse)] p-4 text-[var(--text-inverse)] sm:p-5 lg:col-span-2"
+              className="surface-contrast rounded-[var(--radius-md)] p-4 sm:p-5 lg:col-span-2"
               aria-labelledby="answer-edit-title"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">

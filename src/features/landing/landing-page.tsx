@@ -215,7 +215,7 @@ export function LandingPage() {
 
       <section
         id="journey"
-        className="scroll-mt-24 bg-[var(--surface-inverse)] py-24 text-[var(--text-inverse)] lg:py-32"
+        className="surface-contrast scroll-mt-24 py-24 lg:py-32"
         data-motion-reveal
       >
         <div className="page-wrap">
@@ -286,8 +286,8 @@ export function LandingPage() {
       </section>
 
       <section className="pb-24 lg:pb-32">
-        <div className="page-wrap relative overflow-hidden rounded-[var(--radius-xl)] border border-[color-mix(in_srgb,white_18%,transparent)] bg-[var(--brand)] px-6 py-14 text-center text-white shadow-[var(--shadow-brand)] sm:px-12 lg:py-20">
-          <p className="text-xs font-black uppercase tracking-[.14em] text-white/65">
+        <div className="page-wrap relative overflow-hidden rounded-[var(--radius-xl)] border border-[color-mix(in_srgb,white_18%,transparent)] bg-[var(--brand)] px-6 py-14 text-center text-[var(--text-on-brand)] shadow-[var(--shadow-brand)] sm:px-12 lg:py-20">
+          <p className="text-xs font-black uppercase tracking-[.14em] opacity-65">
             Ready when you are
           </p>
           <h2 className="mx-auto mt-4 max-w-3xl text-balance text-3xl font-black tracking-[-.05em] sm:text-5xl">
@@ -295,7 +295,7 @@ export function LandingPage() {
             <br />
             오늘 첫 질문부터 준비하세요.
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/75">
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 opacity-75">
             데모 단계에서는 어떤 이메일로 가입해도 전체 인터페이스를 바로 확인할
             수 있습니다.
           </p>
@@ -402,7 +402,7 @@ function HeroPreview() {
         <p className="mt-1 text-xs font-extrabold">자소서에서 찾기</p>
       </div>
       <div
-        className="pointer-events-none absolute -right-8 top-[42%] z-20 hidden rounded-[var(--radius-md)] border border-white/10 bg-[var(--surface-inverse)] px-4 py-3 text-[var(--text-inverse)] shadow-[var(--shadow-md)] sm:block"
+        className="surface-contrast pointer-events-none absolute -right-8 top-[42%] z-20 hidden rounded-[var(--radius-md)] px-4 py-3 sm:block"
         data-motion-satellite
       >
         <p className="text-[10px] font-black text-[var(--mint)]">02 · 질문</p>
@@ -460,7 +460,7 @@ function HeroPreview() {
             <span className="text-xs font-bold text-[var(--text-secondary)]">
               자동 저장됨
             </span>
-            <span className="rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 py-3 text-xs font-black text-white">
+            <span className="rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 py-3 text-xs font-black text-[var(--text-on-brand)]">
               답변 저장
             </span>
           </div>
@@ -471,7 +471,7 @@ function HeroPreview() {
 }
 function ExpertConsole() {
   return (
-    <Card className="relative overflow-hidden bg-[var(--surface-inverse)] p-6 text-[var(--text-inverse)] shadow-[var(--shadow-md)]">
+    <Card className="surface-contrast relative overflow-hidden p-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-black text-[var(--mint)]">

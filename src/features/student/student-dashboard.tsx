@@ -365,7 +365,7 @@ export function StudentDashboard({
                         done
                           ? "border-[var(--success)] bg-[var(--mint-soft)] text-[var(--success)]"
                           : current
-                            ? "border-[var(--brand)] bg-[var(--brand)] text-white"
+                            ? "border-[var(--brand)] bg-[var(--brand)] text-[var(--text-on-brand)]"
                             : "border-[var(--border-strong)] text-[var(--text-tertiary)]",
                       )}
                     >

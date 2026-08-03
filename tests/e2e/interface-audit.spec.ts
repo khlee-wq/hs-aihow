@@ -22,6 +22,39 @@ const adminPaths = [
   "/settings",
 ];
 
+async function visit(page: Page, path: string) {
+  // UI 검사는 load 이벤트보다 화면의 핵심 요소를 기다립니다. 동적 모션 청크가
+  // 늦게 로드돼도 CI의 라우팅 검증이 불필요하게 실패하지 않게 합니다.
+  await page.goto(path, { waitUntil: "domcontentloaded" });
+}
+
+function contrastRatio(foreground: string, background: string) {
+  const parse = (color: string) => {
+    const rawValue = color.replace("#", "");
+    const value =
+      rawValue.length === 3
+        ? rawValue
+            .split("")
+            .map((channel) => `${channel}${channel}`)
+            .join("")
+        : rawValue;
+    const channels = [0, 2, 4].map((offset) =>
+      Number.parseInt(value.slice(offset, offset + 2), 16) / 255,
+    );
+    const [red, green, blue] = channels.map((channel) =>
+      channel <= 0.04045
+        ? channel / 12.92
+        : ((channel + 0.055) / 1.055) ** 2.4,
+    );
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  };
+
+  const [lighter, darker] = [parse(foreground), parse(background)].sort(
+    (left, right) => right - left,
+  );
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
 async function expectInterfaceFitsViewport(page: Page) {
   await expect(page.locator("main")).toBeVisible();
   await expect
@@ -98,8 +131,14 @@ async function expectPrimaryTitle(page: Page) {
   await expect(page.locator("main").getByRole("heading", { level: 1 }).first()).toBeVisible();
 }
 
+function isWebKitRscPrefetchNoise(message: string) {
+  // WebKit은 Next의 same-origin RSC prefetch를 실제 화면 오류와 무관하게
+  // access-control 오류로 기록할 수 있습니다. _rsc 요청에만 한정합니다.
+  return /\?_rsc=.*due to access control checks/i.test(message);
+}
+
 async function signUp(page: Page, role: "student" | "expert") {
-  await page.goto("/signup");
+  await visit(page, "/signup");
   if (role === "expert") {
     await page.getByRole("radio", { name: "전문가" }).click();
   }
@@ -127,16 +166,42 @@ test("공개·인증 화면은 320px부터 데스크톱까지 잘리지 않는�
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     for (const path of ["/", "/login", "/signup", "/terms", "/privacy"]) {
-      await page.goto(path);
+      await visit(page, path);
       await expectInterfaceFitsViewport(page);
     }
   }
 
-  expect(pageErrors).toEqual([]);
+  expect(pageErrors.filter((message) => !isWebKitRscPrefetchNoise(message))).toEqual([]);
   expect(
     consoleErrors.filter((message) => /hydration|hydrated|server rendered html/i.test(message)),
   ).toEqual([]);
-  expect(consoleErrors).toEqual([]);
+  expect(consoleErrors.filter((message) => !isWebKitRscPrefetchNoise(message))).toEqual([]);
+});
+
+test("라이트·다크 색상 토큰은 기본·강조 표면에서 읽을 수 있다", async ({
+  page,
+}) => {
+  await visit(page, "/");
+
+  for (const theme of ["light", "dark"]) {
+    const palette = await page.evaluate((nextTheme) => {
+      document.documentElement.classList.remove("light", "dark");
+      document.documentElement.classList.add(nextTheme);
+      const style = getComputedStyle(document.documentElement);
+      return {
+        canvas: style.getPropertyValue("--canvas").trim(),
+        textPrimary: style.getPropertyValue("--text-primary").trim(),
+        contrastSurface: style.getPropertyValue("--surface-contrast").trim(),
+        contrastText: style.getPropertyValue("--text-on-contrast").trim(),
+        brand: style.getPropertyValue("--brand").trim(),
+        brandText: style.getPropertyValue("--text-on-brand").trim(),
+      };
+    }, theme);
+
+    expect(contrastRatio(palette.textPrimary, palette.canvas)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(palette.contrastText, palette.contrastSurface)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(palette.brandText, palette.brand)).toBeGreaterThanOrEqual(4.5);
+  }
 });
 
 test("모바일 랜딩의 안내 목록·미리보기·다음 구간은 서로 겹치지 않는다", async ({
@@ -144,7 +209,7 @@ test("모바일 랜딩의 안내 목록·미리보기·다음 구간은 서로 �
 }) => {
   for (const width of [320, 400]) {
     await page.setViewportSize({ width, height: 910 });
-    await page.goto("/");
+    await visit(page, "/");
 
     const copy = await page.getByTestId("landing-hero-copy").boundingBox();
     const preview = await page.getByTestId("landing-hero-preview").boundingBox();
@@ -167,7 +232,7 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     for (const path of studentPaths) {
-      await page.goto(path);
+      await visit(page, path);
       await expectPrimaryTitle(page);
       await expectInterfaceFitsViewport(page);
     }
@@ -183,7 +248,7 @@ test("전문가 운영 전 메뉴는 모바일·태블릿·데스크톱에서 �
     await page.setViewportSize({ width, height: 900 });
     for (const path of adminPaths) {
       await test.step(`${width}px ${path}`, async () => {
-        await page.goto(path);
+        await visit(page, path);
         await expectPrimaryTitle(page);
         await expectInterfaceFitsViewport(page);
       });

@@ -416,7 +416,7 @@ export function PromptStudio() {
             </Button>
           </div>
 
-          <div className="bg-[var(--surface-inverse)] p-5 text-[var(--text-inverse)] sm:p-6">
+          <div className="surface-contrast p-5 sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="size-4 text-[var(--mint)]" />

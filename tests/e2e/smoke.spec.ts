@@ -1,4 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function visit(page: Page, path: string) {
+  await page.goto(path, { waitUntil: "domcontentloaded" });
+}
 
 test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ page }) => {
   const consoleErrors: string[] = [];
@@ -7,7 +11,7 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
     if (message.type() === "error") consoleErrors.push(message.text());
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
-  await page.goto("/");
+  await visit(page, "/");
   await expect(
     page.getByRole("heading", {
       name: "자소서가 끝나면, 말할 준비가 시작됩니다.",
@@ -36,7 +40,7 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
 test("회의용 팔레트 프리뷰가 Iris와 Deep Teal을 즉시 전환한다", async ({
   page,
 }) => {
-  await page.goto("/?palette=iris&palettePreview=1");
+  await visit(page, "/?palette=iris&palettePreview=1");
   await expect(page.getByTestId("brand-palette-preview")).toBeVisible();
   await expect
     .poll(() => page.locator("html").getAttribute("data-brand-palette"))
@@ -54,7 +58,7 @@ test("320px 공개 헤더는 테마·시작하기를 줄바꿈 없이 정리한�
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 720 });
-  await page.goto("/");
+  await visit(page, "/");
 
   const header = page.locator("header").first();
   const startLink = header.getByRole("link", { name: "시작하기" });
@@ -78,7 +82,7 @@ test("320px 공개 헤더는 테마·시작하기를 줄바꿈 없이 정리한�
 });
 
 test("학생이 가입하고 준비 화면으로 진입한다", async ({ page }, testInfo) => {
-  await page.goto("/signup?plan=all");
+  await visit(page, "/signup?plan=all");
   await expect(
     page.getByRole("button", { name: /현재 .* 테마/ }),
   ).toBeVisible();
@@ -162,7 +166,7 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   ).toBeVisible();
   const forbiddenApi = await page.request.get("/api/question-rules");
   expect(forbiddenApi.status()).toBe(403);
-  await page.goto("/applications/demo/not-a-step");
+  await visit(page, "/applications/demo/not-a-step");
   await expect(
     page.getByRole("heading", { name: "이 경로는 아직 준비되지 않았어요" }),
   ).toBeVisible();
@@ -176,7 +180,7 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
 test("비로그인 보호 경로는 원래 목적지를 보존해 로그인으로 보낸다", async ({
   page,
 }) => {
-  await page.goto("/admin/questions?filter=review");
+  await visit(page, "/admin/questions?filter=review");
   await expect(page).toHaveURL(
     /\/login\?next=%2Fadmin%2Fquestions%3Ffilter%3Dreview$/,
   );
@@ -186,7 +190,7 @@ test("비로그인 보호 경로는 원래 목적지를 보존해 로그인으�
 test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 수 있다", async ({
   page,
 }, testInfo) => {
-  await page.goto("/signup");
+  await visit(page, "/signup");
   await expect(
     page.getByRole("button", { name: /현재 .* 테마/ }),
   ).toBeVisible();
@@ -214,14 +218,14 @@ test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 �
   await page.getByRole("link", { name: "학생 화면으로 전환" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByTestId("student-dashboard")).toBeVisible();
-  await page.goto("/admin/not-a-section");
+  await visit(page, "/admin/not-a-section");
   await expect(
     page.getByRole("heading", { name: "이 경로는 아직 준비되지 않았어요" }),
   ).toBeVisible();
 });
 
 test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", async ({ page }) => {
-  await page.goto("/signup");
+  await visit(page, "/signup");
   await page.getByRole("radio", { name: "전문가" }).click();
   await page.getByLabel("이름", { exact: true }).fill("김소장");
   await page.getByLabel("이메일", { exact: true }).fill("prompt@example.com");
@@ -229,7 +233,7 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
   await page.getByRole("button", { name: "가입하고 시작하기" }).click();
   await expect(page).toHaveURL(/\/admin$/);
 
-  await page.goto("/admin/prompts");
+  await visit(page, "/admin/prompts");
   await expect(
     page.getByRole("heading", { name: "코칭 설계실" }),
   ).toBeVisible();
@@ -254,7 +258,7 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
 test("운영자가 학생 입력과 코칭 답변을 직접 수정해 승인한다", async ({
   page,
 }) => {
-  await page.goto("/signup");
+  await visit(page, "/signup");
   await page.getByRole("radio", { name: "전문가" }).click();
   await page.getByLabel("이름", { exact: true }).fill("박소장");
   await page.getByLabel("이메일", { exact: true }).fill("review@example.com");
@@ -262,7 +266,7 @@ test("운영자가 학생 입력과 코칭 답변을 직접 수정해 승인한�
   await page.getByRole("button", { name: "가입하고 시작하기" }).click();
   await expect(page).toHaveURL(/\/admin$/);
 
-  await page.goto("/admin/reviews");
+  await visit(page, "/admin/reviews");
   await expect(
     page.getByRole("heading", { name: "코칭 응답 검수" }),
   ).toBeVisible();
@@ -281,7 +285,7 @@ test("운영자가 학생 입력과 코칭 답변을 직접 수정해 승인한�
 
 test("전문가가 질문 기준을 생성·수정·삭제한다", async ({ page }, testInfo) => {
   const title = `브라우저 CRUD ${testInfo.project.name} ${Date.now()}`;
-  await page.goto("/signup");
+  await visit(page, "/signup");
   await page.getByRole("radio", { name: "전문가" }).click();
   await page.getByLabel("이름", { exact: true }).fill("이소장");
   await page
@@ -290,7 +294,7 @@ test("전문가가 질문 기준을 생성·수정·삭제한다", async ({ page
   await page.getByPlaceholder("4자 이상").fill("demo1234");
   await page.getByRole("button", { name: "가입하고 시작하기" }).click();
   await expect(page).toHaveURL(/\/admin$/);
-  await page.goto("/admin/questions");
+  await visit(page, "/admin/questions");
 
   await page.getByRole("button", { name: "질문 기준 등록" }).click();
   await page.getByLabel("기준 이름").fill(title);
