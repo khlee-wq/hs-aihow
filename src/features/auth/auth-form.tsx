@@ -11,12 +11,11 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field, inputClass } from "@/components/ui/field";
-import { cn } from "@/lib/utils";
 
 const schema = z.object({
   name: z.string().trim().min(2, "이름을 2자 이상 입력해 주세요."),
@@ -40,8 +39,6 @@ export function AuthForm({
   const {
     register,
     handleSubmit,
-    control,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -52,15 +49,20 @@ export function AuthForm({
       role: "student",
     },
   });
-  const role = useWatch({ control, name: "role" });
-
-  const submit = handleSubmit(async (values) => {
+  const submit = handleSubmit(async (values, event) => {
     setServerError("");
     try {
+      const submittedRole = event?.currentTarget
+        ? new FormData(event.currentTarget as HTMLFormElement).get("role")
+        : values.role;
       const response = await fetch("/api/auth/demo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, next: nextPath }),
+        body: JSON.stringify({
+          ...values,
+          role: submittedRole === "expert" ? "expert" : "student",
+          next: nextPath,
+        }),
       });
       const payload = (await response.json().catch(() => null)) as {
         redirect?: string;
@@ -144,20 +146,30 @@ export function AuthForm({
             role="radiogroup"
             aria-label="사용자 역할"
           >
-            <RoleButton
-              active={role === "student"}
-              onClick={() => setValue("role", "student")}
-              icon={GraduationCap}
-              label="학생·학부모"
-            />
-            <RoleButton
-              active={role === "expert"}
-              onClick={() => setValue("role", "expert")}
-              icon={ShieldCheck}
-              label="전문가"
-            />
+            <label className="relative flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[var(--radius-sm)] text-xs font-extrabold text-[var(--text-secondary)] transition-colors has-[:checked]:bg-[var(--surface)] has-[:checked]:text-[var(--brand)] has-[:checked]:shadow-[var(--shadow-sm)]">
+              <input
+                type="radio"
+                value="student"
+                form="aihow-auth-form"
+                {...register("role")}
+                className="absolute inset-0 z-10 size-full cursor-pointer opacity-0"
+              />
+              <GraduationCap className="size-4" />
+              학생·학부모
+            </label>
+            <label className="relative flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[var(--radius-sm)] text-xs font-extrabold text-[var(--text-secondary)] transition-colors has-[:checked]:bg-[var(--surface)] has-[:checked]:text-[var(--brand)] has-[:checked]:shadow-[var(--shadow-sm)]">
+              <input
+                type="radio"
+                value="expert"
+                form="aihow-auth-form"
+                {...register("role")}
+                className="absolute inset-0 z-10 size-full cursor-pointer opacity-0"
+              />
+              <ShieldCheck className="size-4" />
+              전문가
+            </label>
           </div>
-          <form onSubmit={submit} className="mt-6 grid gap-5">
+          <form id="aihow-auth-form" onSubmit={submit} className="mt-6 grid gap-5">
             <Field label="이름" error={errors.name?.message}>
               <input
                 {...register("name")}
@@ -190,7 +202,6 @@ export function AuthForm({
                 placeholder="4자 이상"
               />
             </Field>
-            <input type="hidden" {...register("role")} />
             {serverError ? (
               <p
                 role="alert"
@@ -216,35 +227,5 @@ export function AuthForm({
         </Card>
       </div>
     </div>
-  );
-}
-
-function RoleButton({
-  active,
-  onClick,
-  icon: Icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: typeof GraduationCap;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={active}
-      onClick={onClick}
-      className={cn(
-        "flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] text-xs font-extrabold transition-colors",
-        active
-          ? "bg-[var(--surface)] text-[var(--brand)] shadow-[var(--shadow-sm)]"
-          : "text-[var(--text-secondary)]",
-      )}
-    >
-      <Icon className="size-4" />
-      {label}
-    </button>
   );
 }

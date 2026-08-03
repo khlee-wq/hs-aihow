@@ -6,7 +6,7 @@ import { getStudentDashboardSnapshot } from "@/server/repositories/student-dashb
 export const metadata: Metadata = { title: "오늘의 준비" };
 export default async function DashboardPage() {
   const [session, snapshot] = await Promise.all([
-    requireSession("student"),
+    requireSession(),
     getStudentDashboardSnapshot(),
   ]);
 

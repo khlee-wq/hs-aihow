@@ -117,8 +117,11 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(
     page.getByRole("heading", { name: "이 경로는 아직 준비되지 않았어요" }),
   ).toBeVisible();
-  await page.goto("/admin/questions");
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.getByRole("link", { name: "운영 화면으로 전환" }).click();
+  await expect(page).toHaveURL(/\/admin$/);
+  await expect(
+    page.getByRole("heading", { name: "좋은 기준이, 좋은 질문을 만듭니다" }),
+  ).toBeVisible();
 });
 
 test("비로그인 보호 경로는 원래 목적지를 보존해 로그인으로 보낸다", async ({
@@ -131,7 +134,9 @@ test("비로그인 보호 경로는 원래 목적지를 보존해 로그인으�
   await expect(page.getByRole("heading", { name: "로그인" })).toBeVisible();
 });
 
-test("전문가 역할과 학생 라우트 경계를 지킨다", async ({ page }, testInfo) => {
+test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 수 있다", async ({
+  page,
+}, testInfo) => {
   await page.goto("/signup");
   await expect(
     page.getByRole("button", { name: /현재 .* 테마/ }),
@@ -157,8 +162,9 @@ test("전문가 역할과 학생 라우트 경계를 지킨다", async ({ page }
       page.getByTestId("expert-desktop-nav").locator("[data-menu-icon]"),
     ).toHaveCount(0);
   }
-  await page.goto("/dashboard");
-  await expect(page).toHaveURL(/\/admin$/);
+  await page.getByRole("link", { name: "학생 화면으로 전환" }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByTestId("student-dashboard")).toBeVisible();
   await page.goto("/admin/not-a-section");
   await expect(
     page.getByRole("heading", { name: "이 경로는 아직 준비되지 않았어요" }),
@@ -187,6 +193,34 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
   await expertAnswer.fill("소장님이 직접 수정한 모의면접 코칭 기준입니다.");
   await expect(page.getByText("전문가 수정됨")).toBeVisible();
   await page.getByRole("button", { name: "승인하고 적용" }).click();
+  await expect(page.getByRole("status")).toContainText("승인했습니다");
+
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("운영자가 학생 입력과 코칭 답변을 직접 수정해 승인한다", async ({
+  page,
+}) => {
+  await page.goto("/signup");
+  await page.getByRole("radio", { name: "전문가" }).click();
+  await page.getByLabel("이름", { exact: true }).fill("박소장");
+  await page.getByLabel("이메일", { exact: true }).fill("review@example.com");
+  await page.getByPlaceholder("4자 이상").fill("demo1234");
+  await page.getByRole("button", { name: "가입하고 시작하기" }).click();
+  await expect(page).toHaveURL(/\/admin$/);
+
+  await page.goto("/admin/reviews");
+  await expect(
+    page.getByRole("heading", { name: "코칭 응답 검수" }),
+  ).toBeVisible();
+  await page
+    .getByLabel("최종 코칭 답변 수정")
+    .fill("소장님이 학생의 판단 근거를 중심으로 수정한 답변입니다.");
+  await page.getByRole("button", { name: "승인하고 학생에게 적용" }).click();
   await expect(page.getByRole("status")).toContainText("승인했습니다");
 
   expect(

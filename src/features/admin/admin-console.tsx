@@ -23,6 +23,7 @@ import { EmptyState } from "@/components/ui/status-state";
 import { inputClass } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import { PromptStudio } from "./prompt-studio/prompt-studio";
+import { ResponseReviewPanel } from "./response-reviews/response-review-panel";
 import { QuestionRulesPanel } from "./question-rules/question-rules-panel";
 
 type AdminSection =
@@ -50,7 +51,7 @@ export function AdminConsole({ section }: { section: string }) {
     ? (section as AdminSection)
     : "home";
   if (normalized === "home") return <AdminHome />;
-  if (normalized === "reviews") return <Reviews />;
+  if (normalized === "reviews") return <ResponseReviewPanel />;
   if (normalized === "questions") return <QuestionRulesPanel />;
   if (normalized === "prompts") return <PromptStudio />;
   if (normalized === "videos") return <Videos />;
@@ -327,60 +328,6 @@ function QueueList({ limit }: { limit?: number }) {
           <ChevronRight className="size-4 text-[var(--text-tertiary)]" />
         </button>
       ))}
-    </div>
-  );
-}
-
-function Reviews() {
-  const [filter, setFilter] = useState("전체");
-  const filtered =
-    filter === "전체"
-      ? reviewQueue
-      : reviewQueue.filter((item) => item.kind === filter);
-  return (
-    <div className="space-y-7 float-in">
-      <PageHeader
-        eyebrow="Review queue"
-        title="검수 큐"
-        description="AI가 정리한 질문·코칭·피드백을 학생에게 전달하기 전에 근거와 기준을 확인합니다."
-      />
-      <Card className="p-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
-            <input
-              className={cn(inputClass, "pl-10")}
-              placeholder="학생, 학교, 검수 내용을 검색"
-            />
-          </div>
-          <div className="flex gap-1 overflow-auto">
-            {["전체", "예상 질문", "자소서", "면접"].map((item) => (
-              <button
-                key={item}
-                onClick={() => setFilter(item)}
-                className={cn(
-                  "min-h-10 shrink-0 rounded-[var(--radius-sm)] px-4 text-xs font-extrabold",
-                  filter === item
-                    ? "bg-[var(--brand)] text-white"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]",
-                )}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Card>
-      <Card className="p-0">
-        {filtered.length ? (
-          <QueueList />
-        ) : (
-          <EmptyState
-            title="조건에 맞는 검수가 없어요"
-            description="검색 조건을 바꾸거나 전체 검수 목록을 확인해 주세요."
-          />
-        )}
-      </Card>
     </div>
   );
 }

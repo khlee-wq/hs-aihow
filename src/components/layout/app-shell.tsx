@@ -8,11 +8,13 @@ import {
   ClipboardCheck,
   FileText,
   Gauge,
+  GraduationCap,
   LayoutDashboard,
   MessageSquareText,
   Mic2,
   School,
   Settings,
+  ShieldCheck,
   Sparkles,
   Users,
   Video,
@@ -147,6 +149,14 @@ function StudentShell({
           </nav>
 
           <div className="ml-auto flex items-center gap-0.5 border-l border-[var(--border)] pl-2 lg:ml-2">
+            <Link
+              href="/admin"
+              className="inline-flex min-h-9 items-center gap-1.5 px-2.5 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+              aria-label="운영 화면으로 전환"
+            >
+              <ShieldCheck className="size-[16px]" />
+              <span className="hidden sm:inline">운영 화면</span>
+            </Link>
             <ThemeToggle />
             <Link
               href="/settings"
@@ -215,7 +225,7 @@ function ExpertShell({
   session: DemoSession;
 }) {
   return (
-    <div className="min-h-[100svh] bg-[var(--canvas)] md:grid md:grid-cols-[15.5rem_1fr]">
+    <div className="min-h-[100svh] overflow-x-hidden bg-[var(--canvas)] md:grid md:grid-cols-[15.5rem_1fr]">
       <aside className="app-navigation sticky top-0 hidden h-[100svh] flex-col border-r border-[var(--border)] bg-[var(--surface)] p-4 md:flex">
         <div className="px-2 py-2">
           <Logo />
@@ -276,6 +286,14 @@ function ExpertShell({
             2027학년도 운영 기준
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+              aria-label="학생 화면으로 전환"
+            >
+              <GraduationCap className="size-[17px]" />
+              <span className="hidden sm:inline">학생 화면</span>
+            </Link>
             <ThemeToggle />
             <Link
               href="/settings"
@@ -287,7 +305,7 @@ function ExpertShell({
           </div>
         </header>
         <nav
-          className="app-navigation no-scrollbar sticky top-16 z-20 flex gap-1 overflow-x-auto border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_94%,transparent)] px-3 py-2 backdrop-blur-xl md:hidden"
+          className="app-navigation no-scrollbar sticky top-16 z-20 flex w-full max-w-[100vw] gap-1 overflow-x-auto border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_94%,transparent)] px-3 py-2 backdrop-blur-xl md:hidden"
           aria-label="모바일 전문가 메뉴"
           data-testid="expert-mobile-nav"
         >
