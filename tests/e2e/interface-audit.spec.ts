@@ -91,6 +91,13 @@ async function expectInterfaceFitsViewport(page: Page) {
   expect(clipped).toEqual([]);
 }
 
+async function expectPrimaryTitle(page: Page) {
+  // 화면 전환 직후에는 이전 제목이 짧게 남을 수 있습니다. 이 감사의 목적은
+  // 각 화면의 주 제목이 보이는지 확인하는 것이므로, main의 첫 level-1 제목을
+  // 기준으로 검사합니다.
+  await expect(page.locator("main").getByRole("heading", { level: 1 }).first()).toBeVisible();
+}
+
 async function signUp(page: Page, role: "student" | "expert") {
   await page.goto("/signup");
   if (role === "expert") {
@@ -141,7 +148,7 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
     await page.setViewportSize({ width, height: 900 });
     for (const path of studentPaths) {
       await page.goto(path);
-      await expect(page.locator("h1")).toBeVisible();
+      await expectPrimaryTitle(page);
       await expectInterfaceFitsViewport(page);
     }
   }
@@ -157,7 +164,7 @@ test("전문가 운영 전 메뉴는 모바일·태블릿·데스크톱에서 �
     for (const path of adminPaths) {
       await test.step(`${width}px ${path}`, async () => {
         await page.goto(path);
-        await expect(page.locator("h1")).toBeVisible();
+        await expectPrimaryTitle(page);
         await expectInterfaceFitsViewport(page);
       });
     }
