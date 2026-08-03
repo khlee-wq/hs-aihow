@@ -139,6 +139,26 @@ test("공개·인증 화면은 320px부터 데스크톱까지 잘리지 않는�
   expect(consoleErrors).toEqual([]);
 });
 
+test("모바일 랜딩의 안내 목록·미리보기·다음 구간은 서로 겹치지 않는다", async ({
+  page,
+}) => {
+  for (const width of [320, 400]) {
+    await page.setViewportSize({ width, height: 910 });
+    await page.goto("/");
+
+    const copy = await page.getByTestId("landing-hero-copy").boundingBox();
+    const preview = await page.getByTestId("landing-hero-preview").boundingBox();
+    const roleStrip = await page.getByTestId("landing-role-strip").boundingBox();
+
+    expect(copy).not.toBeNull();
+    expect(preview).not.toBeNull();
+    expect(roleStrip).not.toBeNull();
+    expect(preview!.y).toBeGreaterThanOrEqual(copy!.y + copy!.height + 24);
+    expect(roleStrip!.y - (preview!.y + preview!.height)).toBeLessThanOrEqual(100);
+    await expectInterfaceFitsViewport(page);
+  }
+});
+
 test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완결된다", async ({
   page,
 }) => {

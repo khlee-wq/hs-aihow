@@ -74,10 +74,10 @@ const journey = [
 export function LandingPage() {
   return (
     <>
-      <section className="relative overflow-hidden pb-24 pt-16 sm:pt-24 lg:pb-32 lg:pt-28">
+      <section className="relative overflow-hidden pb-8 pt-16 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-28">
         <div className="absolute left-[55%] top-0 -z-10 h-[34rem] w-[34rem] rounded-full bg-[var(--brand-soft)] blur-3xl" />
         <div className="page-wrap grid items-center gap-14 lg:grid-cols-[1.05fr_.95fr]">
-          <div className="float-in" data-motion-hero>
+          <div className="float-in" data-motion-hero data-testid="landing-hero-copy">
             <p className="eyebrow mb-6">AIHOW Interview</p>
             <h1 className="display text-balance">
               자소서가 끝나면,
@@ -127,6 +127,7 @@ export function LandingPage() {
       <section
         className="border-y border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--surface)_82%,transparent)] py-8 shadow-[0_18px_50px_color-mix(in_srgb,var(--surface-inverse)_3%,transparent)] backdrop-blur-sm"
         data-motion-reveal
+        data-testid="landing-role-strip"
       >
         <div className="page-wrap grid gap-6 text-center sm:grid-cols-3">
           <Role icon={Sparkles} title="AI는" text="근거를 정리하고 질문해요" />
@@ -389,8 +390,9 @@ function ExpertPoint({
 function HeroPreview() {
   return (
     <div
-      className="relative mx-auto w-full max-w-[33rem] lg:mr-0"
+      className="relative mx-auto mt-10 w-full max-w-[33rem] lg:mr-0 lg:mt-0"
       data-motion-float
+      data-testid="landing-hero-preview"
     >
       <div
         className="pointer-events-none absolute -left-10 top-16 z-20 hidden rounded-[var(--radius-md)] border border-[var(--border-soft)] bg-[var(--surface)] px-4 py-3 shadow-[var(--shadow-md)] sm:block"
@@ -415,7 +417,7 @@ function HeroPreview() {
         </p>
         <p className="mt-1 text-xs font-extrabold">음성으로 반복</p>
       </div>
-      <div className="absolute -inset-5 -z-10 rotate-3 rounded-[var(--radius-xl)] bg-[var(--mint-soft)]" />
+      <div className="absolute -inset-x-2 -inset-y-3 -z-10 rotate-3 rounded-[var(--radius-xl)] bg-[var(--mint-soft)] sm:-inset-5" />
       <Card className="overflow-hidden p-0 shadow-[var(--shadow-md)]">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
           <div className="flex items-center gap-2">
