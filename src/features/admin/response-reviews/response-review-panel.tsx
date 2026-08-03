@@ -152,7 +152,7 @@ export function ResponseReviewPanel() {
   const isCreating = selectedId === "create";
 
   return (
-    <div className="space-y-7 float-in" data-testid="response-review-panel">
+    <div className="min-w-0 space-y-7 float-in" data-testid="response-review-panel">
       <header className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
         <div>
           <p className="eyebrow">Response operations</p>

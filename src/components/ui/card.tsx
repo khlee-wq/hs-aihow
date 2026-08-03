@@ -8,7 +8,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "surface surface-raised bg-[var(--surface)] p-5 sm:p-6",
+        "surface surface-raised min-w-0 bg-[var(--surface)] p-5 sm:p-6",
         className,
       )}
       {...props}
