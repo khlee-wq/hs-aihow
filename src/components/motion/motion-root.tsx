@@ -1,12 +1,7 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-
-gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export function MotionRoot({ children }: { children: React.ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
@@ -28,11 +23,26 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  useGSAP(
-    () => {
-      if (!motionReady) return;
+  useEffect(() => {
+    if (!motionReady || !root.current) return;
 
-      const media = gsap.matchMedia();
+    const motionSelector =
+      ".float-in, [data-motion-hero], [data-motion-float], [data-motion-satellite], [data-motion-drop-group], [data-motion-parallax], [data-motion-reveal]";
+    if (!root.current.querySelector(motionSelector)) return;
+
+    let cancelled = false;
+    let disposeMotion: (() => void) | undefined;
+
+    const loadMotion = async () => {
+      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+      ]);
+      if (cancelled || !root.current) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+      const context = gsap.context(() => {
+        const media = gsap.matchMedia();
       media.add("(prefers-reduced-motion: no-preference)", () => {
         const pageEntry = Array.from(
           root.current?.querySelectorAll<HTMLElement>(".float-in") ?? [],
@@ -216,13 +226,28 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
           ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       });
       return () => media.revert();
-    },
-    {
-      scope: root,
-      dependencies: [motionReady, pathname],
-      revertOnUpdate: true,
-    },
-  );
+      }, root);
+      disposeMotion = () => context.revert();
+    };
+
+    const start = () => void loadMotion();
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (
+        callback: IdleRequestCallback,
+        options?: IdleRequestOptions,
+      ) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    const idleId = idleWindow.requestIdleCallback?.(start, { timeout: 900 });
+    const timeoutId = idleId === undefined ? window.setTimeout(start, 180) : undefined;
+
+    return () => {
+      cancelled = true;
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      if (idleId !== undefined) idleWindow.cancelIdleCallback?.(idleId);
+      disposeMotion?.();
+    };
+  }, [motionReady, pathname]);
 
   return (
     <div ref={root} className="min-h-[100svh]">

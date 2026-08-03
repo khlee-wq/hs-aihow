@@ -303,6 +303,13 @@ body {
   }
 }
 
+@media (hover: none), (pointer: coarse) {
+  body {
+    /* iOS/Android에서 fixed gradient 합성 비용을 피한다. */
+    background-attachment: scroll;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
