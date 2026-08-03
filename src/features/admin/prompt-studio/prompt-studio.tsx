@@ -456,7 +456,7 @@ export function PromptStudio() {
               <Button
                 size="sm"
                 onClick={() => save("approved")}
-                className="bg-[var(--mint)] text-[#10253a] hover:opacity-90"
+                className="bg-[var(--mint)] text-[var(--text-on-mint)] hover:opacity-90"
               >
                 <Check className="size-4" />이 답변을 기준으로 승인
               </Button>

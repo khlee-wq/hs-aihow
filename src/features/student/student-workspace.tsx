@@ -756,7 +756,7 @@ function MockInterviewStep() {
             <Button
               variant="secondary"
               size="lg"
-              className="mt-8 border-transparent bg-white text-[#16233f]"
+              className="mt-8 border-transparent bg-white text-[var(--brand-on-white)]"
               onClick={() => setPhase("feedback")}
             >
               <Square className="size-4 fill-current" />
