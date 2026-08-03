@@ -96,8 +96,8 @@ function StudentShell({
       className="min-h-[100svh] bg-[var(--canvas)]"
       data-testid="student-shell"
     >
-      <header className="app-navigation hairline-top sticky top-0 z-40 border-b border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--canvas)_88%,transparent)] shadow-[0_10px_30px_color-mix(in_srgb,var(--surface-inverse)_3%,transparent)] backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[80rem] items-center gap-4 px-[var(--space-page)]">
+      <header className="app-navigation pointer-events-none sticky top-3 z-40 px-[var(--space-page)]">
+        <div className="liquid-glass pointer-events-auto mx-auto flex h-16 max-w-[96rem] items-center gap-4 rounded-[1.25rem] px-4 sm:px-5">
           <Link
             href="/dashboard"
             className="flex shrink-0 items-center gap-2.5 leading-none"
@@ -177,8 +177,8 @@ function StudentShell({
         </div>
       </header>
 
-      <main className="px-[var(--space-page)] pb-28 pt-7 lg:pb-14 lg:pt-9">
-        <div className="mx-auto max-w-[72rem]">{children}</div>
+      <main className="px-[var(--space-page)] pb-28 pt-8 lg:pb-14 lg:pt-10">
+        <div className="mx-auto max-w-[92rem]">{children}</div>
       </main>
 
       <nav
@@ -225,8 +225,8 @@ function ExpertShell({
   session: DemoSession;
 }) {
   return (
-    <div className="min-h-[100svh] overflow-x-hidden bg-[var(--canvas)] md:grid md:grid-cols-[15.5rem_1fr]">
-      <aside className="app-navigation sticky top-0 hidden h-[100svh] flex-col border-r border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--surface)_92%,var(--brand-soft))] p-4 shadow-[8px_0_28px_color-mix(in_srgb,var(--surface-inverse)_3%,transparent)] md:flex">
+    <div className="min-h-[100svh] overflow-x-hidden bg-[var(--canvas)] md:grid md:grid-cols-[16.5rem_1fr]">
+      <aside className="liquid-glass app-navigation sticky top-3 m-3 hidden h-[calc(100svh-1.5rem)] flex-col rounded-[1.25rem] p-4 md:flex">
         <div className="px-2 py-2">
           <Logo />
         </div>
@@ -278,7 +278,7 @@ function ExpertShell({
         </div>
       </aside>
       <div className="min-w-0">
-        <header className="app-navigation hairline-top sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--canvas)_86%,transparent)] px-4 shadow-[0_10px_30px_color-mix(in_srgb,var(--surface-inverse)_3%,transparent)] backdrop-blur-xl md:px-8">
+        <header className="liquid-glass app-navigation sticky top-3 z-30 mx-3 mt-3 flex h-16 items-center justify-between rounded-[1.25rem] px-4 md:mx-[var(--space-page)] md:px-5">
           <div className="md:hidden">
             <Logo compact />
           </div>
@@ -305,7 +305,7 @@ function ExpertShell({
           </div>
         </header>
         <nav
-          className="app-navigation no-scrollbar sticky top-16 z-20 flex w-full max-w-[100vw] gap-1 overflow-x-auto border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_94%,transparent)] px-3 py-2 backdrop-blur-xl md:hidden"
+          className="liquid-glass app-navigation no-scrollbar sticky top-[5.25rem] z-20 mx-3 flex max-w-[calc(100vw-1.5rem)] gap-1 overflow-x-auto rounded-[1rem] p-1.5 md:hidden"
           aria-label="모바일 전문가 메뉴"
           data-testid="expert-mobile-nav"
         >
@@ -329,8 +329,8 @@ function ExpertShell({
             );
           })}
         </nav>
-        <main className="px-[var(--space-page)] py-7 pb-28 md:py-10 md:pb-12">
-          <div className="mx-auto max-w-[74rem]">{children}</div>
+        <main className="px-[var(--space-page)] py-8 pb-28 md:py-10 md:pb-12">
+          <div className="mx-auto max-w-[92rem]">{children}</div>
         </main>
       </div>
     </div>

@@ -38,8 +38,8 @@
     0 1px 2px rgba(25, 39, 73, 0.04), 0 8px 24px rgba(35, 53, 95, 0.045);
   --shadow-md: 0 22px 60px rgba(29, 46, 86, 0.13);
   --shadow-brand: 0 18px 38px rgba(36, 93, 233, 0.2);
-  --space-page: clamp(1rem, 4vw, 4rem);
-  --content-wide: 76rem;
+  --space-page: clamp(1rem, 3vw, 2.5rem);
+  --content-wide: 90rem;
   --content-reading: 50rem;
   --motion-fast: 140ms;
   --motion-base: 220ms;
