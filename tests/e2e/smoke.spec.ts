@@ -50,6 +50,33 @@ test("회의용 팔레트 프리뷰가 Iris와 Deep Teal을 즉시 전환한다"
   await expect(page).toHaveURL(/palette=teal/);
 });
 
+test("320px 공개 헤더는 테마·시작하기를 줄바꿈 없이 정리한다", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto("/");
+
+  const header = page.locator("header").first();
+  const startLink = header.getByRole("link", { name: "시작하기" });
+  await expect(startLink).toBeVisible();
+  await expect(
+    header.getByRole("button", { name: /현재 .* 테마/ }),
+  ).toBeHidden();
+  const layout = await startLink.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    const headerRect = element.closest("header")?.getBoundingClientRect();
+    return {
+      height: rect.height,
+      whiteSpace: style.whiteSpace,
+      insideHeader: headerRect ? rect.right <= headerRect.right : false,
+    };
+  });
+  expect(layout.whiteSpace).toBe("nowrap");
+  expect(layout.height).toBeLessThanOrEqual(40);
+  expect(layout.insideHeader).toBe(true);
+});
+
 test("학생이 가입하고 준비 화면으로 진입한다", async ({ page }, testInfo) => {
   await page.goto("/signup?plan=all");
   await expect(
