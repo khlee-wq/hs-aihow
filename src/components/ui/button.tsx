@@ -4,13 +4,14 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] px-5 text-sm font-bold transition-[transform,background,color,border-color,opacity] duration-[var(--motion-fast)] disabled:pointer-events-none disabled:opacity-50 active:scale-[.98]",
+  "hairline-top inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 text-sm font-bold transition-[transform,background,color,border-color,box-shadow,opacity] duration-[var(--motion-fast)] disabled:pointer-events-none disabled:opacity-50 active:scale-[.98]",
   {
     variants: {
       variant: {
-        primary: "bg-[var(--brand)] text-white hover:bg-[var(--brand-strong)]",
+        primary:
+          "bg-[var(--brand)] text-white shadow-[var(--shadow-brand)] hover:-translate-y-0.5 hover:bg-[var(--brand-strong)]",
         secondary:
-          "bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--border-strong)]",
+          "bg-[var(--surface-raised)] text-[var(--text-primary)] border border-[var(--border)] shadow-[var(--shadow-sm)] hover:-translate-y-0.5 hover:border-[var(--border-strong)]",
         ghost:
           "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
         inverse:

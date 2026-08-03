@@ -96,14 +96,14 @@ function StudentShell({
       className="min-h-[100svh] bg-[var(--canvas)]"
       data-testid="student-shell"
     >
-      <header className="app-navigation sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_94%,transparent)] backdrop-blur-xl">
+      <header className="app-navigation hairline-top sticky top-0 z-40 border-b border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--canvas)_88%,transparent)] shadow-[0_10px_30px_color-mix(in_srgb,var(--surface-inverse)_3%,transparent)] backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[80rem] items-center gap-4 px-[var(--space-page)]">
           <Link
             href="/dashboard"
             className="flex shrink-0 items-center gap-2.5 leading-none"
             aria-label="AIHOW 학생 홈"
           >
-            <span className="grid size-7 place-items-center bg-[var(--text-primary)] text-[10px] font-black text-[var(--canvas)]">
+            <span className="grid size-7 place-items-center rounded-[var(--radius-xs)] bg-[var(--brand)] text-[10px] font-black text-white shadow-[0_6px_14px_color-mix(in_srgb,var(--brand)_24%,transparent)]">
               A
             </span>
             <span>
@@ -168,7 +168,7 @@ function StudentShell({
             </Link>
             <Link
               href="/settings"
-              className="ml-1 hidden size-8 place-items-center border border-[var(--border)] bg-[var(--mint-soft)] text-xs font-black text-[var(--success)] sm:grid"
+              className="ml-1 hidden size-8 place-items-center rounded-full border border-[color-mix(in_srgb,var(--mint)_24%,var(--border))] bg-[var(--mint-soft)] text-xs font-black text-[var(--success)] shadow-[var(--shadow-sm)] sm:grid"
               aria-label={`${session.name} 프로필`}
             >
               {session.name.slice(0, 1)}
@@ -226,7 +226,7 @@ function ExpertShell({
 }) {
   return (
     <div className="min-h-[100svh] overflow-x-hidden bg-[var(--canvas)] md:grid md:grid-cols-[15.5rem_1fr]">
-      <aside className="app-navigation sticky top-0 hidden h-[100svh] flex-col border-r border-[var(--border)] bg-[var(--surface)] p-4 md:flex">
+      <aside className="app-navigation sticky top-0 hidden h-[100svh] flex-col border-r border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--surface)_92%,var(--brand-soft))] p-4 shadow-[8px_0_28px_color-mix(in_srgb,var(--surface-inverse)_3%,transparent)] md:flex">
         <div className="px-2 py-2">
           <Logo />
         </div>
@@ -247,7 +247,7 @@ function ExpertShell({
                 className={cn(
                   "expert-desktop-nav-link relative flex min-h-11 items-center rounded-[var(--radius-sm)] px-4 text-[13px] font-semibold tracking-[-.01em] transition-[color,background,transform] before:absolute before:left-0 before:h-5 before:w-0.5 before:origin-center before:scale-y-0 before:bg-[var(--brand)] before:transition-transform before:duration-300",
                   active
-                    ? "bg-[color-mix(in_srgb,var(--brand-soft)_68%,transparent)] text-[var(--brand)] before:scale-y-100"
+                    ? "bg-[color-mix(in_srgb,var(--brand-soft)_82%,var(--surface))] text-[var(--brand)] shadow-[inset_0_0_0_1px_var(--border-soft)] before:scale-y-100"
                     : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
                 )}
                 aria-current={active ? "page" : undefined}
@@ -278,7 +278,7 @@ function ExpertShell({
         </div>
       </aside>
       <div className="min-w-0">
-        <header className="app-navigation sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--canvas)_90%,transparent)] px-4 backdrop-blur-xl md:px-8">
+        <header className="app-navigation hairline-top sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--canvas)_86%,transparent)] px-4 shadow-[0_10px_30px_color-mix(in_srgb,var(--surface-inverse)_3%,transparent)] backdrop-blur-xl md:px-8">
           <div className="md:hidden">
             <Logo compact />
           </div>

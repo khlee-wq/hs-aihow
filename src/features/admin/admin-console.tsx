@@ -164,7 +164,7 @@ function AdminHome() {
         />
       </section>
       <section className="grid gap-5 xl:grid-cols-[1.4fr_.8fr]">
-        <Card className="p-0">
+        <Card className="overflow-hidden p-0">
           <div className="flex items-center justify-between border-b border-[var(--border)] p-5">
             <div>
               <h2 className="font-black">우선 검수할 항목</h2>
@@ -268,7 +268,7 @@ function Stat({
   tone: "blue" | "mint" | "coral";
 }) {
   return (
-    <Card>
+    <Card className="surface-interactive">
       <div className="flex items-center justify-between">
         <span
           className={cn(

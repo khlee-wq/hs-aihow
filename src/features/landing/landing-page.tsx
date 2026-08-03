@@ -125,7 +125,7 @@ export function LandingPage() {
       </section>
 
       <section
-        className="border-y border-[var(--border)] bg-[var(--surface)] py-8"
+        className="border-y border-[var(--border-soft)] bg-[color-mix(in_srgb,var(--surface)_82%,transparent)] py-8 shadow-[0_18px_50px_color-mix(in_srgb,var(--surface-inverse)_3%,transparent)] backdrop-blur-sm"
         data-motion-reveal
       >
         <div className="page-wrap grid gap-6 text-center sm:grid-cols-3">
@@ -163,14 +163,14 @@ export function LandingPage() {
                 key={product.title}
                 data-motion-drop
                 className={cn(
-                  "relative flex flex-col overflow-hidden p-7",
+                  "surface-interactive relative flex flex-col overflow-hidden p-7",
                   index === 2 &&
                     "border-[color-mix(in_srgb,var(--coral)_45%,var(--border))]",
                 )}
               >
                 <div
                   className={cn(
-                    "absolute inset-x-0 top-0 h-1.5",
+                    "absolute inset-x-7 top-0 h-[3px] rounded-b-full",
                     product.tone === "mint"
                       ? "bg-[var(--mint)]"
                       : product.tone === "coral"
@@ -229,7 +229,7 @@ export function LandingPage() {
               <div
                 key={title}
                 data-motion-item
-                className="relative rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,var(--text-inverse)_9%,transparent)] p-5"
+                className="relative rounded-[var(--radius-lg)] border border-white/10 bg-[color-mix(in_srgb,var(--text-inverse)_8%,transparent)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,.08)]"
               >
                 <div className="mb-8 flex items-center justify-between">
                   <span className="text-xs font-black opacity-50">
@@ -285,7 +285,7 @@ export function LandingPage() {
       </section>
 
       <section className="pb-24 lg:pb-32">
-        <div className="page-wrap rounded-[var(--radius-xl)] bg-[var(--brand)] px-6 py-14 text-center text-white sm:px-12 lg:py-20">
+        <div className="page-wrap relative overflow-hidden rounded-[var(--radius-xl)] border border-[color-mix(in_srgb,white_18%,transparent)] bg-[var(--brand)] px-6 py-14 text-center text-white shadow-[var(--shadow-brand)] sm:px-12 lg:py-20">
           <p className="text-xs font-black uppercase tracking-[.14em] text-white/65">
             Ready when you are
           </p>
@@ -370,8 +370,11 @@ function ExpertPoint({
   text: string;
 }) {
   return (
-    <div className="flex gap-4 rounded-[var(--radius-md)] p-2" data-motion-item>
-      <div className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--brand-soft)] text-[var(--brand)]">
+    <div
+      className="surface-interactive flex gap-4 rounded-[var(--radius-lg)] border border-transparent p-3 hover:border-[var(--border-soft)] hover:bg-[var(--surface-subtle)]"
+      data-motion-item
+    >
+      <div className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-md)] border border-[var(--border-soft)] bg-[var(--brand-soft)] text-[var(--brand)] shadow-[var(--shadow-sm)]">
         <Icon className="size-5" />
       </div>
       <div>
@@ -390,21 +393,21 @@ function HeroPreview() {
       data-motion-float
     >
       <div
-        className="pointer-events-none absolute -left-10 top-16 z-20 hidden rounded-[var(--radius-sm)] bg-[var(--surface)] px-4 py-3 shadow-[var(--shadow-md)] sm:block"
+        className="pointer-events-none absolute -left-10 top-16 z-20 hidden rounded-[var(--radius-md)] border border-[var(--border-soft)] bg-[var(--surface)] px-4 py-3 shadow-[var(--shadow-md)] sm:block"
         data-motion-satellite
       >
         <p className="text-[10px] font-black text-[var(--brand)]">01 · 근거</p>
         <p className="mt-1 text-xs font-extrabold">자소서에서 찾기</p>
       </div>
       <div
-        className="pointer-events-none absolute -right-8 top-[42%] z-20 hidden rounded-[var(--radius-sm)] bg-[var(--surface-inverse)] px-4 py-3 text-[var(--text-inverse)] shadow-[var(--shadow-md)] sm:block"
+        className="pointer-events-none absolute -right-8 top-[42%] z-20 hidden rounded-[var(--radius-md)] border border-white/10 bg-[var(--surface-inverse)] px-4 py-3 text-[var(--text-inverse)] shadow-[var(--shadow-md)] sm:block"
         data-motion-satellite
       >
         <p className="text-[10px] font-black text-[var(--mint)]">02 · 질문</p>
         <p className="mt-1 text-xs font-extrabold">꼬리까지 연결</p>
       </div>
       <div
-        className="pointer-events-none absolute -bottom-5 left-12 z-20 hidden rounded-[var(--radius-sm)] bg-[var(--coral-soft)] px-4 py-3 shadow-[var(--shadow-md)] sm:block"
+        className="pointer-events-none absolute -bottom-5 left-12 z-20 hidden rounded-[var(--radius-md)] border border-[color-mix(in_srgb,var(--coral)_22%,transparent)] bg-[var(--coral-soft)] px-4 py-3 shadow-[var(--shadow-md)] sm:block"
         data-motion-satellite
       >
         <p className="text-[10px] font-black text-[var(--coral)]">

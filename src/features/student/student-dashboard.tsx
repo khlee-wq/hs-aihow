@@ -99,7 +99,7 @@ export function StudentDashboard({
           </p>
         </div>
         <div
-          className="grid grid-cols-2 border border-[var(--border)] bg-[var(--surface)] text-xs md:min-w-[17rem]"
+          className="surface overflow-hidden grid grid-cols-2 bg-[var(--surface)] text-xs md:min-w-[17rem]"
           data-motion-item
         >
           <div className="border-r border-[var(--border)] px-4 py-3.5">
@@ -135,7 +135,7 @@ export function StudentDashboard({
       </header>
 
       <section
-        className="grid grid-cols-2 overflow-hidden border border-[var(--border)] bg-[var(--surface)] lg:grid-cols-4"
+        className="surface grid grid-cols-2 overflow-hidden bg-[var(--surface)] lg:grid-cols-4"
         aria-label="현재 준비 지표"
         data-motion-reveal
       >
@@ -170,7 +170,7 @@ export function StudentDashboard({
         data-motion-reveal
       >
         <article
-          className="dashboard-grid-surface relative overflow-hidden border border-[var(--border-strong)] bg-[var(--surface)] p-5 sm:p-7 lg:p-8"
+          className="surface surface-accent dashboard-grid-surface relative overflow-hidden p-5 sm:p-7 lg:p-8"
           data-motion-item
         >
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] pb-4">
@@ -243,7 +243,7 @@ export function StudentDashboard({
         </article>
 
         <aside
-          className="border border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_76%,var(--canvas))] p-5 sm:p-6"
+          className="surface bg-[color-mix(in_srgb,var(--surface)_84%,var(--canvas))] p-5 sm:p-6"
           data-motion-item
           aria-labelledby="readiness-title"
         >
@@ -337,7 +337,7 @@ export function StudentDashboard({
         </div>
 
         <ol
-          className="grid overflow-hidden border border-[var(--border)] bg-[var(--surface)] md:grid-cols-5"
+          className="surface grid overflow-hidden bg-[var(--surface)] md:grid-cols-5"
           data-motion-item
         >
           {journeySteps.map((step, index) => {
