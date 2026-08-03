@@ -225,6 +225,19 @@ body {
 .landing-product-stage [data-motion-product-card] {
   will-change: transform, opacity;
 }
+@media (max-width: 767px) {
+  .landing-product-stage {
+    overflow: hidden;
+  }
+  .landing-product-track {
+    display: flex;
+    gap: 1rem;
+    width: max-content;
+  }
+  .landing-product-track [data-motion-product-card] {
+    flex: 0 0 min(17.5rem, calc(100vw - var(--space-page) * 2 - 1.5rem));
+  }
+}
 .journey-stage {
   background: color-mix(in srgb, var(--surface-contrast) 92%, transparent);
 }

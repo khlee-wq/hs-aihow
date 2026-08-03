@@ -195,54 +195,59 @@ export function LandingPage() {
             text="각 상품은 독립적으로 사용할 수 있고, 통합 패키지에서는 앞 단계의 결과가 다음 준비로 자연스럽게 이어집니다."
           />
           <div
-            className="landing-product-stage mt-12 grid gap-5 p-3 sm:p-5 lg:grid-cols-3 lg:p-6"
+            className="landing-product-stage mt-12 p-3 sm:p-5 lg:p-6"
             data-motion-product-stage
           >
-            {products.map((product, index) => (
-              <Card
-                key={product.title}
-                variant="glass"
-                data-motion-product-card
-                className={cn(
-                  `landing-product-card--${product.tone}`,
-                  "landing-product-card surface-interactive relative z-10 flex flex-col overflow-hidden border-0 p-7",
-                  index === 2 &&
-                    "landing-product-card--featured",
-                )}
-              >
-                <p className="mt-2 text-xs font-extrabold text-[var(--text-tertiary)]">
-                  {product.tag}
-                </p>
-                <h3 className="mt-3 text-2xl font-black tracking-[-.04em]">
-                  {product.title}
-                </h3>
-                <p
-                  className="korean-copy mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]"
-                  data-testid="landing-product-description"
+            <div
+              className="landing-product-track grid gap-5 lg:grid-cols-3"
+              data-motion-product-track
+            >
+              {products.map((product, index) => (
+                <Card
+                  key={product.title}
+                  variant="glass"
+                  data-motion-product-card
+                  className={cn(
+                    `landing-product-card--${product.tone}`,
+                    "landing-product-card surface-interactive relative z-10 flex flex-col overflow-hidden border-0 p-7",
+                    index === 2 &&
+                      "landing-product-card--featured",
+                  )}
                 >
-                  {product.description}
-                </p>
-                <ul className="mt-7 grid gap-3">
-                  {product.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-center gap-2 text-sm font-bold"
-                    >
-                      <span className="grid size-5 place-items-center rounded-full bg-[var(--mint-soft)]">
-                        <Check className="size-3 text-[var(--success)]" />
-                      </span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={`/signup?plan=${index === 0 ? "essay" : index === 1 ? "interview" : "all"}`}
-                  className="mt-8 inline-flex items-center gap-1 text-sm font-extrabold text-[var(--brand)]"
-                >
-                  이 과정으로 시작하기 <ChevronRight className="size-4" />
-                </Link>
-              </Card>
-            ))}
+                  <p className="mt-2 text-xs font-extrabold text-[var(--text-tertiary)]">
+                    {product.tag}
+                  </p>
+                  <h3 className="mt-3 text-2xl font-black tracking-[-.04em]">
+                    {product.title}
+                  </h3>
+                  <p
+                    className="korean-copy mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]"
+                    data-testid="landing-product-description"
+                  >
+                    {product.description}
+                  </p>
+                  <ul className="mt-7 grid gap-3">
+                    {product.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-center gap-2 text-sm font-bold"
+                      >
+                        <span className="grid size-5 place-items-center rounded-full bg-[var(--mint-soft)]">
+                          <Check className="size-3 text-[var(--success)]" />
+                        </span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/signup?plan=${index === 0 ? "essay" : index === 1 ? "interview" : "all"}`}
+                    className="mt-8 inline-flex items-center gap-1 text-sm font-extrabold text-[var(--brand)]"
+                  >
+                    이 과정으로 시작하기 <ChevronRight className="size-4" />
+                  </Link>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </section>

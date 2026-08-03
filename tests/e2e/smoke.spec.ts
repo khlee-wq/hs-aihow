@@ -49,6 +49,29 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
   expect(pageErrors).toEqual([]);
 });
 
+test("모바일 상품 카드는 세로 스크롤에 맞춰 가로로 이동한다", async (
+  { page },
+  testInfo,
+) => {
+  test.skip(testInfo.project.name !== "mobile", "모바일 전용 가로 스크롤 검증");
+  await visit(page, "/");
+  const stage = page.locator("[data-motion-product-stage]");
+  const track = page.locator("[data-motion-product-track]");
+  await expect(stage).toBeVisible();
+  await expect(track).toBeVisible();
+  await page.waitForTimeout(1_200);
+
+  await stage.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.scrollBy(0, 640));
+  await page.waitForTimeout(800);
+
+  const transform = await track.evaluate(
+    (element) => getComputedStyle(element).transform,
+  );
+  expect(transform).not.toBe("none");
+});
+
 test("회의용 팔레트 프리뷰가 Iris와 Deep Teal을 즉시 전환한다", async ({
   page,
 }) => {

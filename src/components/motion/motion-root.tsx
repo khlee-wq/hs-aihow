@@ -215,6 +215,33 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
               },
             );
           });
+        } else {
+          Array.from(
+            root.current?.querySelectorAll<HTMLElement>(
+              "[data-motion-product-stage]",
+            ) ?? [],
+          ).forEach((stage) => {
+            const track = stage.querySelector<HTMLElement>(
+              "[data-motion-product-track]",
+            );
+            if (!track) return;
+            gsap.to(track, {
+              x: () => Math.min(0, stage.clientWidth - track.scrollWidth),
+              ease: "none",
+              scrollTrigger: {
+                trigger: stage,
+                // Pin the horizontal sequence directly under the floating nav.
+                // Starting at 72% left too much empty viewport above the cards on phones.
+                start: "top 18%",
+                end: () => `+=${Math.max(520, track.scrollWidth * 1.1)}`,
+                scrub: 0.7,
+                pin: true,
+                pinSpacing: true,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+              },
+            });
+          });
         }
 
         if (window.matchMedia("(min-width: 1024px)").matches) {
