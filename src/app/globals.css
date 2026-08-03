@@ -22,17 +22,6 @@ body {
   margin: 0;
   min-height: 100svh;
   background: var(--canvas);
-  background-image:
-    radial-gradient(
-      circle at 8% 0%,
-      color-mix(in srgb, var(--mint-soft) 35%, transparent),
-      transparent 24rem
-    ),
-    radial-gradient(
-      circle at 96% 18%,
-      color-mix(in srgb, var(--brand-soft) 42%, transparent),
-      transparent 28rem
-    );
   background-attachment: fixed;
   color: var(--text-primary);
   font-family:
@@ -86,14 +75,17 @@ body {
 }
 .surface-raised {
   border: 1px solid var(--border-soft);
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--surface-raised) 92%, var(--brand-soft)),
-    color-mix(in srgb, var(--surface-raised) 92%, transparent)
-  );
+  background: color-mix(in srgb, var(--surface-raised) 94%, transparent);
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(14px) saturate(118%);
   -webkit-backdrop-filter: blur(14px) saturate(118%);
+}
+.surface-glass {
+  border-color: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 38%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 82%, transparent);
+  backdrop-filter: blur(28px) saturate(136%);
+  -webkit-backdrop-filter: blur(28px) saturate(136%);
 }
 .surface-contrast {
   border: 1px solid color-mix(in srgb, var(--text-on-contrast) 12%, transparent);
@@ -103,13 +95,7 @@ body {
 }
 .surface-accent {
   border: 1px solid var(--border-strong);
-  background:
-    radial-gradient(
-      circle at 90% 0%,
-      color-mix(in srgb, var(--brand-soft) 76%, transparent),
-      transparent 35%
-    ),
-    var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 96%, var(--brand-soft));
   box-shadow: var(--shadow-sm);
 }
 .hairline-top {
@@ -117,8 +103,8 @@ body {
     color-mix(in srgb, var(--surface-raised) 86%, transparent);
 }
 .liquid-glass {
-  border: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);
-  background: color-mix(in srgb, var(--surface-raised) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 5%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 68%, transparent);
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, white 60%, transparent),
     0 16px 44px color-mix(in srgb, var(--surface-inverse) 9%, transparent);
@@ -130,82 +116,107 @@ body {
     inset 0 1px 0 color-mix(in srgb, white 10%, transparent),
     0 20px 48px rgba(0, 0, 0, 0.3);
 }
+.public-navigation-glass {
+  isolation: isolate;
+  border: 1px solid color-mix(in srgb, var(--text-primary) 5%, transparent);
+  background: var(--surface-raised);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 82%, transparent),
+    0 16px 44px color-mix(in srgb, var(--surface-inverse) 9%, transparent);
+}
 .liquid-panel {
   background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
   backdrop-filter: blur(16px) saturate(122%);
   -webkit-backdrop-filter: blur(16px) saturate(122%);
 }
-.landing-hero {
+.liquid-glass-group {
   isolation: isolate;
 }
-.landing-hero::before,
-.landing-hero::after {
+.liquid-glass-group::before,
+.liquid-glass-group::after {
   position: absolute;
   z-index: -1;
+  border-radius: 999px;
   content: "";
+  filter: blur(20px);
   pointer-events: none;
 }
-.landing-hero::before {
-  inset: 3rem 4% auto auto;
-  width: min(46vw, 42rem);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 32%, color-mix(in srgb, var(--brand-soft) 92%, transparent), transparent 38%),
-    radial-gradient(circle at 72% 63%, color-mix(in srgb, var(--mint-soft) 90%, transparent), transparent 42%);
-  filter: blur(2px);
-  opacity: .84;
+.liquid-glass-group::before {
+  top: 14%;
+  right: -4%;
+  width: 34%;
+  height: 42%;
+  background: color-mix(in srgb, var(--mint) 17%, transparent);
 }
-.landing-hero::after {
-  inset: auto auto 3.5rem 43%;
-  width: min(23rem, 42vw);
-  height: 7rem;
-  border: 1px solid color-mix(in srgb, var(--brand) 13%, transparent);
-  border-radius: 50%;
-  transform: rotate(-12deg);
+.liquid-glass-group::after {
+  bottom: 7%;
+  left: -3%;
+  width: 38%;
+  height: 32%;
+  background: color-mix(in srgb, var(--coral) 10%, transparent);
+}
+.liquid-glass-section {
+  border: 1px solid color-mix(in srgb, var(--text-primary) 4%, transparent);
+  background: color-mix(in srgb, var(--surface) 56%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 72%, transparent);
+  backdrop-filter: blur(16px) saturate(118%);
+  -webkit-backdrop-filter: blur(16px) saturate(118%);
+}
+.liquid-answer-field {
+  background: color-mix(in srgb, var(--surface) 34%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 5%, transparent);
+}
+.liquid-orbit {
+  background: color-mix(in srgb, var(--brand-soft) 68%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 74%, transparent);
+}
+.landing-hero {
+  background-color: var(--canvas);
 }
 .landing-preview-frame {
   isolation: isolate;
 }
-.landing-preview-frame::before {
-  position: absolute;
-  inset: -1.5rem -1rem;
-  z-index: -1;
-  border: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);
-  border-radius: var(--radius-xl);
-  background: color-mix(in srgb, var(--surface) 48%, transparent);
-  box-shadow: var(--shadow-md);
-  content: "";
-  transform: rotate(2.4deg);
-  backdrop-filter: blur(12px);
+.landing-product-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: calc(var(--radius-xl) + .5rem);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 4%, transparent);
+  background: color-mix(in srgb, var(--surface-muted) 30%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 76%, transparent),
+    inset 0 0 0 1rem color-mix(in srgb, var(--surface-raised) 10%, transparent),
+    0 20px 50px color-mix(in srgb, var(--surface-inverse) 6%, transparent);
+  backdrop-filter: blur(18px) saturate(112%);
+  -webkit-backdrop-filter: blur(18px) saturate(112%);
 }
 .landing-product-card {
   min-height: 24rem;
-  border-color: transparent;
-  background:
-    linear-gradient(155deg, color-mix(in srgb, var(--surface-raised) 96%, var(--brand-soft)), var(--surface-raised));
+  background: color-mix(in srgb, var(--surface-raised) 38%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 82%, transparent),
+    0 14px 30px color-mix(in srgb, var(--surface-inverse) 7%, transparent);
+  backdrop-filter: blur(28px) saturate(136%);
+  -webkit-backdrop-filter: blur(28px) saturate(136%);
 }
 .landing-product-card::after {
   position: absolute;
   inset: 0;
-  border: 1px solid color-mix(in srgb, var(--surface) 70%, transparent);
   border-radius: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--surface-raised) 52%, transparent);
   content: "";
   pointer-events: none;
 }
 .landing-product-card--featured {
-  background:
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--coral-soft) 82%, transparent), transparent 42%),
-    linear-gradient(155deg, color-mix(in srgb, var(--surface-raised) 94%, var(--brand-soft)), var(--surface-raised));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 78%, transparent),
+    0 16px 32px color-mix(in srgb, var(--surface-inverse) 8%, transparent);
 }
 .journey-stage {
-  background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--text-on-contrast) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--text-on-contrast) 5%, transparent) 1px, transparent 1px);
-  background-size: 3rem 3rem;
+  background: color-mix(in srgb, var(--surface-contrast) 92%, transparent);
 }
 .journey-step {
-  background: linear-gradient(150deg, color-mix(in srgb, var(--text-on-contrast) 11%, transparent), color-mix(in srgb, var(--text-on-contrast) 5%, transparent));
+  background: color-mix(in srgb, var(--text-on-contrast) 8%, transparent);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-on-contrast) 12%, transparent);
   transition: transform var(--motion-base) var(--ease-standard), background var(--motion-base) var(--ease-standard);
 }
@@ -404,20 +415,6 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-@media (max-width: 639px) {
-  .landing-hero::before {
-    top: 12rem;
-    right: -9rem;
-    width: 25rem;
-  }
-  .landing-hero::after {
-    display: none;
-  }
-  .landing-preview-frame::before {
-    inset: -.75rem -.5rem;
   }
 }
 

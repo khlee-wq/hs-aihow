@@ -228,6 +228,48 @@ test("모바일 랜딩의 안내 목록·미리보기·다음 구간은 서로 �
   }
 });
 
+test("공개 고정 헤더는 스크롤 중에도 콘텐츠보다 위에서 메뉴 가독성을 유지한다", async ({
+  page,
+}) => {
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await visit(page, "/");
+    await page.evaluate(() => window.scrollTo(0, 620));
+
+    const result = await page.locator(".public-navigation-glass").evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const point = document.elementFromPoint(rect.left + 16, rect.top + rect.height / 2);
+      const style = getComputedStyle(element);
+      return {
+        backgroundColor: style.backgroundColor,
+        isTopLayer: point?.closest(".public-navigation-glass") === element,
+      };
+    });
+
+    expect(result.backgroundColor).toMatch(/^rgb\(/);
+    expect(result.isTopLayer).toBe(true);
+  }
+});
+
+test("전문가 소개의 핵심 제목은 모든 공개 폭에서 한 줄로 유지된다", async ({ page }) => {
+  for (const width of [320, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await visit(page, "/#mentors");
+    const heading = page.getByTestId("landing-mentors-heading");
+    await expect(heading).toBeVisible();
+    const layout = await heading.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return {
+        whiteSpace: style.whiteSpace,
+        fitsViewport: rect.left >= 0 && rect.right <= window.innerWidth,
+      };
+    });
+    expect(layout.whiteSpace).toBe("nowrap");
+    expect(layout.fitsViewport).toBe(true);
+  }
+});
+
 test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완결된다", async ({
   page,
 }) => {

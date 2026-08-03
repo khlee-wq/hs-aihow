@@ -18,16 +18,26 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
     }),
   ).toBeVisible();
   await expect(page.locator("[data-lottie-orbit] svg")).toBeVisible();
-  await expect(page.locator("[data-motion-satellite]")).toHaveCount(3);
-  await expect(page.locator("[data-motion-drop]")).toHaveCount(3);
+  await expect(page.getByTestId("landing-hero-preview")).toBeVisible();
+  await expect(page.locator(".liquid-glass-section").first()).toBeVisible();
+  const productCards = page.locator(".landing-product-stage [data-motion-drop]");
+  await expect(productCards).toHaveCount(3);
   await page.waitForTimeout(1_000);
   const transform = await page
     .locator("[data-motion-float]")
     .evaluate((element) => getComputedStyle(element).transform);
   expect(transform).not.toBe("none");
-  await page.locator("[data-motion-drop-group]").scrollIntoViewIfNeeded();
+  await productCards.first().scrollIntoViewIfNeeded();
   await page.waitForTimeout(900);
-  await expect(page.locator("[data-motion-drop]").first()).toBeVisible();
+  await expect(productCards.first()).toBeVisible();
+  await page.getByTestId("landing-mentors").scrollIntoViewIfNeeded();
+  await expect(page.getByRole("heading", { name: "공다경" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "박영중" })).toBeVisible();
+  await page.getByTestId("landing-pricing").scrollIntoViewIfNeeded();
+  await expect(
+    page.getByRole("heading", { name: "준비 방식에 맞게 선택하세요" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "출시 안내 받기" })).toHaveCount(3);
   expect(
     consoleErrors.filter((message) =>
       /hydration|hydrated|server rendered html/i.test(message),
