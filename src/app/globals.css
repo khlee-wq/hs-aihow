@@ -135,6 +135,86 @@ body {
   backdrop-filter: blur(16px) saturate(122%);
   -webkit-backdrop-filter: blur(16px) saturate(122%);
 }
+.landing-hero {
+  isolation: isolate;
+}
+.landing-hero::before,
+.landing-hero::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+.landing-hero::before {
+  inset: 3rem 4% auto auto;
+  width: min(46vw, 42rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 32%, color-mix(in srgb, var(--brand-soft) 92%, transparent), transparent 38%),
+    radial-gradient(circle at 72% 63%, color-mix(in srgb, var(--mint-soft) 90%, transparent), transparent 42%);
+  filter: blur(2px);
+  opacity: .84;
+}
+.landing-hero::after {
+  inset: auto auto 3.5rem 43%;
+  width: min(23rem, 42vw);
+  height: 7rem;
+  border: 1px solid color-mix(in srgb, var(--brand) 13%, transparent);
+  border-radius: 50%;
+  transform: rotate(-12deg);
+}
+.landing-preview-frame {
+  isolation: isolate;
+}
+.landing-preview-frame::before {
+  position: absolute;
+  inset: -1.5rem -1rem;
+  z-index: -1;
+  border: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--surface) 48%, transparent);
+  box-shadow: var(--shadow-md);
+  content: "";
+  transform: rotate(2.4deg);
+  backdrop-filter: blur(12px);
+}
+.landing-product-card {
+  min-height: 24rem;
+  border-color: transparent;
+  background:
+    linear-gradient(155deg, color-mix(in srgb, var(--surface-raised) 96%, var(--brand-soft)), var(--surface-raised));
+}
+.landing-product-card::after {
+  position: absolute;
+  inset: 0;
+  border: 1px solid color-mix(in srgb, var(--surface) 70%, transparent);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+}
+.landing-product-card--featured {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--coral-soft) 82%, transparent), transparent 42%),
+    linear-gradient(155deg, color-mix(in srgb, var(--surface-raised) 94%, var(--brand-soft)), var(--surface-raised));
+}
+.journey-stage {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--text-on-contrast) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--text-on-contrast) 5%, transparent) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+}
+.journey-step {
+  background: linear-gradient(150deg, color-mix(in srgb, var(--text-on-contrast) 11%, transparent), color-mix(in srgb, var(--text-on-contrast) 5%, transparent));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-on-contrast) 12%, transparent);
+  transition: transform var(--motion-base) var(--ease-standard), background var(--motion-base) var(--ease-standard);
+}
+@media (hover: hover) and (pointer: fine) {
+  .journey-step:hover {
+    background: color-mix(in srgb, var(--text-on-contrast) 13%, transparent);
+    transform: translateY(-.25rem);
+  }
+}
 .eyebrow {
   color: var(--brand);
   font-size: 0.76rem;
@@ -324,6 +404,20 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .landing-hero::before {
+    top: 12rem;
+    right: -9rem;
+    width: 25rem;
+  }
+  .landing-hero::after {
+    display: none;
+  }
+  .landing-preview-frame::before {
+    inset: -.75rem -.5rem;
   }
 }
 

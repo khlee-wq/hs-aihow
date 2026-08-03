@@ -74,8 +74,7 @@ const journey = [
 export function LandingPage() {
   return (
     <>
-      <section className="relative overflow-hidden pb-8 pt-16 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-28">
-        <div className="absolute left-[55%] top-0 -z-10 h-[34rem] w-[34rem] rounded-full bg-[var(--brand-soft)] blur-3xl" />
+      <section className="landing-hero relative overflow-hidden pb-8 pt-16 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-28">
         <div className="page-wrap grid items-center gap-14 lg:grid-cols-[1.05fr_.95fr]">
           <div className="float-in" data-motion-hero data-testid="landing-hero-copy">
             <p className="eyebrow mb-6">AIHOW Interview</p>
@@ -164,9 +163,9 @@ export function LandingPage() {
                 key={product.title}
                 data-motion-drop
                 className={cn(
-                  "surface-interactive relative flex flex-col overflow-hidden p-7",
+                  "landing-product-card surface-interactive relative flex flex-col overflow-hidden p-7",
                   index === 2 &&
-                    "border-[color-mix(in_srgb,var(--coral)_45%,var(--border))]",
+                    "landing-product-card--featured border-[color-mix(in_srgb,var(--coral)_45%,var(--border))]",
                 )}
               >
                 <div
@@ -215,7 +214,7 @@ export function LandingPage() {
 
       <section
         id="journey"
-        className="surface-contrast scroll-mt-24 py-24 lg:py-32"
+        className="journey-stage surface-contrast scroll-mt-24 py-24 lg:py-32"
         data-motion-reveal
       >
         <div className="page-wrap">
@@ -230,7 +229,7 @@ export function LandingPage() {
               <div
                 key={title}
                 data-motion-item
-                className="relative rounded-[var(--radius-lg)] border border-white/10 bg-[color-mix(in_srgb,var(--text-inverse)_8%,transparent)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,.08)]"
+                className="journey-step relative rounded-[var(--radius-lg)] border border-white/10 p-5"
               >
                 <div className="mb-8 flex items-center justify-between">
                   <span className="text-xs font-black opacity-50">
@@ -390,7 +389,7 @@ function ExpertPoint({
 function HeroPreview() {
   return (
     <div
-      className="relative mx-auto mt-10 w-full max-w-[33rem] lg:mr-0 lg:mt-0"
+      className="landing-preview-frame relative mx-auto mt-10 w-full max-w-[33rem] lg:mr-0 lg:mt-0"
       data-motion-float
       data-testid="landing-hero-preview"
     >
@@ -417,7 +416,7 @@ function HeroPreview() {
         </p>
         <p className="mt-1 text-xs font-extrabold">음성으로 반복</p>
       </div>
-      <div className="absolute -inset-x-2 -inset-y-3 -z-10 rotate-3 rounded-[var(--radius-xl)] bg-[var(--mint-soft)] sm:-inset-5" />
+      <div className="absolute -inset-x-2 -inset-y-3 -z-10 rotate-3 rounded-[var(--radius-xl)] bg-[color-mix(in_srgb,var(--mint-soft)_74%,transparent)] sm:-inset-5" />
       <Card className="overflow-hidden p-0 shadow-[var(--shadow-md)]">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
           <div className="flex items-center gap-2">

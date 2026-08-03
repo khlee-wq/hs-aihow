@@ -149,8 +149,17 @@ async function signUp(page: Page, role: "student" | "expert") {
     .getByLabel("이메일", { exact: true })
     .fill(`${role}-${Date.now()}@example.com`);
   await page.getByPlaceholder("4자 이상").fill("demo1234");
+  const authResponse = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/auth/demo") &&
+      response.request().method() === "POST",
+  );
   await page.getByRole("button", { name: "가입하고 시작하기" }).click();
-  await expect(page).toHaveURL(role === "student" ? /\/dashboard$/ : /\/admin$/);
+  expect((await authResponse).status()).toBe(200);
+  await expect(page).toHaveURL(
+    role === "student" ? /\/dashboard$/ : /\/admin$/,
+    { timeout: 10_000 },
+  );
 }
 
 test("공개·인증 화면은 320px부터 데스크톱까지 잘리지 않는다", async ({
