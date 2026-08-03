@@ -85,3 +85,77 @@
   --shadow-md: 0 20px 56px rgba(0, 0, 0, 0.32);
   --shadow-brand: 0 18px 42px rgba(7, 15, 35, 0.48);
 }
+
+/* Meeting palette module: selected through ?palette=iris or Settings. */
+[data-brand-palette="iris"] {
+  --canvas: #f8f7fc;
+  --canvas-alt: #f0edff;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-subtle: #faf9fe;
+  --surface-muted: #f1eff7;
+  --surface-inverse: #211d35;
+  --surface-overlay: rgba(27, 23, 48, 0.52);
+  --text-primary: #201d32;
+  --text-secondary: #6d687d;
+  --text-tertiary: #928ca2;
+  --text-inverse: #ffffff;
+  --brand: #6558d9;
+  --brand-strong: #5045b8;
+  --brand-soft: #ece9ff;
+  --brand-on-white: #5045b8;
+  --mint: #35b995;
+  --mint-soft: #e1f7f0;
+  --coral: #f1846e;
+  --coral-soft: #fff0eb;
+  --warning: #a96e0d;
+  --warning-soft: #fff3d8;
+  --success: #16785d;
+  --danger: #bd454e;
+  --text-on-mint: #163d34;
+  --border-soft: rgba(63, 57, 104, 0.075);
+  --border: rgba(63, 57, 104, 0.13);
+  --border-strong: rgba(101, 88, 217, 0.26);
+  --border-accent: rgba(101, 88, 217, 0.4);
+  --focus: #6558d9;
+  --shadow-sm:
+    0 1px 2px rgba(39, 31, 73, 0.04), 0 8px 24px rgba(52, 42, 94, 0.05);
+  --shadow-md: 0 22px 60px rgba(43, 34, 82, 0.14);
+  --shadow-brand: 0 18px 38px rgba(101, 88, 217, 0.22);
+}
+
+.dark[data-brand-palette="iris"] {
+  --canvas: #12101c;
+  --canvas-alt: #191529;
+  --surface: #1b1828;
+  --surface-raised: #242033;
+  --surface-subtle: #211d30;
+  --surface-muted: #2b273c;
+  --surface-inverse: #f3f0ff;
+  --surface-overlay: rgba(7, 5, 14, 0.72);
+  --text-primary: #f5f2ff;
+  --text-secondary: #c2bbd3;
+  --text-tertiary: #938ba8;
+  --text-inverse: #181424;
+  --brand: #aa9cff;
+  --brand-strong: #c8beff;
+  --brand-soft: #342e5f;
+  --brand-on-white: #5045b8;
+  --mint: #66d5b5;
+  --mint-soft: #173c36;
+  --coral: #ff9c8a;
+  --coral-soft: #4a2a2c;
+  --warning: #ffc862;
+  --warning-soft: #4a3718;
+  --success: #66d5b5;
+  --danger: #ff999e;
+  --text-on-mint: #163d34;
+  --border-soft: rgba(220, 228, 255, 0.075);
+  --border: rgba(220, 228, 255, 0.13);
+  --border-strong: rgba(125, 162, 255, 0.27);
+  --border-accent: rgba(125, 162, 255, 0.42);
+  --focus: #9eb7ff;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 28px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 20px 56px rgba(0, 0, 0, 0.32);
+  --shadow-brand: 0 18px 42px rgba(7, 15, 35, 0.48);
+}

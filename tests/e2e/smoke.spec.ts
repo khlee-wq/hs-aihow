@@ -33,6 +33,23 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
   expect(pageErrors).toEqual([]);
 });
 
+test("회의용 팔레트 프리뷰가 Iris와 Deep Teal을 즉시 전환한다", async ({
+  page,
+}) => {
+  await page.goto("/?palette=iris&palettePreview=1");
+  await expect(page.getByTestId("brand-palette-preview")).toBeVisible();
+  await expect
+    .poll(() => page.locator("html").getAttribute("data-brand-palette"))
+    .toBe("iris");
+
+  await page.getByRole("button", { name: "회의용 브랜드 톤 열기" }).click();
+  await page.getByRole("button", { name: /Deep Teal/ }).click();
+  await expect
+    .poll(() => page.locator("html").getAttribute("data-brand-palette"))
+    .toBe("teal");
+  await expect(page).toHaveURL(/palette=teal/);
+});
+
 test("학생이 가입하고 준비 화면으로 진입한다", async ({ page }, testInfo) => {
   await page.goto("/signup?plan=all");
   await expect(

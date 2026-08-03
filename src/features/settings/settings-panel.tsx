@@ -4,6 +4,7 @@ import {
   Bell,
   Database,
   LogOut,
+  Palette,
   RotateCcw,
   ShieldCheck,
   UserRound,
@@ -11,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { BrandPaletteToggle } from "@/components/brand/brand-palette";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { DemoSession } from "@/lib/session-shared";
@@ -64,6 +66,16 @@ export function SettingsPanel({ session }: { session: DemoSession }) {
             </p>
             <p className="mt-1 text-sm font-extrabold">{session.email}</p>
           </div>
+        </div>
+      </Card>
+      <Card>
+        <SettingTitle
+          icon={Palette}
+          title="회의용 브랜드 톤"
+          description="Deep Teal과 Iris를 즉시 전환합니다. 선택한 톤은 URL과 이 기기에 유지됩니다."
+        />
+        <div className="mt-6">
+          <BrandPaletteToggle />
         </div>
       </Card>
       <Card>
