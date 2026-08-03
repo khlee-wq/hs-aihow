@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { encodeSession, SESSION_COOKIE } from "../../src/lib/session-shared";
 
 const studentPaths = [
   "/dashboard",
@@ -137,29 +138,23 @@ function isWebKitRscPrefetchNoise(message: string) {
   return /\?_rsc=.*due to access control checks/i.test(message);
 }
 
-async function signUp(page: Page, role: "student" | "expert") {
-  await visit(page, "/signup");
-  if (role === "expert") {
-    await page.getByRole("radio", { name: "전문가" }).click();
-  }
-  await page.getByLabel("이름", { exact: true }).fill(
-    role === "student" ? "모바일학생" : "운영전문가",
-  );
-  await page
-    .getByLabel("이메일", { exact: true })
-    .fill(`${role}-${Date.now()}@example.com`);
-  await page.getByPlaceholder("4자 이상").fill("demo1234");
-  const authResponse = page.waitForResponse(
-    (response) =>
-      response.url().endsWith("/api/auth/demo") &&
-      response.request().method() === "POST",
-  );
-  await page.getByRole("button", { name: "가입하고 시작하기" }).click();
-  expect((await authResponse).status()).toBe(200);
-  await expect(page).toHaveURL(
-    role === "student" ? /\/dashboard$/ : /\/admin$/,
-    { timeout: 10_000 },
-  );
+async function seedRoleSession(page: Page, role: "student" | "expert") {
+  // 이 파일은 각 보호 화면의 반응형 감사를 담당합니다. 가입 흐름의 POST·쿠키·
+  // 리다이렉트는 smoke.spec.ts에서 별도로 검증해, 화면 감사가 인증 전송 타이밍에
+  // 의존하지 않도록 합니다.
+  await page.context().addCookies([
+    {
+      name: SESSION_COOKIE,
+      value: encodeSession({
+        name: role === "student" ? "모바일학생" : "운영전문가",
+        email: `${role}@example.com`,
+        role,
+      }),
+      url: "http://127.0.0.1:3000",
+      httpOnly: true,
+      sameSite: "Lax",
+    },
+  ]);
 }
 
 test("공개·인증 화면은 320px부터 데스크톱까지 잘리지 않는다", async ({
@@ -236,7 +231,7 @@ test("모바일 랜딩의 안내 목록·미리보기·다음 구간은 서로 �
 test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완결된다", async ({
   page,
 }) => {
-  await signUp(page, "student");
+  await seedRoleSession(page, "student");
 
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
@@ -251,7 +246,7 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
 test("전문가 운영 전 메뉴는 모바일·태블릿·데스크톱에서 완결된다", async ({
   page,
 }) => {
-  await signUp(page, "expert");
+  await seedRoleSession(page, "expert");
 
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
