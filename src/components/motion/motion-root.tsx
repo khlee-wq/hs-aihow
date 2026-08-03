@@ -27,7 +27,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
     if (!motionReady || !root.current) return;
 
     const motionSelector =
-      ".float-in, [data-motion-hero], [data-motion-float], [data-motion-satellite], [data-motion-drop-group], [data-motion-parallax], [data-motion-reveal]";
+      ".float-in, [data-motion-hero], [data-motion-float], [data-motion-satellite], [data-motion-drop-group], [data-motion-product-stage], [data-motion-parallax], [data-motion-reveal]";
     if (!root.current.querySelector(motionSelector)) return;
 
     let cancelled = false;
@@ -179,6 +179,43 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
             },
           );
         });
+
+        // 상품 카드는 스크롤 구간 안에서만 천천히 제자리로 모입니다.
+        // 과한 상시 모션 대신, 선택지를 읽기 시작하는 순간에만 깊이를 만듭니다.
+        if (window.matchMedia("(min-width: 768px)").matches) {
+          Array.from(
+            root.current?.querySelectorAll<HTMLElement>(
+              "[data-motion-product-stage]",
+            ) ?? [],
+          ).forEach((stage) => {
+            const cards = Array.from(
+              stage.querySelectorAll<HTMLElement>("[data-motion-product-card]"),
+            );
+            if (!cards.length) return;
+            gsap.fromTo(
+              cards,
+              {
+                autoAlpha: 0.08,
+                y: (index) => 44 + index * 14,
+                rotate: (index) => (index - 1) * 2.4,
+              },
+              {
+                autoAlpha: 1,
+                y: (index) => (index - 1) * -7,
+                rotate: 0,
+                stagger: 0.04,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: stage,
+                  start: "top 86%",
+                  end: "top 38%",
+                  scrub: 0.65,
+                  invalidateOnRefresh: true,
+                },
+              },
+            );
+          });
+        }
 
         if (window.matchMedia("(min-width: 1024px)").matches) {
           Array.from(

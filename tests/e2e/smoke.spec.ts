@@ -20,7 +20,9 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
   await expect(page.locator("[data-lottie-orbit] svg")).toBeVisible();
   await expect(page.getByTestId("landing-hero-preview")).toBeVisible();
   await expect(page.locator(".liquid-glass-section").first()).toBeVisible();
-  const productCards = page.locator(".landing-product-stage [data-motion-drop]");
+  const productCards = page.locator(
+    ".landing-product-stage [data-motion-product-card]",
+  );
   await expect(productCards).toHaveCount(3);
   await page.waitForTimeout(1_000);
   const transform = await page

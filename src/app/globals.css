@@ -35,6 +35,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+.korean-copy {
+  /* 한국어는 음절 단위가 아니라 공백 단위로 줄을 바꿉니다. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+/* 제품 설명·질문·피드백에서 조사가 따로 내려가는 일을 기본적으로 막습니다. */
+:where(p, li, blockquote, h1, h2, h3, h4) {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
 @layer base {
   button,
   input,
@@ -211,6 +221,9 @@ body {
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 78%, transparent),
     0 16px 32px color-mix(in srgb, var(--surface-inverse) 8%, transparent);
+}
+.landing-product-stage [data-motion-product-card] {
+  will-change: transform, opacity;
 }
 .journey-stage {
   background: color-mix(in srgb, var(--surface-contrast) 92%, transparent);

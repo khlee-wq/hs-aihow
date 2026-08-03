@@ -196,13 +196,13 @@ export function LandingPage() {
           />
           <div
             className="landing-product-stage mt-12 grid gap-5 p-3 sm:p-5 lg:grid-cols-3 lg:p-6"
-            data-motion-drop-group
+            data-motion-product-stage
           >
             {products.map((product, index) => (
               <Card
                 key={product.title}
                 variant="glass"
-                data-motion-drop
+                data-motion-product-card
                 className={cn(
                   `landing-product-card--${product.tone}`,
                   "landing-product-card surface-interactive relative z-10 flex flex-col overflow-hidden border-0 p-7",
@@ -216,7 +216,10 @@ export function LandingPage() {
                 <h3 className="mt-3 text-2xl font-black tracking-[-.04em]">
                   {product.title}
                 </h3>
-                <p className="mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]">
+                <p
+                  className="korean-copy mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]"
+                  data-testid="landing-product-description"
+                >
                   {product.description}
                 </p>
                 <ul className="mt-7 grid gap-3">
@@ -478,7 +481,7 @@ function SectionIntro({
       <h2 className="heading-xl mt-4 text-balance">{title}</h2>
       <p
         className={cn(
-          "mt-5 text-base leading-8",
+          "korean-copy mt-5 text-base leading-8",
           inverse ? "text-white/65" : "text-[var(--text-secondary)]",
         )}
       >

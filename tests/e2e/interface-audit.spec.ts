@@ -228,6 +228,46 @@ test("모바일 랜딩의 안내 목록·미리보기·다음 구간은 서로 �
   }
 });
 
+test("랜딩 상품 설명은 한국어 어절을 쪼개지 않고 줄바꿈한다", async ({
+  page,
+}) => {
+  for (const width of [320, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await visit(page, "/");
+
+    const report = await page
+      .getByTestId("landing-product-description")
+      .evaluateAll((elements) =>
+        elements.map((element) => {
+          const style = getComputedStyle(element);
+          const words = element.textContent?.trim().split(/\s+/) ?? [];
+          const textNode = element.firstChild;
+          if (!textNode) return { wordBreak: style.wordBreak, splitWords: [] };
+
+          let cursor = 0;
+          const splitWords = words.filter((word) => {
+            const start = element.textContent?.indexOf(word, cursor) ?? -1;
+            cursor = start + word.length;
+            if (start < 0) return false;
+            const range = document.createRange();
+            range.setStart(textNode, start);
+            range.setEnd(textNode, start + word.length);
+            return range.getClientRects().length > 1;
+          });
+          return { wordBreak: style.wordBreak, splitWords };
+        }),
+      );
+
+    expect(report).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ wordBreak: "keep-all", splitWords: [] }),
+      ]),
+    );
+    expect(report.every(({ splitWords }) => splitWords.length === 0)).toBe(true);
+    await expectInterfaceFitsViewport(page);
+  }
+});
+
 test("공개 고정 헤더는 스크롤 중에도 콘텐츠보다 위에서 메뉴 가독성을 유지한다", async ({
   page,
 }) => {
