@@ -8,7 +8,7 @@ export default async function AdminLayout({
 }) {
   const session = await requireSession();
   return (
-    <AppShell session={session} role="expert">
+    <AppShell session={session} role="admin">
       {children}
     </AppShell>
   );

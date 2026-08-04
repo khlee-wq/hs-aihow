@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   BookOpenText,
-  ClipboardCheck,
   FileText,
   Gauge,
   GraduationCap,
@@ -13,15 +12,15 @@ import {
   MessageSquareText,
   Mic2,
   School,
-  Settings,
   ShieldCheck,
   Sparkles,
-  Users,
   Video,
 } from "lucide-react";
 import type { DemoSession } from "@/lib/session-shared";
 import { cn } from "@/lib/utils";
+import { SessionLifecycle } from "@/features/session/session-lifecycle";
 import { Logo } from "./logo";
+import { ProfileMenu } from "./profile-menu";
 import { ThemeToggle } from "./theme-toggle";
 
 const studentNav = [
@@ -41,14 +40,12 @@ const studentNav = [
 ];
 
 const adminNav = [
-  { href: "/admin", label: "운영 홈", icon: Gauge },
-  { href: "/admin/reviews", label: "검수 큐", icon: ClipboardCheck },
-  { href: "/admin/questions", label: "질문 기준", icon: MessageSquareText },
-  { href: "/admin/prompts", label: "코칭 프롬프트", icon: Sparkles },
-  { href: "/admin/videos", label: "영상 가이드", icon: Video },
-  { href: "/admin/schools", label: "학교 기준", icon: School },
-  { href: "/admin/users", label: "사용자", icon: Users },
-  { href: "/admin/metrics", label: "운영 지표", icon: BarChart3 },
+  { href: "/admin", label: "수업 개요", icon: Gauge },
+  { href: "/admin/questions", label: "질문 설계", icon: MessageSquareText },
+  { href: "/admin/prompts", label: "코칭 레시피", icon: Sparkles },
+  { href: "/admin/videos", label: "영상 연결", icon: Video },
+  { href: "/admin/schools", label: "학교 데이터", icon: School },
+  { href: "/admin/metrics", label: "학습 인사이트", icon: BarChart3 },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -63,11 +60,11 @@ export function AppShell({
 }: {
   children: React.ReactNode;
   session: DemoSession;
-  role: "student" | "expert";
+  role: "user" | "admin";
 }) {
   const pathname = usePathname();
 
-  if (role === "student") {
+  if (role === "user") {
     return (
       <StudentShell pathname={pathname} session={session}>
         {children}
@@ -126,6 +123,7 @@ function StudentShell({
             className="ml-auto hidden items-center gap-1 lg:flex"
             aria-label="학생 메뉴"
             data-testid="student-desktop-nav"
+            data-tour="student-menu"
           >
             {studentNav.map(({ href, label }) => {
               const active = isActive(pathname, href);
@@ -152,27 +150,13 @@ function StudentShell({
             <Link
               href="/admin"
               className="inline-flex min-h-9 items-center gap-1.5 px-2.5 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
-              aria-label="운영 화면으로 전환"
+              aria-label="교사 워크스페이스로 전환"
             >
               <ShieldCheck className="size-[16px]" />
-              <span className="hidden sm:inline">운영 화면</span>
+              <span className="hidden sm:inline">교사 공간</span>
             </Link>
             <ThemeToggle />
-            <Link
-              href="/settings"
-              className="inline-flex min-h-9 items-center justify-center px-2.5 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
-              aria-label="설정"
-            >
-              <Settings className="size-[17px] sm:hidden" />
-              <span className="hidden sm:inline">설정</span>
-            </Link>
-            <Link
-              href="/settings"
-              className="ml-1 hidden size-8 place-items-center rounded-full border border-[color-mix(in_srgb,var(--mint)_24%,var(--border))] bg-[var(--mint-soft)] text-xs font-black text-[var(--success)] shadow-[var(--shadow-sm)] sm:grid"
-              aria-label={`${session.name} 프로필`}
-            >
-              {session.name.slice(0, 1)}
-            </Link>
+            <ProfileMenu session={session} />
           </div>
         </div>
       </header>
@@ -185,6 +169,7 @@ function StudentShell({
         className="liquid-bottom-nav app-navigation fixed inset-x-3 bottom-[max(.65rem,env(safe-area-inset-bottom))] z-40 grid grid-cols-5 px-1.5 py-1.5 lg:hidden"
         aria-label="모바일 학생 메뉴"
         data-testid="student-mobile-nav"
+        data-tour="student-menu"
       >
         {studentNav.map(({ href, label, icon: Icon }) => {
           const active = isActive(pathname, href);
@@ -211,6 +196,7 @@ function StudentShell({
           );
         })}
       </nav>
+      <SessionLifecycle role="user" />
     </div>
   );
 }
@@ -225,18 +211,19 @@ function ExpertShell({
   session: DemoSession;
 }) {
   return (
-    <div className="min-h-[100svh] overflow-x-hidden bg-[var(--canvas)] md:grid md:grid-cols-[16.5rem_1fr]">
-      <aside className="liquid-glass app-navigation sticky top-3 m-3 hidden h-[calc(100svh-1.5rem)] flex-col rounded-[1.25rem] p-4 md:flex">
-        <div className="px-2 py-2">
-          <Logo />
-        </div>
-        <div className="mt-6 px-3">
-          <span className="eyebrow">Expert operations</span>
+    <div className="min-h-[100svh] overflow-x-clip bg-[var(--canvas)]">
+      <header className="teacher-navigation liquid-glass app-navigation sticky top-3 z-30 mx-3 mt-3 flex min-h-16 items-center gap-4 rounded-[1.25rem] px-4 md:mx-[var(--space-page)] md:px-5">
+        <div className="shrink-0 sm:hidden"><Logo compact /></div>
+        <div className="hidden shrink-0 sm:block"><Logo /></div>
+        <div className="hidden min-w-0 border-l border-[var(--border)] pl-4 xl:block">
+          <p className="text-xs font-black">교사 워크스페이스</p>
+          <p className="mt-0.5 text-[10px] text-[var(--text-tertiary)]">2027학년도 고입 수업 설계</p>
         </div>
         <nav
-          className="mt-3 grid gap-1"
-          aria-label="전문가 메뉴"
+          className="ml-auto hidden items-center gap-0.5 lg:flex"
+          aria-label="교사 메뉴"
           data-testid="expert-desktop-nav"
+          data-tour="admin-menu"
         >
           {adminNav.map(({ href, label }) => {
             const active = isActive(pathname, href);
@@ -245,10 +232,10 @@ function ExpertShell({
                 key={href}
                 href={href}
                 className={cn(
-                  "expert-desktop-nav-link relative flex min-h-11 items-center rounded-[var(--radius-sm)] px-4 text-[13px] font-semibold tracking-[-.01em] transition-[color,background,transform] before:absolute before:left-0 before:h-5 before:w-0.5 before:origin-center before:scale-y-0 before:bg-[var(--brand)] before:transition-transform before:duration-300",
+                  "relative inline-flex min-h-10 items-center px-2.5 text-[12px] font-semibold tracking-[-.02em] transition-[color,transform] after:absolute after:inset-x-2.5 after:bottom-1 after:h-px after:origin-center after:scale-x-0 after:bg-[var(--brand)] after:transition-transform",
                   active
-                    ? "bg-[color-mix(in_srgb,var(--brand-soft)_82%,var(--surface))] text-[var(--brand)] shadow-[inset_0_0_0_1px_var(--border-soft)] before:scale-y-100"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
+                    ? "text-[var(--text-primary)] after:scale-x-100"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
                 )}
                 aria-current={active ? "page" : undefined}
               >
@@ -257,82 +244,49 @@ function ExpertShell({
             );
           })}
         </nav>
-        <div className="mt-auto grid gap-2 border-t border-[var(--border)] pt-4">
+        <div className="ml-auto flex shrink-0 items-center gap-1 border-l border-[var(--border)] pl-2 lg:ml-1">
           <Link
-            href="/settings"
-            className="expert-desktop-nav-link flex min-h-10 items-center rounded-[var(--radius-sm)] px-4 text-[13px] font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+            href="/dashboard"
+            className="inline-flex min-h-10 items-center gap-2 px-2.5 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+            aria-label="학생 화면으로 전환"
           >
-            설정
+            <GraduationCap className="size-[17px]" />
+            <span className="hidden sm:inline">학생 화면</span>
           </Link>
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="grid size-9 place-items-center rounded-full bg-[var(--mint-soft)] font-black text-[var(--success)]">
-              {session.name.slice(0, 1)}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-bold">{session.name}</p>
-              <p className="truncate text-xs text-[var(--text-tertiary)]">
-                전문가
-              </p>
-            </div>
-          </div>
+          <ThemeToggle />
+          <ProfileMenu session={session} />
         </div>
-      </aside>
-      <div className="min-w-0">
-        <header className="liquid-glass app-navigation sticky top-3 z-30 mx-3 mt-3 flex h-16 items-center justify-between rounded-[1.25rem] px-4 md:mx-[var(--space-page)] md:px-5">
-          <div className="md:hidden">
-            <Logo compact />
-          </div>
-          <div className="hidden items-center text-xs font-bold text-[var(--text-secondary)] md:flex">
-            2027학년도 운영 기준
-          </div>
-          <div className="ml-auto flex items-center gap-2">
+      </header>
+      <nav
+        className="teacher-navigation liquid-glass app-navigation no-scrollbar sticky top-[5.25rem] z-20 mx-3 flex max-w-[calc(100vw-1.5rem)] gap-1 overflow-x-auto rounded-[1rem] p-1.5 lg:hidden"
+        aria-label="교사 메뉴"
+        data-testid="expert-mobile-nav"
+        data-tour="admin-menu"
+      >
+        {adminNav.map(({ href, label, icon: Icon }) => {
+          const active = isActive(pathname, href);
+          return (
             <Link
-              href="/dashboard"
-              className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
-              aria-label="학생 화면으로 전환"
+              key={href}
+              href={href}
+              className={cn(
+                "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-xs font-bold",
+                active
+                  ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                  : "text-[var(--text-secondary)]",
+              )}
+              aria-current={active ? "page" : undefined}
             >
-              <GraduationCap className="size-[17px]" />
-              <span className="hidden sm:inline">학생 화면</span>
+              <Icon data-menu-icon className="size-4" />
+              {label}
             </Link>
-            <ThemeToggle />
-            <Link
-              href="/settings"
-              className="grid size-10 place-items-center rounded-[var(--radius-sm)] hover:bg-[var(--surface-muted)]"
-              aria-label="설정"
-            >
-              <Settings className="size-[18px]" />
-            </Link>
-          </div>
-        </header>
-        <nav
-          className="liquid-glass app-navigation no-scrollbar sticky top-[5.25rem] z-20 mx-3 flex max-w-[calc(100vw-1.5rem)] gap-1 overflow-x-auto rounded-[1rem] p-1.5 md:hidden"
-          aria-label="모바일 전문가 메뉴"
-          data-testid="expert-mobile-nav"
-        >
-          {adminNav.map(({ href, label, icon: Icon }) => {
-            const active = isActive(pathname, href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-xs font-bold",
-                  active
-                    ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                    : "text-[var(--text-secondary)]",
-                )}
-                aria-current={active ? "page" : undefined}
-              >
-                <Icon data-menu-icon className="size-4" />
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-        <main className="px-[var(--space-page)] py-8 pb-28 md:py-10 md:pb-12">
-          <div className="mx-auto max-w-[92rem]">{children}</div>
-        </main>
-      </div>
+          );
+        })}
+      </nav>
+      <main className="px-[var(--space-page)] py-8 pb-28 md:py-10 md:pb-12">
+        <div className="mx-auto max-w-[92rem]">{children}</div>
+      </main>
+      <SessionLifecycle role="admin" />
     </div>
   );
 }

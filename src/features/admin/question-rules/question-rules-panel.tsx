@@ -9,10 +9,10 @@ import {
   Plus,
   Search,
   Trash2,
-  X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { AppDialog } from "@/components/ui/app-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field, inputClass } from "@/components/ui/field";
@@ -273,38 +273,14 @@ function QuestionRuleDialog({
   });
 
   return (
-    <div
-      className="fixed inset-0 z-[80] grid place-items-center overflow-y-auto bg-[var(--surface-overlay)] p-4 backdrop-blur-sm"
-      role="presentation"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
+    <AppDialog
+      open
+      onClose={onClose}
+      eyebrow="CRUD workspace"
+      title={rule ? "질문 기준 편집" : "질문 기준 등록"}
+      purpose="confirmation"
+      className="max-w-xl"
     >
-      <section
-        className="surface w-full max-w-xl bg-[var(--surface)] p-5 shadow-[var(--shadow-md)] sm:p-7"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="question-rule-dialog-title"
-        data-motion-dialog
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="eyebrow">CRUD workspace</p>
-            <h2
-              id="question-rule-dialog-title"
-              className="mt-2 text-xl font-black"
-            >
-              {rule ? "질문 기준 편집" : "질문 기준 등록"}
-            </h2>
-          </div>
-          <button
-            className="grid size-10 place-items-center rounded-full text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
-            onClick={onClose}
-            aria-label="닫기"
-          >
-            <X className="size-5" />
-          </button>
-        </div>
         <form
           className="mt-6 grid gap-4"
           onSubmit={form.handleSubmit((input) => save.mutate(input))}
@@ -403,7 +379,6 @@ function QuestionRuleDialog({
             </div>
           </div>
         </form>
-      </section>
-    </div>
+    </AppDialog>
   );
 }

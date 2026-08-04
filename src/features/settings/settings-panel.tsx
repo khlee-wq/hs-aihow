@@ -3,14 +3,12 @@
 import {
   Bell,
   Database,
-  LogOut,
   Palette,
   RotateCcw,
   ShieldCheck,
+  Sparkles,
   UserRound,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { BrandPaletteToggle } from "@/components/brand/brand-palette";
 import { Button } from "@/components/ui/button";
@@ -19,8 +17,6 @@ import type { DemoSession } from "@/lib/session-shared";
 import { useAppStore } from "@/stores/app-store";
 
 export function SettingsPanel({ session }: { session: DemoSession }) {
-  const router = useRouter();
-  const [logoutPending, setLogoutPending] = useState(false);
   const notificationsEnabled = useAppStore(
     (state) => state.notificationsEnabled,
   );
@@ -28,16 +24,6 @@ export function SettingsPanel({ session }: { session: DemoSession }) {
     (state) => state.setNotificationsEnabled,
   );
   const resetDemo = useAppStore((state) => state.resetDemo);
-  const logout = async () => {
-    setLogoutPending(true);
-    const response = await fetch("/api/auth/logout", { method: "POST" });
-    if (response.ok) {
-      router.push("/");
-      router.refresh();
-      return;
-    }
-    setLogoutPending(false);
-  };
   return (
     <div className="mx-auto max-w-3xl space-y-7 float-in">
       <header>
@@ -71,12 +57,26 @@ export function SettingsPanel({ session }: { session: DemoSession }) {
       <Card>
         <SettingTitle
           icon={Palette}
-          title="회의용 브랜드 톤"
-          description="Deep Teal과 Iris를 즉시 전환합니다. 선택한 톤은 URL과 이 기기에 유지됩니다."
+          title="브랜드 톤"
+          description="Deep Teal, Iris, Cobalt, Plum을 즉시 비교합니다. 선택한 톤은 URL과 이 기기에 유지됩니다."
         />
         <div className="mt-6">
           <BrandPaletteToggle />
         </div>
+      </Card>
+      <Card>
+        <SettingTitle
+          icon={Sparkles}
+          title="첫 화면 안내"
+          description="학생과 소장님은 역할에 맞는 시작 가이드를 첫 진입 시 확인합니다. 회의 중에는 이 버튼으로 언제든 다시 볼 수 있습니다."
+        />
+        <Button
+          variant="secondary"
+          className="mt-5"
+          onClick={() => window.dispatchEvent(new Event("aihow:intro-preview"))}
+        >
+          첫 화면 안내 다시 보기
+        </Button>
       </Card>
       <Card>
         <SettingTitle
@@ -125,23 +125,19 @@ export function SettingsPanel({ session }: { session: DemoSession }) {
           데모 진행 상태 초기화
         </Button>
       </Card>
-      <Card className="border-[color-mix(in_srgb,var(--coral)_30%,var(--border))]">
+      <Card>
         <SettingTitle
-          icon={LogOut}
-          title="세션"
-          description="로그아웃하면 역할 세션 쿠키가 즉시 삭제됩니다."
+          icon={ShieldCheck}
+          title="자동 로그아웃 안내"
+          description="30분간 활동이 없으면 5분 전 경고를 표시하고, 남은 시간이 지나면 안전하게 로그인 화면으로 이동합니다."
         />
-        <div className="mt-5">
-          <Button
-            type="button"
-            variant="secondary"
-            loading={logoutPending}
-            onClick={logout}
-          >
-            <LogOut className="size-4" />
-            로그아웃
-          </Button>
-        </div>
+        <Button
+          variant="secondary"
+          className="mt-5"
+          onClick={() => window.dispatchEvent(new Event("aihow:session-warning-preview"))}
+        >
+          자동 로그아웃 경고 보기
+        </Button>
       </Card>
     </div>
   );

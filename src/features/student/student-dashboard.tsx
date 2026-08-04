@@ -2,18 +2,25 @@
 
 import {
   ArrowUpRight,
+  BellRing,
   CalendarDays,
   Check,
   ChevronRight,
   CircleAlert,
   Clock3,
   FileText,
+  FileClock,
+  Gift,
+  Infinity,
   LockKeyhole,
   Sparkles,
   TimerReset,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { JourneyOrbit } from "@/components/motion/journey-orbit";
+import { AppDialog } from "@/components/ui/app-dialog";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/ui/status-state";
 import { deriveProgress, journeySteps } from "@/lib/mock-data";
@@ -29,6 +36,30 @@ import {
 
 const metricLabels = ["전체 준비", "완료 단계", "이번 주", "면접까지"];
 
+const admissionsSignals = [
+  {
+    label: "모집요강 원문",
+    source: "공식 출처",
+    state: "공개 대기",
+    detail: "공개되면 원문과 발행일을 먼저 확인합니다.",
+    active: true,
+  },
+  {
+    label: "지원 기준 정리",
+    source: "소장님 검수",
+    state: "대기",
+    detail: "지원 조건과 변경점을 학생의 준비 언어로 정리합니다.",
+    active: false,
+  },
+  {
+    label: "예상 질문 · 영상 가이드",
+    source: "AIHOW 준비 경로",
+    state: "대기",
+    detail: "검수된 기준만 질문과 영상 가이드에 연결합니다.",
+    active: false,
+  },
+] as const;
+
 export function StudentDashboard({
   name,
   snapshot: data,
@@ -36,6 +67,8 @@ export function StudentDashboard({
   name?: string;
   snapshot?: DashboardSnapshot | null;
 }) {
+  const [membershipOpen, setMembershipOpen] = useState(false);
+  const [admissionsAlertOpen, setAdmissionsAlertOpen] = useState(false);
   const isLoading = data === undefined;
   const completed = useAppStore((state) => state.completedSteps);
   const progress = deriveProgress(completed);
@@ -172,6 +205,7 @@ export function StudentDashboard({
         <article
           className="surface surface-accent dashboard-grid-surface relative overflow-hidden p-5 sm:p-7 lg:p-8"
           data-motion-item
+          data-tour="student-next-action"
         >
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] pb-4">
             <div className="flex items-center gap-3">
@@ -309,6 +343,149 @@ export function StudentDashboard({
             </p>
           </div>
         </aside>
+      </section>
+
+      <section
+        className="grid overflow-hidden border-y border-[var(--border)] md:grid-cols-[1.1fr_.9fr]"
+        data-motion-reveal
+      >
+        <div className="bg-[var(--brand-soft)] p-5 sm:p-6" data-motion-item>
+          <p className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand)]">
+            <Gift className="size-3.5" /> Welcome benefit
+          </p>
+          <h2 className="mt-3 text-xl font-bold tracking-[-.035em]">
+            무료 자소서 분석 1회가 준비되어 있어요
+          </h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
+            자소서 근거를 확인하고, 면접에서 먼저 준비할 포인트와 예상 질문을
+            받아보세요.
+          </p>
+          <Link
+            href="/applications/demo/analysis"
+            className="mt-5 inline-flex min-h-10 items-center gap-2 bg-[var(--brand)] px-4 text-sm font-bold text-[var(--text-on-brand)]"
+          >
+            무료 분석 시작하기 <ArrowUpRight className="size-4" />
+          </Link>
+        </div>
+        <div className="bg-[var(--surface)] p-5 sm:p-6" data-motion-item>
+          <p className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[.14em] text-[var(--text-tertiary)]">
+            <Infinity className="size-3.5 text-[var(--brand)]" /> Continue with
+            subscription
+          </p>
+          <h2 className="mt-3 text-lg font-bold tracking-[-.03em]">
+            준비 기록을 끊지 않고 이어가세요
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+            구독하면 분석과 질문 훈련, 영상 가이드를 반복해서 활용하며 면접 직전
+            노트까지 한 흐름으로 관리합니다.
+          </p>
+          <button
+            type="button"
+            onClick={() => setMembershipOpen(true)}
+            className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-[var(--brand)]"
+          >
+            구독 과정 살펴보기 <ChevronRight className="size-4" />
+          </button>
+        </div>
+      </section>
+
+      <section
+        className="border-b border-[var(--border)] pb-8"
+        aria-labelledby="admissions-update-title"
+        data-motion-reveal
+        data-tour="student-admissions"
+      >
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,.85fr)]">
+          <div data-motion-item>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[.14em] text-[var(--text-tertiary)]">
+              Admissions signal
+            </p>
+            <h2
+              id="admissions-update-title"
+              className="mt-2 text-xl font-bold tracking-[-.035em]"
+            >
+              고입 정보를 준비 순서로 바꿔 드릴게요
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+              공개된 자료는 그대로 쌓지 않습니다. 공식 원문을 확인하고, 소장님의
+              검수를 거쳐 지원 기준·예상 질문·영상 가이드로 연결합니다.
+            </p>
+          </div>
+          <div
+            className="surface grid grid-cols-3 divide-x divide-[var(--border)] overflow-hidden bg-[var(--surface)]"
+            data-motion-item
+            aria-label="2027 지원 정보 현황"
+          >
+            <div className="p-4">
+              <p className="font-mono text-[9px] font-bold uppercase tracking-[.12em] text-[var(--text-tertiary)]">
+                Year
+              </p>
+              <p className="mt-2 text-lg font-bold tracking-[-.04em]">2027</p>
+            </div>
+            <div className="p-4">
+              <p className="font-mono text-[9px] font-bold uppercase tracking-[.12em] text-[var(--text-tertiary)]">
+                School
+              </p>
+              <p className="mt-2 truncate text-sm font-bold">
+                {data?.schoolShort ?? "관심 학교"}
+              </p>
+            </div>
+            <div className="p-4">
+              <p className="font-mono text-[9px] font-bold uppercase tracking-[.12em] text-[var(--text-tertiary)]">
+                Status
+              </p>
+              <p className="mt-2 text-sm font-bold text-[var(--warning)]">확인 대기</p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="mt-5 grid overflow-hidden border-y border-[var(--border)] md:grid-cols-3"
+          data-motion-item
+        >
+          {admissionsSignals.map((signal, index) => (
+            <div
+              key={signal.label}
+              className="min-w-0 border-b border-[var(--border)] p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span
+                  className={cn(
+                    "grid size-7 shrink-0 place-items-center border text-[10px] font-bold",
+                    signal.active
+                      ? "border-[var(--warning)] bg-[var(--warning-soft)] text-[var(--warning)]"
+                      : "border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-tertiary)]",
+                  )}
+                >
+                  0{index + 1}
+                </span>
+                <span className="text-[10px] font-bold text-[var(--text-tertiary)]">
+                  {signal.state}
+                </span>
+              </div>
+              <p className="mt-5 text-sm font-bold">{signal.label}</p>
+              <p className="mt-1 font-mono text-[9px] font-bold uppercase tracking-[.1em] text-[var(--brand)]">
+                {signal.source}
+              </p>
+              <p className="mt-3 text-xs leading-5 text-[var(--text-secondary)]">
+                {signal.detail}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3" data-motion-item>
+          <p className="flex items-center gap-1.5 text-[11px] leading-5 text-[var(--text-tertiary)]">
+            <FileClock className="size-3.5 shrink-0" /> 공개 전 자료는 확정된 지원 조건으로 안내하지 않습니다.
+          </p>
+          <button
+            type="button"
+            onClick={() => setAdmissionsAlertOpen(true)}
+            className="inline-flex items-center gap-1 text-xs font-bold text-[var(--brand)]"
+          >
+            <BellRing className="size-3.5" /> 업데이트 알림 설정
+            <ChevronRight className="size-3.5" />
+          </button>
+        </div>
       </section>
 
       <section aria-labelledby="journey-title" data-motion-reveal>
@@ -502,6 +679,51 @@ export function StudentDashboard({
           </div>
         </Link>
       </section>
+      <AppDialog
+        open={membershipOpen}
+        onClose={() => setMembershipOpen(false)}
+        eyebrow="Membership guide"
+        title="반복 훈련이 필요한 시점에 구독을 선택하세요"
+        purpose="notice"
+      >
+        <div className="mt-6 grid divide-y divide-[var(--border)] border-y border-[var(--border)] text-sm">
+          {[
+            ["무료 분석", "자소서 근거와 첫 예상 질문을 확인"],
+            ["AIHOW 코치 구독", "분석·질문 훈련·영상 가이드를 준비 기록과 연결"],
+            ["전문가 진단 이용권", "필요한 결과물 하나를 소장님에게 검수 요청"],
+          ].map(([label, detail]) => (
+            <div key={label} className="py-3.5">
+              <p className="font-bold">{label}</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{detail}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-xs leading-5 text-[var(--text-tertiary)]">
+          가격·이용 한도·응답 정책은 운영 기준이 확정된 뒤 안내합니다.
+        </p>
+        <div className="mt-5 flex justify-end">
+          <Button onClick={() => setMembershipOpen(false)}>확인했어요</Button>
+        </div>
+      </AppDialog>
+      <AppDialog
+        open={admissionsAlertOpen}
+        onClose={() => setAdmissionsAlertOpen(false)}
+        eyebrow="Admissions alerts"
+        title="검수된 변경만 알려드릴게요"
+        purpose="notice"
+      >
+        <p className="mt-6 border-y border-[var(--border)] py-4 text-sm leading-6 text-[var(--text-secondary)]">
+          관심 학교의 모집요강이 공개되면 공식 원문을 확인합니다. 소장님 검수가 끝난 변경점만 준비 경로와 알림으로 안내합니다.
+        </p>
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button variant="ghost" onClick={() => setAdmissionsAlertOpen(false)}>
+            나중에 설정
+          </Button>
+          <Link href="/settings" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]">
+            알림 설정으로 이동 <ChevronRight className="size-4" />
+          </Link>
+        </div>
+      </AppDialog>
     </div>
   );
 }

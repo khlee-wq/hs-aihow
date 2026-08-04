@@ -1,6 +1,6 @@
 export const SESSION_COOKIE = "aihow_demo_session";
 
-export type UserRole = "student" | "expert";
+export type UserRole = "user" | "admin";
 
 export type DemoSession = {
   name: string;
@@ -16,7 +16,7 @@ export function decodeSession(value?: string): DemoSession | null {
   if (!value) return null;
   try {
     const parsed = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as Partial<DemoSession>;
-    if (!parsed.email || !parsed.name || (parsed.role !== "student" && parsed.role !== "expert")) return null;
+    if (!parsed.email || !parsed.name || !["user", "admin"].includes(parsed.role ?? "")) return null;
     return parsed as DemoSession;
   } catch {
     return null;

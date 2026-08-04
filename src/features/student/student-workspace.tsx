@@ -33,6 +33,7 @@ import { Progress } from "@/components/ui/progress";
 import { analysisPoints, journeySteps, questions } from "@/lib/mock-data";
 import { cn, sleep } from "@/lib/utils";
 import { type JourneyStep, useAppStore } from "@/stores/app-store";
+import { StudentCoachGuide } from "@/features/video-guides/student-coach-guide";
 
 export function StudentWorkspace({ step }: { step: JourneyStep }) {
   const normalizedStep = step;
@@ -352,6 +353,7 @@ function AnalysisStep() {
           </div>
         </div>
       </Card>
+      <StudentCoachGuide stage="analysis" />
       <div className="flex justify-between">
         <Link
           href="/applications/demo/essay"

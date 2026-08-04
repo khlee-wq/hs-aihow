@@ -148,19 +148,28 @@ function createOrbitAnimation(orbitColor: number[], coreColor: number[]) {
 export function JourneyOrbit({ className }: { className?: string }) {
   const { palette } = useBrandPalette();
   const [reducedMotion, setReducedMotion] = useState(true);
-  const animationData = useMemo(
-    () =>
-      palette === "iris"
-        ? createOrbitAnimation(
-            [0.396, 0.345, 0.851, 1],
-            [0.208, 0.725, 0.584, 1],
-          )
-        : createOrbitAnimation(
-            [0.094, 0.482, 0.447, 1],
-            [0.51, 0.659, 0.29, 1],
-          ),
-    [palette],
-  );
+  const animationData = useMemo(() => {
+    const colors = {
+      teal: [
+        [0.094, 0.482, 0.447, 1],
+        [0.51, 0.659, 0.29, 1],
+      ],
+      iris: [
+        [0.396, 0.345, 0.851, 1],
+        [0.208, 0.725, 0.584, 1],
+      ],
+      cobalt: [
+        [0.169, 0.404, 0.784, 1],
+        [0.231, 0.604, 0.553, 1],
+      ],
+      plum: [
+        [0.537, 0.318, 0.467, 1],
+        [0.365, 0.62, 0.545, 1],
+      ],
+    } as const;
+    const [primary, accent] = colors[palette];
+      return createOrbitAnimation([...primary], [...accent]);
+  }, [palette]);
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReducedMotion(media.matches);

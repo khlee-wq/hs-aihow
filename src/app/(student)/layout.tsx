@@ -8,7 +8,7 @@ export default async function StudentLayout({
 }) {
   const session = await requireSession();
   return (
-    <AppShell session={session} role="student">
+    <AppShell session={session} role="user">
       {children}
     </AppShell>
   );

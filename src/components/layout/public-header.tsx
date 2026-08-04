@@ -11,7 +11,7 @@ export function PublicHeader() {
           <Logo />
         </div>
         <nav
-          className="hidden items-center gap-1 rounded-full bg-[color-mix(in_srgb,var(--surface-muted)_62%,transparent)] p-1 text-sm font-bold text-[var(--text-secondary)] md:flex"
+          className="hidden items-center gap-1 rounded-full bg-[color-mix(in_srgb,var(--surface-muted)_62%,transparent)] p-1 text-sm font-bold text-[var(--text-secondary)] lg:flex"
           aria-label="공개 메뉴"
         >
           <Link

@@ -175,7 +175,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 
         // 세로 스크롤 안에서 카드 덱 자체가 옆으로 한 장씩 넘어갑니다.
         // 이전·다음 카드를 일부 남겨, 슬라이드 쇼가 아닌 실제 카드의 이동으로 읽힙니다.
-        if (window.matchMedia("(min-width: 1024px)").matches) {
+        media.add("(min-width: 1024px)", () => {
           Array.from(
             root.current?.querySelectorAll<HTMLElement>(
               "[data-motion-product-stage]",
@@ -221,9 +221,9 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
               });
             });
           });
-        }
+        });
 
-        if (window.matchMedia("(max-width: 639px)").matches) {
+        media.add("(max-width: 639px)", () => {
           Array.from(
             root.current?.querySelectorAll<HTMLElement>(
               "[data-motion-product-stage]",
@@ -248,9 +248,9 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
               },
             });
           });
-        }
+        });
 
-        if (window.matchMedia("(min-width: 1024px)").matches) {
+        media.add("(min-width: 1024px)", () => {
           Array.from(
             root.current?.querySelectorAll<HTMLElement>(
               "[data-motion-parallax]",
@@ -298,7 +298,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
               },
             );
           });
-        }
+        });
 
         Array.from(
           root.current?.querySelectorAll<HTMLElement>("[data-motion-reveal]") ??
@@ -319,8 +319,6 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
           );
         });
 
-        return () =>
-          ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       });
       return () => media.revert();
       }, root);

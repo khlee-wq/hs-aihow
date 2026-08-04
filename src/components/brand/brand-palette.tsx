@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 export const brandPalettes = {
   teal: { label: "Deep Teal", description: "차분한 신뢰와 집중" },
   iris: { label: "Iris", description: "선명한 디지털 교육" },
+  cobalt: { label: "Cobalt", description: "또렷한 학습의 밀도" },
+  plum: { label: "Plum", description: "차분한 판단과 대화" },
 } as const;
 
 export type BrandPalette = keyof typeof brandPalettes;
@@ -24,7 +26,7 @@ const BrandPaletteContext = createContext<{
 } | null>(null);
 
 function isBrandPalette(value: string | null): value is BrandPalette {
-  return value === "teal" || value === "iris";
+  return value !== null && Object.hasOwn(brandPalettes, value);
 }
 
 export function BrandPaletteProvider({
@@ -138,13 +140,13 @@ export function BrandPalettePreview() {
   return (
     <aside
       className="fixed bottom-4 right-4 z-50"
-      aria-label="회의용 브랜드 톤 전환"
+      aria-label="브랜드 톤 전환"
       data-testid="brand-palette-preview"
     >
       {open ? (
         <div className="liquid-glass mb-2 w-[min(20rem,calc(100vw-2rem))] rounded-[var(--radius-lg)] p-3 shadow-[var(--shadow-md)]">
           <p className="mb-2 px-1 text-[10px] font-black uppercase tracking-[.14em] text-[var(--text-tertiary)]">
-            Meeting palette preview
+            AIHOW BRAND TONES
           </p>
           <BrandPaletteToggle />
         </div>
@@ -153,7 +155,7 @@ export function BrandPalettePreview() {
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
-        aria-label={`회의용 브랜드 톤 ${open ? "닫기" : "열기"}`}
+        aria-label={`브랜드 톤 ${open ? "닫기" : "열기"}`}
         className="liquid-glass inline-flex min-h-10 items-center gap-2 rounded-full px-4 text-xs font-black text-[var(--text-primary)] shadow-[var(--shadow-md)]"
       >
         <Palette className="size-4 text-[var(--brand)]" />톤 비교

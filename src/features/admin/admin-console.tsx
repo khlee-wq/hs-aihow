@@ -2,47 +2,44 @@
 
 import {
   Activity,
+  ArrowUpRight,
+  BellRing,
+  BookOpenCheck,
   ChevronRight,
   Clock3,
   FileCheck2,
+  FileClock,
+  FileUp,
   MessageCircleQuestion,
-  PencilLine,
-  Play,
   Plus,
+  PlayCircle,
   School,
-  Search,
+  Sparkles,
   TrendingUp,
   UserRoundCheck,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { EmptyState } from "@/components/ui/status-state";
-import { inputClass } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import { PromptStudio } from "./prompt-studio/prompt-studio";
-import { ResponseReviewPanel } from "./response-reviews/response-review-panel";
 import { QuestionRulesPanel } from "./question-rules/question-rules-panel";
+import { VideoGuidesPanel } from "../video-guides/video-guides-panel";
 
 type AdminSection =
   | "home"
-  | "reviews"
   | "questions"
   | "prompts"
   | "videos"
   | "schools"
-  | "users"
   | "metrics";
 const validSections = new Set<AdminSection>([
   "home",
-  "reviews",
   "questions",
   "prompts",
   "videos",
   "schools",
-  "users",
   "metrics",
 ]);
 
@@ -51,49 +48,12 @@ export function AdminConsole({ section }: { section: string }) {
     ? (section as AdminSection)
     : "home";
   if (normalized === "home") return <AdminHome />;
-  if (normalized === "reviews") return <ResponseReviewPanel />;
   if (normalized === "questions") return <QuestionRulesPanel />;
   if (normalized === "prompts") return <PromptStudio />;
-  if (normalized === "videos") return <Videos />;
+  if (normalized === "videos") return <VideoGuidesPanel />;
   if (normalized === "schools") return <Schools />;
-  if (normalized === "users") return <UsersPanel />;
   return <Metrics />;
 }
-
-const reviewQueue = [
-  {
-    student: "김하우",
-    school: "민사고",
-    kind: "예상 질문",
-    title: "지원 동기 질문 3건",
-    priority: "긴급",
-    time: "12분 전",
-  },
-  {
-    student: "박서윤",
-    school: "하나고",
-    kind: "자소서",
-    title: "소재·논리 분석 결과",
-    priority: "높음",
-    time: "28분 전",
-  },
-  {
-    student: "이도현",
-    school: "상산고",
-    kind: "면접",
-    title: "음성 답변 피드백",
-    priority: "보통",
-    time: "1시간 전",
-  },
-  {
-    student: "최지우",
-    school: "외대부고",
-    kind: "예상 질문",
-    title: "꼬리질문 분기 5건",
-    priority: "보통",
-    time: "2시간 전",
-  },
-];
 
 function PageHeader({
   eyebrow,
@@ -124,26 +84,27 @@ function AdminHome() {
   return (
     <div className="space-y-8 float-in">
       <PageHeader
-        eyebrow="Operations overview"
-        title="좋은 기준이, 좋은 질문을 만듭니다"
-        description="학생에게 전달되기 전 검수할 결과와 학교별 기준의 최신 상태를 확인하세요."
+        eyebrow="교사 워크스페이스"
+        title="수업 기준이 학생의 연습을 이끕니다"
+        description="교사의 노하우를 질문·피드백 레시피로 설계하고, 학교 자료를 바로 적용 가능한 기준으로 정리하세요."
         action={
-          <Button>
-            <Plus className="size-4" />새 기준 등록
-          </Button>
+          <Link href="/admin/prompts" className={buttonVariants()}>
+            <Plus className="size-4" />새 코칭 레시피
+          </Link>
         }
       />
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <CoachStartGuide />
+      <section className="grid gap-4 sm:grid-cols-3">
         <Stat
           icon={FileCheck2}
-          label="검수 대기"
+          label="활성 코칭 레시피"
           value="12"
-          change="긴급 2건"
+          change="이번 주 +2"
           tone="coral"
         />
         <Stat
           icon={MessageCircleQuestion}
-          label="활성 질문 기준"
+          label="질문 설계 기준"
           value="148"
           change="이번 주 +9"
           tone="blue"
@@ -155,36 +116,46 @@ function AdminHome() {
           change="2027학년도"
           tone="mint"
         />
-        <Stat
-          icon={Users}
-          label="훈련 중 학생"
-          value="64"
-          change="오늘 18명"
-          tone="blue"
-        />
       </section>
       <section className="grid gap-5 xl:grid-cols-[1.4fr_.8fr]">
-        <Card className="overflow-hidden p-0">
+        <Card className="overflow-hidden p-0" data-tour="admin-prompt-recipes">
           <div className="flex items-center justify-between border-b border-[var(--border)] p-5">
             <div>
-              <h2 className="font-black">우선 검수할 항목</h2>
+              <h2 className="font-black">내 수업에 적용 중인 레시피</h2>
               <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                학생에게 전달되기 전 전문가 확인이 필요해요
+                교사가 정한 기준은 학생 수와 관계없이 각 준비 단계에 자동 적용됩니다.
               </p>
             </div>
             <Link
-              href="/admin/reviews"
+              href="/admin/prompts"
               className="text-xs font-extrabold text-[var(--brand)]"
             >
-              전체 보기
+              수업 기준 열기
             </Link>
           </div>
-          <QueueList limit={4} />
+          <div className="divide-y divide-[var(--border)]">
+            {[
+              ["자소서 분석", "공통", "근거를 먼저 짚고 다음 행동 제안", "v3.2"],
+              ["예상 질문", "민사고", "학교 관점과 꼬리질문 깊이 반영", "v2.4"],
+              ["답변 피드백", "공통", "학생의 말투를 살린 구체적 피드백", "v1.8"],
+            ].map(([stage, school, rule, version]) => (
+              <div key={stage} className="flex items-center gap-4 p-5">
+                <span className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--brand-soft)] text-[var(--brand)]">
+                  <Sparkles className="size-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <strong className="block text-sm">{stage}</strong>
+                  <span className="mt-1 block text-xs text-[var(--text-secondary)]">{school} · {rule}</span>
+                </span>
+                <span className="text-[10px] font-bold text-[var(--text-tertiary)]">{version}</span>
+              </div>
+            ))}
+          </div>
         </Card>
         <div className="space-y-5">
           <Card>
             <div className="flex items-center justify-between">
-              <h2 className="font-black">기준 최신도</h2>
+              <h2 className="font-black">학교 데이터 최신도</h2>
               <span className="text-xs font-extrabold text-[var(--success)]">
                 양호
               </span>
@@ -215,7 +186,7 @@ function AdminHome() {
               href="/admin/schools"
               className="mt-6 flex items-center justify-between text-xs font-extrabold"
             >
-              학교 기준 관리 <ChevronRight className="size-4" />
+              학교 데이터 열기 <ChevronRight className="size-4" />
             </Link>
           </Card>
           <Card>
@@ -225,32 +196,126 @@ function AdminHome() {
               </span>
               <div>
                 <p className="text-xs font-bold text-[var(--text-secondary)]">
-                  오늘의 시스템 상태
+                  이번 주 학습 흐름
                 </p>
-                <p className="mt-1 text-sm font-black">모든 데모 모듈 정상</p>
+                <p className="mt-1 text-sm font-black">질문 연습 전환이 가장 낮아요</p>
               </div>
             </div>
-            <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+            <div className="mt-5 grid grid-cols-4 gap-1" aria-label="이번 주 학습 단계 흐름">
               {[
-                ["OCR", "정상"],
-                ["질문", "정상"],
-                ["음성", "데모"],
-              ].map(([label, status]) => (
-                <div
-                  key={label}
-                  className="rounded-[var(--radius-xs)] bg-[var(--surface-muted)] p-2"
-                >
-                  <p className="text-[10px] text-[var(--text-tertiary)]">
-                    {label}
-                  </p>
-                  <p className="mt-1 text-[11px] font-black">{status}</p>
+                ["자소서", "64", "100"],
+                ["질문", "43", "67"],
+                ["면접", "22", "34"],
+                ["노트", "12", "19"],
+              ].map(([label, count, rate], index) => (
+                <div key={label} className="min-w-0">
+                  <p className="text-[10px] font-bold text-[var(--text-tertiary)]">{label}</p>
+                  <p className="mt-1 text-base font-black tracking-[-.04em]">{count}</p>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--surface-muted)]">
+                    <div className="h-full rounded-full bg-[var(--brand)]" style={{ width: `${rate}%` }} />
+                  </div>
+                  {index < 3 ? <span className="mt-1 block text-[9px] text-[var(--text-tertiary)]">{rate}%</span> : null}
                 </div>
               ))}
             </div>
+            <Link href="/admin/metrics" className="mt-5 flex items-center justify-between text-xs font-extrabold text-[var(--brand)]">
+              학습 인사이트에서 원인 보기 <ChevronRight className="size-4" />
+            </Link>
           </Card>
         </div>
       </section>
     </div>
+  );
+}
+
+const coachGuideSteps = [
+  {
+    eyebrow: "01 · 수업 기준",
+    title: "반복할 판단 기준을 수업에 담으세요",
+    description:
+      "개별 학생의 결과를 하나씩 확인하지 않습니다. 자소서·질문·면접 단계별로 교사의 판단 방식을 레시피로 정하면 학생 상황에 맞춰 자동 적용됩니다.",
+    action: "코칭 레시피 열기",
+    href: "/admin/prompts",
+    note: "교사의 노하우 → 단계별 레시피 → 학생별 자동 적용",
+  },
+  {
+    eyebrow: "02 · 학교 데이터",
+    title: "학교별 기준을 최신 상태로 유지하세요",
+    description:
+      "모집요강과 학교별 수업 기준은 검토 후 갱신합니다. 이 정보는 해당 학교 학생에게만 자동으로 결합됩니다.",
+    action: "학교 데이터 열기",
+    href: "/admin/schools",
+    note: "공식 출처 → 학교 정보 갱신 → 대상 학생에게 자동 반영",
+  },
+  {
+    eyebrow: "03 · 영상 연결",
+    title: "완성한 영상은 주소만 연결하세요",
+    description:
+      "영상 편집은 익숙한 도구에서 마친 뒤 URL만 붙입니다. 학생이 필요한 단계에서 바로 재생되도록 간단히 연결합니다.",
+    action: "영상 연결 열기",
+    href: "/admin/videos",
+    note: "영상 URL → 재생 미리보기 → 학생 단계 연결",
+  },
+] as const;
+
+function CoachStartGuide() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = coachGuideSteps[activeIndex];
+
+  return (
+    <section
+      className="grid overflow-hidden border-y border-[var(--border)] lg:grid-cols-[minmax(0,1fr)_minmax(22rem,.7fr)]"
+      aria-labelledby="coach-start-title"
+      data-tour="admin-guide"
+    >
+      <div className="bg-[var(--brand-soft)] p-5 sm:p-7">
+        <p className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand)]">
+          <BookOpenCheck className="size-4" /> 교사 수업 도구
+        </p>
+        <h2 id="coach-start-title" className="mt-3 text-2xl font-black tracking-[-.045em]">
+          내 수업 기준을 세 곳에서 설계하세요
+        </h2>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
+          메뉴를 외울 필요는 없습니다. 학생에게 어떤 학습 경험을 만들지 기준으로, 수업 설계에 필요한 도구만 연결합니다.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-2" role="tablist" aria-label="수업 설계 시작 가이드">
+          {coachGuideSteps.map((step, index) => (
+            <button
+              key={step.eyebrow}
+              type="button"
+              role="tab"
+              aria-selected={activeIndex === index}
+              onClick={() => setActiveIndex(index)}
+              className={cn(
+                "min-h-10 border px-3 text-xs font-bold transition-colors",
+                activeIndex === index
+                  ? "border-[var(--brand)] bg-[var(--brand)] text-[var(--text-on-brand)]"
+                  : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
+              )}
+            >
+              {index + 1}. {step.eyebrow.split("·")[1].trim()}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="relative p-5 sm:p-7" role="tabpanel">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand)]">
+          {active.eyebrow}
+        </p>
+        <h3 className="mt-3 text-xl font-black tracking-[-.035em]">{active.title}</h3>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{active.description}</p>
+        <div className="mt-5 flex items-start gap-3 border-y border-[var(--border)] py-3.5 text-xs leading-5 text-[var(--text-secondary)]">
+          <PlayCircle className="mt-0.5 size-4 shrink-0 text-[var(--brand)]" />
+          {active.note}
+        </div>
+        <Link
+          href={active.href}
+          className="mt-5 inline-flex min-h-10 items-center gap-2 bg-[var(--text-primary)] px-4 text-sm font-bold text-[var(--canvas)] hover:bg-[var(--brand)]"
+        >
+          {active.action} <ArrowUpRight className="size-4" />
+        </Link>
+      </div>
+    </section>
   );
 }
 
@@ -261,7 +326,7 @@ function Stat({
   change,
   tone,
 }: {
-  icon: typeof Users;
+  icon: typeof Activity;
   label: string;
   value: string;
   change: string;
@@ -293,138 +358,6 @@ function Stat({
     </Card>
   );
 }
-function QueueList({ limit }: { limit?: number }) {
-  return (
-    <div>
-      {reviewQueue.slice(0, limit).map((item) => (
-        <button
-          key={`${item.student}-${item.kind}`}
-          className="flex w-full items-center gap-4 border-b border-[var(--border)] p-5 text-left last:border-0 hover:bg-[var(--surface-muted)]"
-        >
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--brand-soft)] text-sm font-black text-[var(--brand)]">
-            {item.student.slice(0, 1)}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="flex flex-wrap items-center gap-2">
-              <strong className="text-sm">{item.title}</strong>
-              <span
-                className={cn(
-                  "rounded-full px-2 py-1 text-[9px] font-black",
-                  item.priority === "긴급"
-                    ? "bg-[var(--coral-soft)] text-[var(--danger)]"
-                    : "bg-[var(--surface-muted)] text-[var(--text-secondary)]",
-                )}
-              >
-                {item.priority}
-              </span>
-            </span>
-            <span className="mt-1 block text-xs text-[var(--text-secondary)]">
-              {item.student} · {item.school} · {item.kind}
-            </span>
-          </span>
-          <span className="hidden text-[10px] text-[var(--text-tertiary)] sm:block">
-            {item.time}
-          </span>
-          <ChevronRight className="size-4 text-[var(--text-tertiary)]" />
-        </button>
-      ))}
-    </div>
-  );
-}
-
-const videos = [
-  {
-    title: "지원 동기를 학교와 연결하는 법",
-    category: "자소서 코칭",
-    duration: "04:18",
-    views: 128,
-    status: "게시",
-  },
-  {
-    title: "꼬리질문을 끝까지 듣는 연습",
-    category: "면접 기초",
-    duration: "03:42",
-    views: 94,
-    status: "게시",
-  },
-  {
-    title: "탐구 실패를 구체적으로 설명하기",
-    category: "답변 구조",
-    duration: "05:06",
-    views: 71,
-    status: "검토",
-  },
-];
-function Videos() {
-  return (
-    <div className="space-y-7 float-in">
-      <PageHeader
-        eyebrow="Expert guides"
-        title="영상 가이드"
-        description="긴 강의가 아니라 학생이 막히는 코칭 지점에 바로 연결할 짧은 영상을 관리합니다."
-        action={
-          <Button>
-            <Plus className="size-4" />
-            영상 등록
-          </Button>
-        }
-      />
-      <div className="grid gap-4 lg:grid-cols-3">
-        {videos.map((video, index) => (
-          <Card key={video.title} className="p-0 overflow-hidden">
-            <div
-              className={cn(
-                "relative grid aspect-video place-items-center",
-                index === 0
-                  ? "bg-[var(--brand-soft)]"
-                  : index === 1
-                    ? "bg-[var(--mint-soft)]"
-                    : "bg-[var(--coral-soft)]",
-              )}
-            >
-              <span className="grid size-12 place-items-center rounded-full bg-[var(--surface)] shadow-[var(--shadow-md)]">
-                <Play className="size-5 fill-[var(--text-primary)]" />
-              </span>
-              <span className="absolute bottom-3 right-3 rounded bg-black/65 px-2 py-1 text-[10px] font-bold text-white">
-                {video.duration}
-              </span>
-            </div>
-            <div className="p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-[var(--brand)]">
-                  {video.category}
-                </span>
-                <span className="text-[10px] text-[var(--text-tertiary)]">
-                  재생 {video.views}
-                </span>
-              </div>
-              <h2 className="mt-3 min-h-12 font-black leading-6">
-                {video.title}
-              </h2>
-              <div className="mt-5 flex items-center justify-between">
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-[9px] font-black",
-                    video.status === "게시"
-                      ? "bg-[var(--mint-soft)] text-[var(--success)]"
-                      : "bg-[var(--warning-soft)] text-[var(--warning)]",
-                  )}
-                >
-                  {video.status}
-                </span>
-                <Button variant="ghost" size="sm">
-                  <PencilLine className="size-4" />
-                  편집
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 const schools = [
   ["민족사관고등학교", "민사고", 94, "2027", 38],
   ["하나고등학교", "하나고", 82, "2027", 26],
@@ -432,19 +365,92 @@ const schools = [
   ["상산고등학교", "상산고", 76, "2027", 22],
 ] as const;
 function Schools() {
+  const [selectedFileName, setSelectedFileName] = useState("");
   return (
     <div className="space-y-7 float-in">
       <PageHeader
-        eyebrow="School knowledge"
-        title="학교별 기준"
-        description="학년도와 전형을 구분해 판단 기준·적용 조건·제외 조건·출처와 검수자를 관리합니다."
+        eyebrow="학교 데이터"
+        title="자료를 기준으로 바꾸는 곳"
+        description="모집요강 PDF와 경쟁률 파일을 가져오면, 학교·학년도·전형별로 나누어 추출 초안을 만듭니다. 교사는 필요한 부분만 확인해 적용합니다."
         action={
-          <Button>
-            <Plus className="size-4" />
-            학교 추가
-          </Button>
+          <label className={buttonVariants()}>
+            <FileUp className="size-4" /> 자료 가져오기
+            <input
+              className="sr-only"
+              type="file"
+              accept="application/pdf,.pdf,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              onChange={(event) =>
+                setSelectedFileName(event.target.files?.[0]?.name ?? "")
+              }
+            />
+          </label>
         }
       />
+      <section className="grid overflow-hidden border-y border-[var(--border)] lg:grid-cols-[1.1fr_.9fr]">
+        <label className="group flex min-h-52 cursor-pointer flex-col justify-between bg-[var(--brand-soft)] p-5 sm:p-7">
+          <span className="grid size-11 place-items-center rounded-[var(--radius-sm)] bg-[var(--surface)] text-[var(--brand)] shadow-[var(--shadow-sm)]">
+            <FileUp className="size-5" />
+          </span>
+          <span>
+            <strong className="block text-lg tracking-[-.03em]">PDF 또는 엑셀 자료를 놓아 주세요</strong>
+            <span className="mt-2 block text-sm leading-6 text-[var(--text-secondary)]">
+              모집요강 PDF는 OCR로 항목·일정·지원 조건을, 경쟁률 엑셀은 학교·전형·연도별 표를 읽어 옵니다.
+            </span>
+          </span>
+          <span className="mt-5 inline-flex w-fit items-center gap-2 text-xs font-black text-[var(--brand)]">
+            파일 선택 <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+          <input
+            className="sr-only"
+            type="file"
+            accept="application/pdf,.pdf,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            onChange={(event) => setSelectedFileName(event.target.files?.[0]?.name ?? "")}
+          />
+        </label>
+        <div className="grid content-center gap-4 p-5 sm:p-7">
+          <p className="eyebrow">Import flow</p>
+          {[
+            ["01", "원본 보관", "비공개 자료는 권한 있는 교사만 볼 수 있는 저장소에 보관"],
+            ["02", "자동 추출", "OCR·표 파서가 학교, 전형, 일정, 경쟁률 후보를 분리"],
+            ["03", "확인 후 적용", "추출 초안을 확인한 항목만 학생 준비 화면에 반영"],
+          ].map(([number, title, detail]) => (
+            <div key={number} className="flex gap-3 border-t border-[var(--border)] pt-3 first:border-t-0 first:pt-0">
+              <span className="font-mono text-[10px] font-bold text-[var(--brand)]">{number}</span>
+              <span><strong className="block text-sm">{title}</strong><span className="mt-1 block text-xs leading-5 text-[var(--text-secondary)]">{detail}</span></span>
+            </div>
+          ))}
+          {selectedFileName ? (
+            <p role="status" className="border-t border-[var(--border)] pt-4 text-xs font-bold text-[var(--success)]">
+              선택됨 · {selectedFileName} — 서버 연결 후 자동 추출을 시작합니다.
+            </p>
+          ) : null}
+        </div>
+      </section>
+      <section className="grid overflow-hidden border-y border-[var(--border)] md:grid-cols-3">
+        <div className="bg-[var(--warning-soft)] p-5">
+          <p className="flex items-center gap-2 text-xs font-black text-[var(--warning)]">
+            <FileClock className="size-4" /> 현재 상태
+          </p>
+          <p className="mt-3 text-lg font-black">모집요강 공개 대기</p>
+          <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
+            공개 전 정보는 학생에게 확정 기준처럼 노출하지 않습니다.
+          </p>
+        </div>
+        <div className="border-t border-[var(--border)] p-5 md:border-l md:border-t-0">
+          <p className="text-xs font-black">공개 후 검수 순서</p>
+          <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
+            모집요강 원문 확인 → 지원 조건 정리 → 질문·영상 가이드 반영
+          </p>
+        </div>
+        <div className="border-t border-[var(--border)] p-5 md:border-l md:border-t-0">
+          <p className="flex items-center gap-2 text-xs font-black">
+            <BellRing className="size-4 text-[var(--brand)]" /> 학생 알림
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
+            검수 완료된 변경만 해당 학교 학생의 준비 경로에 안내합니다.
+          </p>
+        </div>
+      </section>
       <Card className="p-0 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[44rem] text-left text-sm">
@@ -505,85 +511,14 @@ function Schools() {
   );
 }
 
-function UsersPanel() {
-  const [query, setQuery] = useState("");
-  const users = useMemo(
-    () =>
-      ["김하우", "박서윤", "이도현", "최지우"].filter((name) =>
-        name.includes(query),
-      ),
-    [query],
-  );
-  return (
-    <div className="space-y-7 float-in">
-      <PageHeader
-        eyebrow="Learners"
-        title="사용자"
-        description="학생의 현재 준비 단계와 마지막 활동만 확인합니다. 자소서 원문은 기본 목록에 노출하지 않습니다."
-      />
-      <Card>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            className={cn(inputClass, "pl-10")}
-            placeholder="이름으로 검색"
-          />
-        </div>
-      </Card>
-      <div className="grid gap-3">
-        {users.length ? (
-          users.map((name, index) => (
-            <Card
-              key={name}
-              className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center"
-            >
-              <div className="flex items-center gap-4">
-                <span className="grid size-11 place-items-center rounded-full bg-[var(--mint-soft)] font-black text-[var(--success)]">
-                  {name.slice(0, 1)}
-                </span>
-                <div>
-                  <h2 className="font-black">{name}</h2>
-                  <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                    {schools[index][1]} · 통합 패키지
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-5">
-                <div className="text-right">
-                  <p className="text-xs font-black">
-                    {[40, 60, 80, 20][index]}% 진행
-                  </p>
-                  <p className="mt-1 text-[10px] text-[var(--text-tertiary)]">
-                    {index + 1}시간 전 활동
-                  </p>
-                </div>
-                <Button variant="secondary" size="sm">
-                  상세 보기
-                </Button>
-              </div>
-            </Card>
-          ))
-        ) : (
-          <EmptyState
-            title="검색 결과가 없어요"
-            description="이름을 다시 확인해 주세요. 원문이나 민감한 학생 정보로는 검색하지 않습니다."
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
 function Metrics() {
   const bars = [42, 58, 49, 72, 64, 82, 76];
   return (
     <div className="space-y-7 float-in">
       <PageHeader
         eyebrow="Product signals"
-        title="운영 지표"
-        description="완료율과 반복 훈련을 중심으로 제품 흐름을 확인합니다. AI 사용량 자체를 성과로 보지 않습니다."
+        title="학습 인사이트"
+        description="완료율과 반복 훈련을 중심으로 수업의 흐름을 확인합니다. AI 사용량 자체를 성과로 보지 않습니다."
       />
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat

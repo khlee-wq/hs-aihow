@@ -1,16 +1,16 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useAppTheme, type Theme } from "@/components/theme/theme-provider";
 
-const themes = [
+const themes: { value: Theme; label: string }[] = [
   { value: "light", label: "라이트" },
   { value: "dark", label: "다크" },
   { value: "system", label: "시스템" },
 ];
 
 export function ThemeToggle({ expanded = false }: { expanded?: boolean }) {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useAppTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     const timer = window.setTimeout(() => setMounted(true), 0);

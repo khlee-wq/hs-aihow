@@ -97,18 +97,27 @@ const plans = [
     title: "자소서 코칭",
     description: "초안을 읽고, 핵심 소재와 문장 구조를 내 언어로 정리하는 과정",
     features: ["자소서 구조 진단", "핵심 소재 맵", "전문가 영상 가이드"],
+    offerLabel: "가입 혜택",
+    offer: "무료 자소서 분석 1회 제공",
+    cta: "무료 분석으로 시작하기",
     plan: "essay",
   },
   {
     title: "면접 훈련",
     description: "자소서 근거에서 시작해 질문과 답변을 반복하는 실전 과정",
     features: ["학교별 예상 질문", "꼬리질문 퀘스트", "음성 모의면접"],
+    offerLabel: "시작 기준",
+    offer: "분석 결과에서 첫 질문으로 연결",
+    cta: "면접 훈련 살펴보기",
     plan: "interview",
   },
   {
     title: "통합 패키지",
     description: "자소서부터 면접 직전 한 장의 파이널 노트까지 연결하는 과정",
     features: ["자소서 코칭 전체", "면접 훈련 전체", "진행 이력 연결"],
+    offerLabel: "구독 혜택",
+    offer: "반복 분석·질문 훈련을 제한 없이",
+    cta: "통합 과정 시작하기",
     plan: "all",
     featured: true,
   },
@@ -119,7 +128,11 @@ export function LandingPage() {
     <>
       <section className="landing-hero relative overflow-hidden pb-8 pt-16 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-28">
         <div className="page-wrap grid items-center gap-14 lg:grid-cols-[1.05fr_.95fr]">
-          <div className="float-in" data-motion-hero data-testid="landing-hero-copy">
+          <div
+            className="float-in"
+            data-motion-hero
+            data-testid="landing-hero-copy"
+          >
             <p className="eyebrow mb-6">AIHOW Interview</p>
             <h1 className="display text-balance">
               자소서가 끝나면,
@@ -147,6 +160,9 @@ export function LandingPage() {
                 준비 과정 보기
               </Link>
             </div>
+            <p className="mt-4 flex items-center gap-2 text-sm font-bold text-[var(--brand)]">
+              <Sparkles className="size-4" /> 가입하면 무료 자소서 분석 1회 제공
+            </p>
             <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs font-bold text-[var(--text-secondary)]">
               <span className="flex items-center gap-2">
                 <Check className="size-4 text-[var(--success)]" />
@@ -224,40 +240,40 @@ export function LandingPage() {
                     <span />
                   </div>
                   <div className="landing-product-copy">
-                  <span className="landing-product-step" aria-hidden="true">
-                    0{index + 1}
-                  </span>
-                  <p className="text-xs font-extrabold text-[var(--text-tertiary)]">
-                    {product.tag}
-                  </p>
-                  <h3 className="mt-3 text-2xl font-black tracking-[-.04em]">
-                    {product.title}
-                  </h3>
-                  <p
-                    className="korean-copy mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]"
-                    data-testid="landing-product-description"
-                  >
-                    {product.description}
-                  </p>
-                  <ul className="mt-7 grid gap-3">
-                    {product.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-center gap-2 text-sm font-bold"
-                      >
-                        <span className="grid size-5 place-items-center rounded-full bg-[var(--mint-soft)]">
-                          <Check className="size-3 text-[var(--success)]" />
-                        </span>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={`/signup?plan=${index === 0 ? "essay" : index === 1 ? "interview" : "all"}`}
-                    className="mt-8 inline-flex items-center gap-1 text-sm font-extrabold text-[var(--brand)]"
-                  >
-                    이 과정으로 시작하기 <ChevronRight className="size-4" />
-                  </Link>
+                    <span className="landing-product-step" aria-hidden="true">
+                      0{index + 1}
+                    </span>
+                    <p className="text-xs font-extrabold text-[var(--text-tertiary)]">
+                      {product.tag}
+                    </p>
+                    <h3 className="mt-3 text-2xl font-black tracking-[-.04em]">
+                      {product.title}
+                    </h3>
+                    <p
+                      className="korean-copy mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]"
+                      data-testid="landing-product-description"
+                    >
+                      {product.description}
+                    </p>
+                    <ul className="mt-7 grid gap-3">
+                      {product.features.map((feature) => (
+                        <li
+                          key={feature}
+                          className="flex items-center gap-2 text-sm font-bold"
+                        >
+                          <span className="grid size-5 place-items-center rounded-full bg-[var(--mint-soft)]">
+                            <Check className="size-3 text-[var(--success)]" />
+                          </span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={`/signup?plan=${index === 0 ? "essay" : index === 1 ? "interview" : "all"}`}
+                      className="mt-8 inline-flex items-center gap-1 text-sm font-extrabold text-[var(--brand)]"
+                    >
+                      이 과정으로 시작하기 <ChevronRight className="size-4" />
+                    </Link>
                   </div>
                 </article>
               ))}
@@ -352,10 +368,14 @@ export function LandingPage() {
               전문가의 기준이 과정 안에 남습니다
             </h2>
             <p className="mt-5 text-base leading-8 text-[var(--text-secondary)]">
-              두 전문가가 설계한 질문의 기준과 코칭 원칙을 서비스 안에서 이어갑니다.
+              두 전문가가 설계한 질문의 기준과 코칭 원칙을 서비스 안에서
+              이어갑니다.
             </p>
           </div>
-          <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-2" data-motion-drop-group>
+          <div
+            className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-2"
+            data-motion-drop-group
+          >
             {mentors.map((mentor) => (
               <Card
                 key={mentor.name}
@@ -371,8 +391,12 @@ export function LandingPage() {
                     className="size-[4.5rem] rounded-full object-cover"
                   />
                   <div>
-                    <h3 className="text-xl font-black tracking-[-.04em]">{mentor.name}</h3>
-                    <p className="mt-1 text-sm font-bold text-[var(--text-secondary)]">{mentor.role}</p>
+                    <h3 className="text-xl font-black tracking-[-.04em]">
+                      {mentor.name}
+                    </h3>
+                    <p className="mt-1 text-sm font-bold text-[var(--text-secondary)]">
+                      {mentor.role}
+                    </p>
                   </div>
                 </div>
                 <div className="mt-7 flex flex-wrap gap-2">
@@ -403,19 +427,26 @@ export function LandingPage() {
         <div className="page-wrap">
           <div className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">Plans</p>
-            <h2 className="heading-xl mt-4 text-balance">준비 방식에 맞게 선택하세요</h2>
+            <h2 className="heading-xl mt-4 text-balance">
+              준비 방식에 맞게 선택하세요
+            </h2>
             <p className="mt-5 text-base leading-8 text-[var(--text-secondary)]">
-              자소서와 면접을 각각 시작하거나, 하나의 흐름으로 연결할 수 있습니다.
+              자소서와 면접을 각각 시작하거나, 하나의 흐름으로 연결할 수
+              있습니다.
             </p>
           </div>
-          <div className="mt-12 grid gap-5 lg:grid-cols-3" data-motion-drop-group>
+          <div
+            className="mt-12 grid gap-5 lg:grid-cols-3"
+            data-motion-drop-group
+          >
             {plans.map((plan) => (
               <Card
                 key={plan.title}
                 data-motion-drop
                 className={cn(
                   "surface-interactive relative flex min-h-[28rem] flex-col p-7",
-                  plan.featured && "border-[var(--brand)] shadow-[var(--shadow-brand)]",
+                  plan.featured &&
+                    "border-[var(--brand)] shadow-[var(--shadow-brand)]",
                 )}
               >
                 {plan.featured ? (
@@ -423,17 +454,24 @@ export function LandingPage() {
                     함께 준비하기
                   </span>
                 ) : null}
-                <p className="text-sm font-extrabold text-[var(--text-secondary)]">{plan.title}</p>
+                <p className="text-sm font-extrabold text-[var(--text-secondary)]">
+                  {plan.title}
+                </p>
                 <p className="mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]">
                   {plan.description}
                 </p>
                 <div className="mt-7 rounded-[var(--radius-md)] bg-[var(--surface-muted)] px-4 py-3">
-                  <p className="text-xs font-bold text-[var(--text-tertiary)]">출시 전 가격 안내</p>
-                  <p className="mt-1 text-sm font-extrabold">구성 확정 후 가장 먼저 안내드립니다.</p>
+                  <p className="text-xs font-bold text-[var(--text-tertiary)]">
+                    {plan.offerLabel}
+                  </p>
+                  <p className="mt-1 text-sm font-extrabold">{plan.offer}</p>
                 </div>
                 <ul className="mt-7 grid gap-3">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm font-bold">
+                    <li
+                      key={feature}
+                      className="flex items-center gap-2 text-sm font-bold"
+                    >
                       <Check className="size-4 text-[var(--success)]" />
                       {feature}
                     </li>
@@ -443,7 +481,7 @@ export function LandingPage() {
                   href={`/signup?plan=${plan.plan}`}
                   className="mt-auto inline-flex items-center gap-1 pt-8 text-sm font-extrabold text-[var(--brand)]"
                 >
-                  출시 안내 받기 <ChevronRight className="size-4" />
+                  {plan.cta} <ChevronRight className="size-4" />
                 </Link>
               </Card>
             ))}
@@ -589,7 +627,9 @@ function HeroPreview() {
             </div>
           </div>
           <div className="liquid-glass-section mt-6 rounded-[var(--radius-md)] p-4">
-            <p className="text-xs font-black text-[var(--brand)]">자소서 근거</p>
+            <p className="text-xs font-black text-[var(--brand)]">
+              자소서 근거
+            </p>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
               “과학 동아리에서 결과보다 실험 설계의 과정을 기록했습니다…”
             </p>
@@ -598,7 +638,9 @@ function HeroPreview() {
             내 생각을 먼저 적어 보세요.
           </div>
           <div className="mt-4 flex items-center justify-between">
-            <span className="text-xs font-bold text-[var(--text-secondary)]">자동 저장됨</span>
+            <span className="text-xs font-bold text-[var(--text-secondary)]">
+              자동 저장됨
+            </span>
             <span className="rounded-[var(--radius-sm)] bg-[var(--brand)] px-4 py-2.5 text-xs font-black text-[var(--text-on-brand)]">
               답변 저장
             </span>
@@ -651,7 +693,9 @@ function ExpertConsole() {
         ))}
       </div>
       <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-5 text-xs">
-        <span className="text-white/50">최근 기준 업데이트 8분 전</span>
+        <span className="text-white/50">
+          짧은 영상 가이드 3개 · 분석 뒤 추천
+        </span>
         <span className="font-black text-[var(--mint)]">운영 화면 보기 →</span>
       </div>
     </Card>

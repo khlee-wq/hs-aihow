@@ -1,13 +1,13 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 import {
   BrandPalettePreview,
   BrandPaletteProvider,
 } from "@/components/brand/brand-palette";
 import { MotionRoot } from "@/components/motion/motion-root";
+import { AppThemeProvider } from "@/components/theme/theme-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -21,18 +21,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <AppThemeProvider>
       <QueryClientProvider client={queryClient}>
         <BrandPaletteProvider>
           <MotionRoot>{children}</MotionRoot>
           <BrandPalettePreview />
         </BrandPaletteProvider>
       </QueryClientProvider>
-    </ThemeProvider>
+    </AppThemeProvider>
   );
 }

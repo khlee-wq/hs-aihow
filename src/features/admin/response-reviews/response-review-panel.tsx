@@ -158,8 +158,8 @@ export function ResponseReviewPanel() {
           <p className="eyebrow">Response operations</p>
           <h1 className="heading-lg mt-3">코칭 응답 검수</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            학생이 입력한 내용과 AI 코칭 답변을 한 화면에서 비교하고, 소장님이
-            직접 수정·승인합니다.
+            학생이 입력한 내용과 AI 코칭 답변을 한 화면에서 비교하고, 학생에게
+            전달할 결과를 확인합니다.
           </p>
         </div>
         <Button onClick={create}>
@@ -373,7 +373,7 @@ export function ResponseReviewPanel() {
                   </h3>
                 </div>
                 <span className="text-[10px] font-bold text-white/55">
-                  소장님이 직접 수정할 수 있습니다
+                  승인 전 검토
                 </span>
               </div>
               <textarea

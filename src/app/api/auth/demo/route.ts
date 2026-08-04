@@ -7,7 +7,8 @@ const payloadSchema = z.object({
   name: z.string().trim().min(2),
   email: z.email(),
   password: z.string().min(4),
-  role: z.enum(["student", "expert"]),
+  // 로그인은 학생과 교사 화면의 첫 진입만 구분합니다.
+  role: z.enum(["user", "admin"]),
   next: z.string().optional(),
 });
 
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   const { name, email, role, next } = parsed.data;
-  const fallback = role === "expert" ? "/admin" : "/dashboard";
+  const fallback = role === "admin" ? "/admin" : "/dashboard";
   const candidate = safeInternalPath(next, fallback);
   const redirect = candidate;
   const response = NextResponse.json({ redirect });

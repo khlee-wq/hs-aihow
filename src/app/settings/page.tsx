@@ -4,4 +4,11 @@ import { SettingsPanel } from "@/features/settings/settings-panel";
 import { requireSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "설정" };
-export default async function SettingsPage() { const session = await requireSession(); return <AppShell session={session} role={session.role}><SettingsPanel session={session} /></AppShell>; }
+export default async function SettingsPage() {
+  const session = await requireSession();
+  return (
+    <AppShell session={session} role={session.role === "user" ? "user" : "admin"}>
+      <SettingsPanel session={session} />
+    </AppShell>
+  );
+}

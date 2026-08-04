@@ -126,6 +126,18 @@ body {
     inset 0 1px 0 color-mix(in srgb, white 10%, transparent),
     0 20px 48px rgba(0, 0, 0, 0.3);
 }
+.teacher-navigation {
+  border-color: color-mix(in srgb, var(--text-primary) 7%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 80%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 88%, transparent),
+    0 14px 36px color-mix(in srgb, var(--surface-inverse) 8%, transparent);
+  backdrop-filter: blur(20px) saturate(126%);
+  -webkit-backdrop-filter: blur(20px) saturate(126%);
+}
+.dark .teacher-navigation {
+  background: color-mix(in srgb, var(--surface-raised) 72%, transparent);
+}
 .public-navigation-glass {
   isolation: isolate;
   border: 1px solid color-mix(in srgb, var(--text-primary) 5%, transparent);
@@ -295,15 +307,6 @@ body {
   }
   .landing-product-card {
     min-height: 27rem;
-  }
-}
-@media (max-width: 1023px) {
-  /* 데스크톱에서 뷰포트를 줄이는 경우에도 남은 GSAP inline transform이
-     카드의 정적 모바일·태블릿 레이아웃을 밀어내지 못하게 한다. */
-  .landing-product-track [data-motion-product-card] {
-    opacity: 1 !important;
-    transform: none !important;
-    visibility: visible !important;
   }
 }
 @media (max-width: 639px) and (prefers-reduced-motion: reduce) {

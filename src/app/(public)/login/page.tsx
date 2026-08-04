@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "로그인" };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; reason?: string }>;
 }) {
   const query = await searchParams;
   return (
@@ -15,6 +15,7 @@ export default async function LoginPage({
       nextPath={
         query.next ? safeInternalPath(query.next, "/dashboard") : undefined
       }
+      reason={query.reason === "session-expired" ? "session-expired" : undefined}
     />
   );
 }

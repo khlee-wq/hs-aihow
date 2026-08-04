@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { decodeSession, SESSION_COOKIE } from "@/lib/session-shared";
 import { safeInternalPath } from "@/lib/utils";
 
-const protectedRoutes = ["/dashboard", "/applications", "/admin", "/settings"];
+const protectedRoutes = [
+  "/dashboard",
+  "/applications",
+  "/admin",
+  "/settings",
+];
 
 export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;

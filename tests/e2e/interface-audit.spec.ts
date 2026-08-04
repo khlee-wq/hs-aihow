@@ -13,12 +13,10 @@ const studentPaths = [
 
 const adminPaths = [
   "/admin",
-  "/admin/reviews",
   "/admin/questions",
   "/admin/prompts",
   "/admin/videos",
   "/admin/schools",
-  "/admin/users",
   "/admin/metrics",
   "/settings",
 ];
@@ -138,7 +136,7 @@ function isWebKitRscPrefetchNoise(message: string) {
   return /\?_rsc=.*due to access control checks/i.test(message);
 }
 
-async function seedRoleSession(page: Page, role: "student" | "expert") {
+async function seedRoleSession(page: Page, role: "user" | "admin") {
   // 이 파일은 각 보호 화면의 반응형 감사를 담당합니다. 가입 흐름의 POST·쿠키·
   // 리다이렉트는 smoke.spec.ts에서 별도로 검증해, 화면 감사가 인증 전송 타이밍에
   // 의존하지 않도록 합니다.
@@ -146,7 +144,7 @@ async function seedRoleSession(page: Page, role: "student" | "expert") {
     {
       name: SESSION_COOKIE,
       value: encodeSession({
-        name: role === "student" ? "모바일학생" : "운영전문가",
+        name: role === "user" ? "모바일학생" : "운영교사",
         email: `${role}@example.com`,
         role,
       }),
@@ -337,7 +335,7 @@ test("전문가 소개의 핵심 제목은 모든 공개 폭에서 한 줄로 �
 test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완결된다", async ({
   page,
 }) => {
-  await seedRoleSession(page, "student");
+  await seedRoleSession(page, "user");
 
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
@@ -352,7 +350,7 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
 test("전문가 운영 전 메뉴는 모바일·태블릿·데스크톱에서 완결된다", async ({
   page,
 }) => {
-  await seedRoleSession(page, "expert");
+  await seedRoleSession(page, "admin");
 
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
