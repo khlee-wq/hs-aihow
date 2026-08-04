@@ -27,6 +27,7 @@ const products = [
     description: "초안의 소재와 논리를 이해하고, 내 언어로 완성해요.",
     features: ["자소서 구조 진단", "핵심 소재 맵", "전문가 영상 가이드"],
     tone: "mint",
+    icon: FileCheck2,
   },
   {
     title: "면접 훈련",
@@ -34,6 +35,7 @@ const products = [
     description: "자소서 근거에서 시작한 질문에 답하며 실전 감각을 만들어요.",
     features: ["학교별 예상 질문", "꼬리질문 퀘스트", "음성 모의면접"],
     tone: "blue",
+    icon: Mic2,
   },
   {
     title: "통합 패키지",
@@ -41,6 +43,7 @@ const products = [
     description: "자소서에서 면접 직전 한 장까지 하나의 과정으로 연결해요.",
     features: ["모든 코칭·훈련", "진행 이력 연결", "1페이지 파이널 노트"],
     tone: "coral",
+    icon: BookOpenCheck,
   },
 ];
 
@@ -195,26 +198,34 @@ export function LandingPage() {
             text="각 상품은 독립적으로 사용할 수 있고, 통합 패키지에서는 앞 단계의 결과가 다음 준비로 자연스럽게 이어집니다."
           />
           <div
-            className="landing-product-stage mt-12 p-3 sm:p-5 lg:p-6"
+            className="landing-product-stage mt-12"
             data-motion-product-stage
+            data-testid="landing-product-stage"
           >
             <div
-              className="landing-product-track grid gap-5 lg:grid-cols-3"
+              className="landing-product-track grid gap-5 md:grid-cols-3"
               data-motion-product-track
             >
-              {products.map((product, index) => (
-                <Card
+              {products.map(({ icon: Icon, ...product }, index) => (
+                <article
                   key={product.title}
-                  variant="glass"
                   data-motion-product-card
                   className={cn(
                     `landing-product-card--${product.tone}`,
-                    "landing-product-card surface-interactive relative z-10 flex flex-col overflow-hidden border-0 p-7",
-                    index === 2 &&
-                      "landing-product-card--featured",
+                    "landing-product-card relative flex flex-col overflow-hidden",
                   )}
                 >
-                  <p className="mt-2 text-xs font-extrabold text-[var(--text-tertiary)]">
+                  <div className="landing-product-art" aria-hidden="true">
+                    <Icon className="size-10" strokeWidth={1.65} />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className="landing-product-copy">
+                  <span className="landing-product-step" aria-hidden="true">
+                    0{index + 1}
+                  </span>
+                  <p className="text-xs font-extrabold text-[var(--text-tertiary)]">
                     {product.tag}
                   </p>
                   <h3 className="mt-3 text-2xl font-black tracking-[-.04em]">
@@ -245,7 +256,8 @@ export function LandingPage() {
                   >
                     이 과정으로 시작하기 <ChevronRight className="size-4" />
                   </Link>
-                </Card>
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -443,10 +455,8 @@ export function LandingPage() {
           <p className="text-xs font-black uppercase tracking-[.14em] opacity-65">
             Ready when you are
           </p>
-          <h2 className="mx-auto mt-4 max-w-3xl text-balance text-3xl font-black tracking-[-.05em] sm:text-5xl">
-            면접 직전의 한 장까지,
-            <br />
-            오늘 첫 질문부터 준비하세요.
+          <h2 className="mx-auto mt-4 max-w-3xl text-balance text-3xl font-black tracking-[-.05em] sm:text-5xl lg:max-w-none lg:whitespace-nowrap lg:text-[clamp(2.1rem,3.15vw,3.5rem)]">
+            면접 직전의 한 장까지, 오늘 첫 질문부터 준비하세요.
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-sm leading-7 opacity-75">
             데모 단계에서는 어떤 이메일로 가입해도 전체 인터페이스를 바로 확인할

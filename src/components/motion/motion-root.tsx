@@ -180,8 +180,8 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
           );
         });
 
-        // 상품 카드는 스크롤 구간 안에서만 천천히 제자리로 모입니다.
-        // 과한 상시 모션 대신, 선택지를 읽기 시작하는 순간에만 깊이를 만듭니다.
+        // 세로 스크롤 안에서 카드 덱 자체가 옆으로 한 장씩 넘어갑니다.
+        // 이전·다음 카드를 일부 남겨, 슬라이드 쇼가 아닌 실제 카드의 이동으로 읽힙니다.
         if (window.matchMedia("(min-width: 768px)").matches) {
           Array.from(
             root.current?.querySelectorAll<HTMLElement>(
@@ -192,54 +192,40 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
               stage.querySelectorAll<HTMLElement>("[data-motion-product-card]"),
             );
             if (!cards.length) return;
-            gsap.fromTo(
-              cards,
-              {
-                autoAlpha: 0.08,
-                y: (index) => 44 + index * 14,
-                rotate: (index) => (index - 1) * 2.4,
-              },
-              {
-                autoAlpha: 1,
-                y: (index) => (index - 1) * -7,
-                rotate: 0,
-                stagger: 0.04,
-                ease: "none",
-                scrollTrigger: {
-                  trigger: stage,
-                  start: "top 86%",
-                  end: "top 38%",
-                  scrub: 0.65,
-                  invalidateOnRefresh: true,
-                },
-              },
-            );
-          });
-        } else {
-          Array.from(
-            root.current?.querySelectorAll<HTMLElement>(
-              "[data-motion-product-stage]",
-            ) ?? [],
-          ).forEach((stage) => {
-            const track = stage.querySelector<HTMLElement>(
-              "[data-motion-product-track]",
-            );
-            if (!track) return;
-            gsap.to(track, {
-              x: () => Math.min(0, stage.clientWidth - track.scrollWidth),
-              ease: "none",
+            gsap.set(cards, {
+              xPercent: (index) => -50 + index * 108,
+              y: (index) => index * 26,
+              rotate: (index) => index * 5,
+              autoAlpha: (index) => (index === 0 ? 1 : 0.6),
+            });
+            const sequence = gsap.timeline({
               scrollTrigger: {
                 trigger: stage,
-                // Pin the horizontal sequence directly under the floating nav.
-                // Starting at 72% left too much empty viewport above the cards on phones.
-                start: "top 18%",
-                end: () => `+=${Math.max(520, track.scrollWidth * 1.1)}`,
-                scrub: 0.7,
+                start: "top 16%",
+                end: () => `+=${Math.max(980, cards.length * 480)}`,
+                scrub: 0.72,
                 pin: true,
                 pinSpacing: true,
                 anticipatePin: 1,
                 invalidateOnRefresh: true,
               },
+            });
+            cards.slice(0, -1).forEach((card, index) => {
+              cards.forEach((item, itemIndex) => {
+                const distance = itemIndex - (index + 1);
+                sequence.to(
+                  item,
+                  {
+                    xPercent: -50 + distance * 108,
+                    y: Math.abs(distance) * 26,
+                    rotate: distance * 5,
+                    autoAlpha: distance === 0 ? 1 : distance < -1 ? 0.28 : 0.6,
+                    duration: 1,
+                    ease: "none",
+                  },
+                  itemIndex === 0 ? undefined : "<",
+                );
+              });
             });
           });
         }
@@ -314,7 +300,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
   }, [motionReady, pathname]);
 
   return (
-    <div ref={root} className="min-h-[100svh]">
+    <div ref={root} className={`min-h-[100svh]${motionReady ? " motion-ready" : ""}`}>
       {children}
     </div>
   );

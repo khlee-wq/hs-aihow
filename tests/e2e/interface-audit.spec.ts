@@ -228,6 +228,30 @@ test("모바일 랜딩의 안내 목록·미리보기·다음 구간은 서로 �
   }
 });
 
+test("상품 준비 시퀀스는 모든 화면에서 스크롤 가능한 하나의 장면으로 남는다", async ({
+  page,
+}) => {
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await visit(page, "/");
+
+    const stage = page.getByTestId("landing-product-stage");
+    await expect(stage).toBeVisible();
+    const layout = await stage.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return {
+        minHeight: style.minHeight,
+        fitsViewport: rect.left >= 0 && rect.right <= window.innerWidth,
+      };
+    });
+
+    expect(layout.fitsViewport).toBe(true);
+    if (width >= 768) expect(layout.minHeight).not.toBe("0px");
+    await expectInterfaceFitsViewport(page);
+  }
+});
+
 test("랜딩 상품 설명은 한국어 어절을 쪼개지 않고 줄바꿈한다", async ({
   page,
 }) => {

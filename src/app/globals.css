@@ -188,55 +188,94 @@ body {
 }
 .landing-product-stage {
   position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  border-radius: calc(var(--radius-xl) + .5rem);
-  border: 1px solid color-mix(in srgb, var(--text-primary) 4%, transparent);
-  background: color-mix(in srgb, var(--surface-muted) 30%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 76%, transparent),
-    inset 0 0 0 1rem color-mix(in srgb, var(--surface-raised) 10%, transparent),
-    0 20px 50px color-mix(in srgb, var(--surface-inverse) 6%, transparent);
-  backdrop-filter: blur(18px) saturate(112%);
-  -webkit-backdrop-filter: blur(18px) saturate(112%);
+  width: calc(100% + var(--space-page) * 2);
+  margin-left: calc(var(--space-page) * -1);
+  overflow: clip;
 }
 .landing-product-card {
-  min-height: 24rem;
-  background: color-mix(in srgb, var(--surface-raised) 38%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 5%, transparent);
+  border-radius: calc(var(--radius-xl) + .35rem);
+  background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 82%, transparent),
-    0 14px 30px color-mix(in srgb, var(--surface-inverse) 7%, transparent);
-  backdrop-filter: blur(28px) saturate(136%);
-  -webkit-backdrop-filter: blur(28px) saturate(136%);
+    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 88%, transparent),
+    0 18px 42px color-mix(in srgb, var(--surface-inverse) 10%, transparent);
+  backdrop-filter: blur(18px) saturate(122%);
+  -webkit-backdrop-filter: blur(18px) saturate(122%);
 }
-.landing-product-card::after {
+.landing-product-art {
+  position: relative;
+  display: grid;
+  min-height: 10rem;
+  place-items: center;
+  overflow: hidden;
+  color: var(--brand);
+}
+.landing-product-art::before {
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--surface-raised) 52%, transparent);
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  background: var(--brand-soft);
   content: "";
-  pointer-events: none;
 }
-.landing-product-card--featured {
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--surface-raised) 78%, transparent),
-    0 16px 32px color-mix(in srgb, var(--surface-inverse) 8%, transparent);
+.landing-product-art svg,
+.landing-product-art span {
+  position: relative;
+}
+.landing-product-art span {
+  position: absolute;
+  width: 4.7rem;
+  height: .38rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 20%, transparent);
+}
+.landing-product-art span:nth-of-type(1) { transform: translateY(3.9rem); }
+.landing-product-art span:nth-of-type(2) { width: 3.2rem; transform: translateY(5rem); }
+.landing-product-art span:nth-of-type(3) { width: 2.1rem; transform: translateY(6.1rem); }
+.landing-product-card--blue .landing-product-art { color: var(--brand-strong); }
+.landing-product-card--blue .landing-product-art::before { background: color-mix(in srgb, var(--brand-soft) 72%, var(--canvas-alt)); }
+.landing-product-card--coral .landing-product-art { color: var(--coral); }
+.landing-product-card--coral .landing-product-art::before { background: var(--coral-soft); }
+.landing-product-copy { position: relative; display: flex; flex: 1; flex-direction: column; padding: 0 1.5rem 1.65rem; }
+.landing-product-step {
+  position: absolute;
+  right: 1.5rem;
+  top: .1rem;
+  color: color-mix(in srgb, var(--text-primary) 22%, transparent);
+  font-size: clamp(2.6rem, 5vw, 4.6rem);
+  font-weight: 800;
+  letter-spacing: -0.09em;
+  line-height: 0.8;
 }
 .landing-product-stage [data-motion-product-card] {
   will-change: transform, opacity;
 }
+@media (min-width: 768px) {
+  .landing-product-stage {
+    min-height: 37rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .motion-ready .landing-product-track {
+      display: block;
+      min-height: 35rem;
+      position: relative;
+    }
+    .motion-ready .landing-product-track [data-motion-product-card] {
+      left: 50%;
+      top: 1rem;
+      position: absolute;
+      width: clamp(17rem, 28vw, 27rem);
+      aspect-ratio: .68;
+    }
+  }
+}
 @media (max-width: 767px) {
   .landing-product-stage {
-    overflow: hidden;
+    width: auto;
+    margin-left: 0;
+    overflow: visible;
   }
-  .landing-product-track {
-    display: flex;
-    gap: 1rem;
-    width: max-content;
-  }
-  .landing-product-track [data-motion-product-card] {
-    flex: 0 0 min(17.5rem, calc(100vw - var(--space-page) * 2 - 1.5rem));
-  }
+  .landing-product-card { min-height: 28rem; }
 }
 .journey-stage {
   background: color-mix(in srgb, var(--surface-contrast) 92%, transparent);
