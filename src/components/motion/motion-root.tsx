@@ -156,20 +156,13 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
           if (!cards.length) return;
           gsap.fromTo(
             cards,
-            {
-              autoAlpha: 0,
-              y: (index) => -62 - index * 18,
-              rotate: (index) => (index - 1) * 4,
-              scale: 0.94,
-            },
+            { autoAlpha: 0, y: 24 },
             {
               autoAlpha: 1,
               y: 0,
-              rotate: 0,
-              scale: 1,
-              duration: 0.88,
-              stagger: 0.12,
-              ease: "back.out(1.35)",
+              duration: 0.62,
+              stagger: 0.08,
+              ease: "power3.out",
               clearProps: "transform,opacity,visibility",
               scrollTrigger: {
                 trigger: group,
@@ -182,7 +175,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 
         // 세로 스크롤 안에서 카드 덱 자체가 옆으로 한 장씩 넘어갑니다.
         // 이전·다음 카드를 일부 남겨, 슬라이드 쇼가 아닌 실제 카드의 이동으로 읽힙니다.
-        if (window.matchMedia("(min-width: 768px)").matches) {
+        if (window.matchMedia("(min-width: 1024px)").matches) {
           Array.from(
             root.current?.querySelectorAll<HTMLElement>(
               "[data-motion-product-stage]",
@@ -230,6 +223,33 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
           });
         }
 
+        if (window.matchMedia("(max-width: 639px)").matches) {
+          Array.from(
+            root.current?.querySelectorAll<HTMLElement>(
+              "[data-motion-product-stage]",
+            ) ?? [],
+          ).forEach((stage) => {
+            const track = stage.querySelector<HTMLElement>(
+              "[data-motion-product-track]",
+            );
+            if (!track) return;
+            gsap.to(track, {
+              x: () => Math.min(0, stage.clientWidth - track.scrollWidth),
+              ease: "none",
+              scrollTrigger: {
+                trigger: stage,
+                start: "top 17%",
+                end: () => `+=${Math.max(680, track.scrollWidth * 1.05)}`,
+                scrub: 0.7,
+                pin: true,
+                pinSpacing: true,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+              },
+            });
+          });
+        }
+
         if (window.matchMedia("(min-width: 1024px)").matches) {
           Array.from(
             root.current?.querySelectorAll<HTMLElement>(
@@ -247,6 +267,33 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
                   start: "top bottom",
                   end: "bottom top",
                   scrub: 0.8,
+                },
+              },
+            );
+          });
+
+          Array.from(
+            root.current?.querySelectorAll<HTMLElement>(
+              "[data-motion-journey]",
+            ) ?? [],
+          ).forEach((journey) => {
+            const steps = Array.from(
+              journey.querySelectorAll<HTMLElement>("[data-motion-item]"),
+            );
+            if (!steps.length) return;
+            gsap.fromTo(
+              steps,
+              { autoAlpha: 0.45, y: 20 },
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.5,
+                stagger: 0.09,
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: journey,
+                  start: "top 76%",
+                  once: true,
                 },
               },
             );

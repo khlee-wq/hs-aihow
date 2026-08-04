@@ -250,7 +250,7 @@ body {
 .landing-product-stage [data-motion-product-card] {
   will-change: transform, opacity;
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .landing-product-stage {
     min-height: 37rem;
   }
@@ -269,13 +269,54 @@ body {
     }
   }
 }
-@media (max-width: 767px) {
+@media (max-width: 639px) {
+  .landing-product-stage {
+    width: calc(100% + var(--space-page));
+    margin-left: 0;
+    overflow: hidden;
+  }
+  .landing-product-track {
+    display: flex;
+    gap: 1rem;
+    width: max-content;
+    padding: .25rem 0 1rem;
+  }
+  .landing-product-card {
+    min-height: 25rem;
+    flex: 0 0 min(78vw, 20rem);
+    grid-column: auto !important;
+  }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
   .landing-product-stage {
     width: auto;
     margin-left: 0;
     overflow: visible;
   }
-  .landing-product-card { min-height: 28rem; }
+  .landing-product-card {
+    min-height: 27rem;
+  }
+}
+@media (max-width: 1023px) {
+  /* 데스크톱에서 뷰포트를 줄이는 경우에도 남은 GSAP inline transform이
+     카드의 정적 모바일·태블릿 레이아웃을 밀어내지 못하게 한다. */
+  .landing-product-track [data-motion-product-card] {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+}
+@media (max-width: 639px) and (prefers-reduced-motion: reduce) {
+  .landing-product-stage { overflow: visible; }
+  .landing-product-track {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-right: var(--space-page);
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .landing-product-track::-webkit-scrollbar { display: none; }
+  .landing-product-card { scroll-snap-align: start; }
 }
 .journey-stage {
   background: color-mix(in srgb, var(--surface-contrast) 92%, transparent);

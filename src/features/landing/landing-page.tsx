@@ -203,7 +203,7 @@ export function LandingPage() {
             data-testid="landing-product-stage"
           >
             <div
-              className="landing-product-track grid gap-5 md:grid-cols-3"
+              className="landing-product-track grid gap-5 sm:grid-cols-2"
               data-motion-product-track
             >
               {products.map(({ icon: Icon, ...product }, index) => (
@@ -213,6 +213,8 @@ export function LandingPage() {
                   className={cn(
                     `landing-product-card--${product.tone}`,
                     "landing-product-card relative flex flex-col overflow-hidden",
+                    index === 2 &&
+                      "sm:col-span-2 sm:mx-auto sm:w-[calc(50%-0.625rem)]",
                   )}
                 >
                   <div className="landing-product-art" aria-hidden="true">
@@ -267,7 +269,6 @@ export function LandingPage() {
       <section
         id="journey"
         className="journey-stage surface-contrast scroll-mt-24 py-24 lg:py-32"
-        data-motion-reveal
       >
         <div className="page-wrap">
           <SectionIntro
@@ -276,7 +277,7 @@ export function LandingPage() {
             text="무엇을 물어볼지 고민하는 채팅이 아닙니다. 완료한 결과가 다음 단계의 준비물이 되는 명확한 경로입니다."
             inverse
           />
-          <div className="mt-14 grid gap-3 lg:grid-cols-5">
+          <div className="mt-14 grid gap-3 lg:grid-cols-5" data-motion-journey>
             {journey.map(({ icon: Icon, title, text }, index) => (
               <div
                 key={title}
