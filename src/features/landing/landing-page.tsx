@@ -18,7 +18,6 @@ import {
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { JourneyOrbit } from "@/components/motion/journey-orbit";
 
 const products = [
   {
@@ -126,59 +125,101 @@ const plans = [
 export function LandingPage() {
   return (
     <>
-      <section className="landing-hero relative overflow-hidden pb-8 pt-16 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-28">
-        <div className="page-wrap grid items-center gap-14 lg:grid-cols-[1.05fr_.95fr]">
+      <section className="landing-hero relative overflow-hidden">
+        <div
+          className="landing-hero-stage"
+          data-motion-hero-stage
+          data-testid="landing-hero-art"
+        >
           <div
-            className="float-in"
-            data-motion-hero
-            data-testid="landing-hero-copy"
+            aria-hidden="true"
+            className="landing-hero-object landing-hero-object--document"
+            data-motion-waterfall-art
           >
-            <p className="eyebrow mb-6">AIHOW Interview</p>
-            <h1 className="display text-balance">
-              자소서가 끝나면,
-              <br />
-              <span className="text-[var(--brand)]">말할 준비</span>가
-              시작됩니다.
-            </h1>
-            <p className="mt-7 max-w-xl text-base leading-8 text-[var(--text-secondary)] sm:text-lg">
-              전문가의 기준과 나의 실제 자소서를 연결해, 예상 질문부터 음성
-              면접과 한 장의 파이널 노트까지 준비하세요.
-            </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link
-                className={cn(buttonVariants({ size: "lg" }), "group")}
-                href="/signup"
-              >
-                내 준비 시작하기{" "}
-                <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link
-                className={buttonVariants({ variant: "secondary", size: "lg" })}
-                href="#journey"
-              >
-                <Play className="size-4 fill-current" />
-                준비 과정 보기
-              </Link>
-            </div>
-            <p className="mt-4 flex items-center gap-2 text-sm font-bold text-[var(--brand)]">
-              <Sparkles className="size-4" /> 가입하면 무료 자소서 분석 1회 제공
-            </p>
-            <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs font-bold text-[var(--text-secondary)]">
-              <span className="flex items-center gap-2">
-                <Check className="size-4 text-[var(--success)]" />
-                학생이 직접 완성
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="size-4 text-[var(--success)]" />
-                전문가 기준 기반
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="size-4 text-[var(--success)]" />
-                자료 보관 상태 확인
-              </span>
-            </div>
+            <Image
+              src="/landing/hero/aihow-glass-document-v2.png"
+              alt=""
+              fill
+              sizes="(max-width: 639px) 46vw, (max-width: 1023px) 31vw, 22vw"
+              priority
+            />
           </div>
-          <HeroPreview />
+          <div
+            aria-hidden="true"
+            className="landing-hero-object landing-hero-object--question"
+            data-motion-waterfall-art
+          >
+            <Image
+              src="/landing/hero/aihow-glass-question-v2.png"
+              alt=""
+              fill
+              sizes="(max-width: 639px) 40vw, (max-width: 1023px) 25vw, 17vw"
+              priority
+            />
+          </div>
+          <div
+            aria-hidden="true"
+            className="landing-hero-object landing-hero-object--microphone"
+            data-motion-waterfall-art
+          >
+            <Image
+              src="/landing/hero/aihow-glass-microphone-v2.png"
+              alt=""
+              fill
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 23vw"
+              priority
+            />
+          </div>
+        </div>
+
+        <div
+          className="landing-hero-copy page-wrap"
+          data-motion-hero-waterfall
+          data-testid="landing-hero-copy"
+        >
+          <p className="eyebrow mb-6">AIHOW Interview</p>
+          <h1 className="display text-balance">
+            자소서가 끝나면,
+            <br />
+            <span className="text-[var(--brand)]">말할 준비</span>가 시작됩니다.
+          </h1>
+          <p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-[var(--text-secondary)] sm:text-lg">
+            전문가의 기준과 나의 실제 자소서를 연결해, 예상 질문부터 음성 면접과
+            한 장의 파이널 노트까지 준비하세요.
+          </p>
+          <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              className={cn(buttonVariants({ size: "lg" }), "group")}
+              href="/signup"
+            >
+              내 준비 시작하기{" "}
+              <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <Link
+              className={buttonVariants({ variant: "secondary", size: "lg" })}
+              href="#journey"
+            >
+              <Play className="size-4 fill-current" />
+              준비 과정 보기
+            </Link>
+          </div>
+          <p className="mt-4 flex items-center justify-center gap-2 text-sm font-bold text-[var(--brand)]">
+            <Sparkles className="size-4" /> 가입하면 무료 자소서 분석 1회 제공
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-xs font-bold text-[var(--text-secondary)]">
+            <span className="flex items-center gap-2">
+              <Check className="size-4 text-[var(--success)]" />
+              학생이 직접 완성
+            </span>
+            <span className="flex items-center gap-2">
+              <Check className="size-4 text-[var(--success)]" />
+              전문가 기준 기반
+            </span>
+            <span className="flex items-center gap-2">
+              <Check className="size-4 text-[var(--success)]" />
+              자료 보관 상태 확인
+            </span>
+          </div>
         </div>
       </section>
 
@@ -228,52 +269,51 @@ export function LandingPage() {
                   data-motion-product-card
                   className={cn(
                     `landing-product-card--${product.tone}`,
-                    "landing-product-card relative flex flex-col overflow-hidden",
-                    index === 2 &&
-                      "sm:col-span-2 sm:mx-auto sm:w-[calc(50%-0.625rem)]",
+                    "landing-product-card relative overflow-hidden",
                   )}
                 >
-                  <div className="landing-product-art" aria-hidden="true">
-                    <Icon className="size-10" strokeWidth={1.65} />
-                    <span />
-                    <span />
-                    <span />
-                  </div>
                   <div className="landing-product-copy">
-                    <span className="landing-product-step" aria-hidden="true">
-                      0{index + 1}
-                    </span>
-                    <p className="text-xs font-extrabold text-[var(--text-tertiary)]">
-                      {product.tag}
-                    </p>
-                    <h3 className="mt-3 text-2xl font-black tracking-[-.04em]">
-                      {product.title}
-                    </h3>
-                    <p
-                      className="korean-copy mt-4 min-h-14 text-sm leading-7 text-[var(--text-secondary)]"
-                      data-testid="landing-product-description"
+                    <div className="landing-product-index" aria-hidden="true">
+                      <span>0{index + 1}</span>
+                      <span className="landing-product-index-line" />
+                      <Icon className="size-5" strokeWidth={1.7} />
+                    </div>
+                    <div className="landing-product-message">
+                      <p className="text-xs font-extrabold text-[var(--brand)]">
+                        {product.tag}
+                      </p>
+                      <h3 className="mt-4 text-3xl font-black tracking-[-.055em] sm:text-4xl">
+                        {product.title}
+                      </h3>
+                      <p
+                        className="korean-copy mt-5 max-w-xl text-base leading-8 text-[var(--text-secondary)]"
+                        data-testid="landing-product-description"
+                      >
+                        {product.description}
+                      </p>
+                      <Link
+                        href={`/signup?plan=${index === 0 ? "essay" : index === 1 ? "interview" : "all"}`}
+                        className="mt-8 inline-flex items-center gap-1 text-sm font-extrabold text-[var(--brand)]"
+                      >
+                        이 과정으로 시작하기 <ChevronRight className="size-4" />
+                      </Link>
+                    </div>
+                    <div
+                      className="landing-product-outcomes"
+                      aria-label={`${product.title}에서 완성하는 것`}
                     >
-                      {product.description}
-                    </p>
-                    <ul className="mt-7 grid gap-3">
-                      {product.features.map((feature) => (
-                        <li
-                          key={feature}
-                          className="flex items-center gap-2 text-sm font-bold"
-                        >
-                          <span className="grid size-5 place-items-center rounded-full bg-[var(--mint-soft)]">
-                            <Check className="size-3 text-[var(--success)]" />
-                          </span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <Link
-                      href={`/signup?plan=${index === 0 ? "essay" : index === 1 ? "interview" : "all"}`}
-                      className="mt-8 inline-flex items-center gap-1 text-sm font-extrabold text-[var(--brand)]"
-                    >
-                      이 과정으로 시작하기 <ChevronRight className="size-4" />
-                    </Link>
+                      <p>이 과정에서 완성하는 것</p>
+                      <ol>
+                        {product.features.map((feature, featureIndex) => (
+                          <li key={feature}>
+                            <span>
+                              {String(featureIndex + 1).padStart(2, "0")}
+                            </span>
+                            {feature}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
                   </div>
                 </article>
               ))}
@@ -298,7 +338,7 @@ export function LandingPage() {
               <div
                 key={title}
                 data-motion-item
-                className="journey-step relative rounded-[var(--radius-lg)] border border-white/10 p-5"
+                className="journey-step relative rounded-[var(--radius-lg)] p-5"
               >
                 <div className="mb-8 flex items-center justify-between">
                   <span className="text-xs font-black opacity-50">
@@ -327,18 +367,18 @@ export function LandingPage() {
             <SectionIntro
               eyebrow="Human-guided AI"
               title="좋은 질문은, 좋은 기준에서 시작됩니다"
-              text="원장·소장·컨설턴트가 학교별 판단 기준과 질문 규칙을 직접 등록하고, AI 결과를 검수합니다."
+              text="학교별 판단 기준과 질문 규칙이 자소서 근거, 예상 질문, 단계별 영상 가이드로 이어집니다."
             />
             <div className="mt-8 grid gap-4">
               <ExpertPoint
                 icon={MessageCircleQuestion}
-                title="질문 기준과 꼬리질문 규칙"
-                text="학교·학년도·전형과 자소서 근거를 함께 연결합니다."
+                title="학교별 질문 설계"
+                text="학교·학년도·전형과 자소서 근거를 한 흐름으로 연결합니다."
               />
               <ExpertPoint
                 icon={ShieldCheck}
-                title="승인 상태와 변경 이력"
-                text="전문가가 제공 범위를 알고 직접 검수할 수 있습니다."
+                title="기준의 버전과 적용 범위"
+                text="어떤 기준이 어느 준비 단계에 쓰이는지 일관되게 관리합니다."
               />
               <ExpertPoint
                 icon={Play}
@@ -589,67 +629,6 @@ function ExpertPoint({
     </div>
   );
 }
-function HeroPreview() {
-  return (
-    <div
-      className="landing-preview-frame liquid-glass-group relative mx-auto mt-10 w-full max-w-[33rem] p-2 lg:mr-0 lg:mt-0"
-      data-motion-float
-      data-testid="landing-hero-preview"
-    >
-      <Card
-        variant="glass"
-        className="liquid-glass relative overflow-hidden border-0 p-0 shadow-none"
-      >
-        <div className="flex items-center justify-between px-5 py-4 sm:px-6">
-          <div className="flex items-center gap-2" aria-hidden="true">
-            <span className="size-2 rounded-full bg-[var(--coral)]" />
-            <span className="size-2 rounded-full bg-[var(--warning)]" />
-            <span className="size-2 rounded-full bg-[var(--mint)]" />
-          </div>
-          <p className="text-[10px] font-black uppercase tracking-[.12em] text-[var(--text-tertiary)]">
-            Today&apos;s practice
-          </p>
-        </div>
-        <div className="liquid-glass-section m-2 rounded-[calc(var(--radius-lg)-.3rem)] p-5 sm:m-3 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="eyebrow">오늘의 질문 2/5</p>
-              <h3 className="mt-3 text-xl font-black leading-snug">
-                지원 학교의 교육 철학과
-                <br />내 경험을 연결해 설명해 보세요.
-              </h3>
-            </div>
-            <div
-              data-lottie-orbit
-              className="liquid-orbit grid size-12 shrink-0 place-items-center rounded-full"
-            >
-              <JourneyOrbit className="size-12" />
-            </div>
-          </div>
-          <div className="liquid-glass-section mt-6 rounded-[var(--radius-md)] p-4">
-            <p className="text-xs font-black text-[var(--brand)]">
-              자소서 근거
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              “과학 동아리에서 결과보다 실험 설계의 과정을 기록했습니다…”
-            </p>
-          </div>
-          <div className="liquid-answer-field mt-4 h-24 rounded-[var(--radius-md)] p-4 text-sm text-[var(--text-tertiary)]">
-            내 생각을 먼저 적어 보세요.
-          </div>
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-xs font-bold text-[var(--text-secondary)]">
-              자동 저장됨
-            </span>
-            <span className="rounded-[var(--radius-sm)] bg-[var(--brand)] px-4 py-2.5 text-xs font-black text-[var(--text-on-brand)]">
-              답변 저장
-            </span>
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-}
 function ExpertConsole() {
   return (
     <Card className="surface-contrast relative overflow-hidden p-6">
@@ -658,10 +637,10 @@ function ExpertConsole() {
           <p className="text-xs font-black text-[var(--mint)]">
             EXPERT CONSOLE
           </p>
-          <h3 className="mt-2 text-xl font-black">질문 기준 검수</h3>
+          <h3 className="mt-2 text-xl font-black">학교별 질문 설계</h3>
         </div>
         <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">
-          검수 대기 12
+          2027 운영 기준
         </span>
       </div>
       <div className="mt-8 grid gap-3">
@@ -683,19 +662,15 @@ function ExpertConsole() {
                 2027 · 민사고
               </span>
             </div>
-            <div className="mt-4 h-1.5 rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full bg-[var(--mint)]"
-                style={{ width: `${82 - index * 13}%` }}
-              />
+            <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[10px] font-bold">
+              <span className="text-white/45">학교 기준</span>
+              <span className="text-[var(--mint)]">학생 질문에 연결됨</span>
             </div>
           </div>
         ))}
       </div>
       <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-5 text-xs">
-        <span className="text-white/50">
-          짧은 영상 가이드 3개 · 분석 뒤 추천
-        </span>
+        <span className="text-white/50">질문·영상 가이드 · 준비 단계 연결</span>
         <span className="font-black text-[var(--mint)]">운영 화면 보기 →</span>
       </div>
     </Card>

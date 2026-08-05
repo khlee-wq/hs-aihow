@@ -37,13 +37,11 @@ function contrastRatio(foreground: string, background: string) {
             .map((channel) => `${channel}${channel}`)
             .join("")
         : rawValue;
-    const channels = [0, 2, 4].map((offset) =>
-      Number.parseInt(value.slice(offset, offset + 2), 16) / 255,
+    const channels = [0, 2, 4].map(
+      (offset) => Number.parseInt(value.slice(offset, offset + 2), 16) / 255,
     );
     const [red, green, blue] = channels.map((channel) =>
-      channel <= 0.04045
-        ? channel / 12.92
-        : ((channel + 0.055) / 1.055) ** 2.4,
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
     );
     return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
   };
@@ -58,7 +56,9 @@ async function expectInterfaceFitsViewport(page: Page) {
   await expect(page.locator("main")).toBeVisible();
   await expect
     .poll(() =>
-      page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
     )
     .toBe(true);
 
@@ -88,9 +88,7 @@ async function expectInterfaceFitsViewport(page: Page) {
           (style.overflow === "hidden" || style.textOverflow === "ellipsis") &&
           element.scrollWidth > element.clientWidth + 1;
         const hasHorizontalScroller = Array.from(
-          element.parentElement?.closest("main")
-            ? [element.parentElement]
-            : [],
+          element.parentElement?.closest("main") ? [element.parentElement] : [],
         )
           .flatMap((parent) => {
             const ancestors: HTMLElement[] = [];
@@ -112,7 +110,9 @@ async function expectInterfaceFitsViewport(page: Page) {
           ? [
               {
                 tag: element.tagName,
-                label: element.getAttribute("aria-label") ?? element.textContent?.trim(),
+                label:
+                  element.getAttribute("aria-label") ??
+                  element.textContent?.trim(),
                 outsideViewport,
                 textOverflowing,
               },
@@ -127,7 +127,9 @@ async function expectPrimaryTitle(page: Page) {
   // 화면 전환 직후에는 이전 제목이 짧게 남을 수 있습니다. 이 감사의 목적은
   // 각 화면의 주 제목이 보이는지 확인하는 것이므로, main의 첫 level-1 제목을
   // 기준으로 검사합니다.
-  await expect(page.locator("main").getByRole("heading", { level: 1 }).first()).toBeVisible();
+  await expect(
+    page.locator("main").getByRole("heading", { level: 1 }).first(),
+  ).toBeVisible();
 }
 
 function isWebKitRscPrefetchNoise(message: string) {
@@ -173,11 +175,17 @@ test("공개·인증 화면은 320px부터 데스크톱까지 잘리지 않는�
     }
   }
 
-  expect(pageErrors.filter((message) => !isWebKitRscPrefetchNoise(message))).toEqual([]);
   expect(
-    consoleErrors.filter((message) => /hydration|hydrated|server rendered html/i.test(message)),
+    pageErrors.filter((message) => !isWebKitRscPrefetchNoise(message)),
   ).toEqual([]);
-  expect(consoleErrors.filter((message) => !isWebKitRscPrefetchNoise(message))).toEqual([]);
+  expect(
+    consoleErrors.filter((message) =>
+      /hydration|hydrated|server rendered html/i.test(message),
+    ),
+  ).toEqual([]);
+  expect(
+    consoleErrors.filter((message) => !isWebKitRscPrefetchNoise(message)),
+  ).toEqual([]);
 });
 
 test("라이트·다크 색상 토큰은 기본·강조 표면에서 읽을 수 있다", async ({
@@ -200,28 +208,54 @@ test("라이트·다크 색상 토큰은 기본·강조 표면에서 읽을 수 
       };
     }, theme);
 
-    expect(contrastRatio(palette.textPrimary, palette.canvas)).toBeGreaterThanOrEqual(4.5);
-    expect(contrastRatio(palette.contrastText, palette.contrastSurface)).toBeGreaterThanOrEqual(4.5);
-    expect(contrastRatio(palette.brandText, palette.brand)).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(palette.textPrimary, palette.canvas),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(palette.contrastText, palette.contrastSurface),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(palette.brandText, palette.brand),
+    ).toBeGreaterThanOrEqual(4.5);
   }
 });
 
-test("모바일 랜딩의 안내 목록·미리보기·다음 구간은 서로 겹치지 않는다", async ({
+test("모바일 랜딩의 중앙 카피·개별 오브젝트·다음 구간은 서로 겹치지 않는다", async ({
   page,
 }) => {
   for (const width of [320, 400]) {
     await page.setViewportSize({ width, height: 910 });
     await visit(page, "/");
 
+    const mobileArtObjects = page.locator("[data-motion-waterfall-art]");
+    await expect(mobileArtObjects).toHaveCount(3);
+    await expect
+      .poll(
+        () =>
+          mobileArtObjects.evaluateAll((elements) =>
+            elements.map((element) => getComputedStyle(element).transform),
+          ),
+        { timeout: 3_000 },
+      )
+      .toEqual(["none", "none", "none"]);
+
     const copy = await page.getByTestId("landing-hero-copy").boundingBox();
-    const preview = await page.getByTestId("landing-hero-preview").boundingBox();
-    const roleStrip = await page.getByTestId("landing-role-strip").boundingBox();
+    const mobileArt = await mobileArtObjects.evaluateAll((elements) => {
+      const boxes = elements.map((element) => element.getBoundingClientRect());
+      return {
+        top: Math.min(...boxes.map((box) => box.top + window.scrollY)),
+        bottom: Math.max(...boxes.map((box) => box.bottom + window.scrollY)),
+      };
+    });
+    const roleStrip = await page
+      .getByTestId("landing-role-strip")
+      .boundingBox();
 
     expect(copy).not.toBeNull();
-    expect(preview).not.toBeNull();
     expect(roleStrip).not.toBeNull();
-    expect(preview!.y).toBeGreaterThanOrEqual(copy!.y + copy!.height + 24);
-    expect(roleStrip!.y - (preview!.y + preview!.height)).toBeLessThanOrEqual(100);
+    expect(mobileArt.top).toBeGreaterThanOrEqual(copy!.y + copy!.height + 16);
+    expect(roleStrip!.y).toBeGreaterThanOrEqual(mobileArt.bottom);
+    expect(roleStrip!.y - mobileArt.bottom).toBeLessThanOrEqual(24);
     await expectInterfaceFitsViewport(page);
   }
 });
@@ -248,6 +282,33 @@ test("상품 준비 시퀀스는 모든 화면에서 스크롤 가능한 하나�
     if (width >= 768) expect(layout.minHeight).not.toBe("0px");
     await expectInterfaceFitsViewport(page);
   }
+});
+
+test("데스크톱에서 모바일로 전환해도 랜딩 모션이 화면 폭을 밀어내지 않는다", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await visit(page, "/");
+  await page.waitForTimeout(1_000);
+
+  const stage = page.getByTestId("landing-product-stage");
+  await stage.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(500);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(900);
+
+  const layout = await page.evaluate(() => ({
+    viewport: window.innerWidth,
+    documentWidth: document.documentElement.scrollWidth,
+    scrollX: window.scrollX,
+  }));
+  const stageBox = await stage.boundingBox();
+
+  expect(layout.documentWidth).toBeLessThanOrEqual(layout.viewport + 1);
+  expect(layout.scrollX).toBe(0);
+  expect(stageBox).not.toBeNull();
+  expect(stageBox!.x).toBeGreaterThanOrEqual(0);
+  expect(stageBox!.x + stageBox!.width).toBeLessThanOrEqual(391);
 });
 
 test("랜딩 상품 설명은 한국어 어절을 쪼개지 않고 줄바꿈한다", async ({
@@ -285,7 +346,9 @@ test("랜딩 상품 설명은 한국어 어절을 쪼개지 않고 줄바꿈한�
         expect.objectContaining({ wordBreak: "keep-all", splitWords: [] }),
       ]),
     );
-    expect(report.every(({ splitWords }) => splitWords.length === 0)).toBe(true);
+    expect(report.every(({ splitWords }) => splitWords.length === 0)).toBe(
+      true,
+    );
     await expectInterfaceFitsViewport(page);
   }
 });
@@ -298,22 +361,29 @@ test("공개 고정 헤더는 스크롤 중에도 콘텐츠보다 위에서 메�
     await visit(page, "/");
     await page.evaluate(() => window.scrollTo(0, 620));
 
-    const result = await page.locator(".public-navigation-glass").evaluate((element) => {
-      const rect = element.getBoundingClientRect();
-      const point = document.elementFromPoint(rect.left + 16, rect.top + rect.height / 2);
-      const style = getComputedStyle(element);
-      return {
-        backgroundColor: style.backgroundColor,
-        isTopLayer: point?.closest(".public-navigation-glass") === element,
-      };
-    });
+    const result = await page
+      .locator(".public-navigation-glass")
+      .evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        const point = document.elementFromPoint(
+          rect.left + 16,
+          rect.top + rect.height / 2,
+        );
+        const style = getComputedStyle(element);
+        return {
+          backgroundColor: style.backgroundColor,
+          isTopLayer: point?.closest(".public-navigation-glass") === element,
+        };
+      });
 
     expect(result.backgroundColor).toMatch(/^rgb\(/);
     expect(result.isTopLayer).toBe(true);
   }
 });
 
-test("전문가 소개의 핵심 제목은 모든 공개 폭에서 한 줄로 유지된다", async ({ page }) => {
+test("전문가 소개의 핵심 제목은 모든 공개 폭에서 한 줄로 유지된다", async ({
+  page,
+}) => {
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await visit(page, "/#mentors");

@@ -376,7 +376,7 @@ function Schools() {
           <label className={buttonVariants()}>
             <FileUp className="size-4" /> 자료 가져오기
             <input
-              className="sr-only"
+              className="hidden"
               type="file"
               accept="application/pdf,.pdf,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               onChange={(event) =>
@@ -401,7 +401,7 @@ function Schools() {
             파일 선택 <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
           </span>
           <input
-            className="sr-only"
+            className="hidden"
             type="file"
             accept="application/pdf,.pdf,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={(event) => setSelectedFileName(event.target.files?.[0]?.name ?? "")}
@@ -437,7 +437,7 @@ function Schools() {
           </p>
         </div>
         <div className="border-t border-[var(--border)] p-5 md:border-l md:border-t-0">
-          <p className="text-xs font-black">공개 후 검수 순서</p>
+          <p className="text-xs font-black">공개 후 확인 순서</p>
           <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
             모집요강 원문 확인 → 지원 조건 정리 → 질문·영상 가이드 반영
           </p>
@@ -447,7 +447,7 @@ function Schools() {
             <BellRing className="size-4 text-[var(--brand)]" /> 학생 알림
           </p>
           <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
-            검수 완료된 변경만 해당 학교 학생의 준비 경로에 안내합니다.
+            확인된 변경만 해당 학교 학생의 준비 경로에 안내합니다.
           </p>
         </div>
       </section>
@@ -460,7 +460,7 @@ function Schools() {
                 <th className="p-4 font-extrabold">학년도</th>
                 <th className="p-4 font-extrabold">기준 완성도</th>
                 <th className="p-4 font-extrabold">질문 규칙</th>
-                <th className="p-4 font-extrabold">최근 검수</th>
+                <th className="p-4 font-extrabold">최근 확인</th>
                 <th className="p-4" />
               </tr>
             </thead>

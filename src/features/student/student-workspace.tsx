@@ -586,13 +586,85 @@ const personas: {
   },
 ];
 
+type InterviewPhase =
+  | "select"
+  | "ready"
+  | "recording"
+  | "follow-up"
+  | "feedback";
+type InterviewRound = "core" | "follow-up";
+
+const interviewFlow = [
+  ["준비 확인", "방식과 질문 확인"],
+  ["핵심 질문", "첫 답변 말하기"],
+  ["꼬리질문", "근거 한 단계 더"],
+  ["말하기 점검", "구조와 전달 확인"],
+  ["피드백", "다음 연습 결정"],
+] as const;
+
+function InterviewFlow({
+  phase,
+  round,
+}: {
+  phase: InterviewPhase;
+  round: InterviewRound;
+}) {
+  const current =
+    phase === "select" || phase === "ready"
+      ? 0
+      : phase === "recording" && round === "core"
+        ? 1
+        : phase === "follow-up" ||
+            (phase === "recording" && round === "follow-up")
+          ? 2
+          : phase === "feedback"
+            ? 4
+            : 3;
+  return (
+    <nav
+      aria-label="모의면접 진행 단계"
+      className="overflow-x-auto border-y border-[var(--border)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      <ol className="grid min-w-[43rem] grid-cols-5 sm:min-w-0">
+        {interviewFlow.map(([title, description], index) => (
+          <li
+            key={title}
+            aria-current={index === current ? "step" : undefined}
+            className={cn(
+              "relative border-r border-[var(--border)] px-4 py-4 last:border-r-0",
+              index === current && "bg-[var(--brand-soft)]",
+            )}
+          >
+            <span
+              className={cn(
+                "font-mono text-[10px] font-black",
+                index <= current
+                  ? "text-[var(--brand)]"
+                  : "text-[var(--text-tertiary)]",
+              )}
+            >
+              {index < current ? "DONE" : `0${index + 1}`}
+            </span>
+            <strong className="mt-2 block text-sm">{title}</strong>
+            <span className="mt-1 block text-[11px] text-[var(--text-secondary)]">
+              {description}
+            </span>
+            {index === current ? (
+              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--brand)]" />
+            ) : null}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+
 function MockInterviewStep() {
   const selected = useAppStore((state) => state.selectedPersona);
   const selectPersona = useAppStore((state) => state.selectPersona);
   const completeStep = useAppStore((state) => state.completeStep);
-  const [phase, setPhase] = useState<
-    "select" | "ready" | "recording" | "feedback"
-  >("select");
+  const [phase, setPhase] = useState<InterviewPhase>("select");
+  const [round, setRound] = useState<InterviewRound>("core");
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
     if (phase !== "recording") return;
@@ -606,6 +678,7 @@ function MockInterviewStep() {
   if (phase === "select")
     return (
       <div className="space-y-5">
+        <InterviewFlow phase={phase} round={round} />
         <Card className="surface-contrast border-0">
           <p className="text-xs font-black text-[var(--mint)]">
             INTERVIEW MODE
@@ -658,7 +731,13 @@ function MockInterviewStep() {
           ))}
         </div>
         <div className="flex justify-end">
-          <Button size="lg" onClick={() => setPhase("ready")}>
+          <Button
+            size="lg"
+            onClick={() => {
+              setRound("core");
+              setPhase("ready");
+            }}
+          >
             이 방식으로 연습 <ArrowRight className="size-4" />
           </Button>
         </div>
@@ -667,6 +746,7 @@ function MockInterviewStep() {
   if (phase === "feedback")
     return (
       <div className="space-y-5">
+        <InterviewFlow phase={phase} round={round} />
         <Card className="text-center">
           <span className="mx-auto grid size-16 place-items-center rounded-full bg-[var(--mint-soft)] text-[var(--success)]">
             <CheckCircle2 className="size-8" />
@@ -689,6 +769,7 @@ function MockInterviewStep() {
               variant="secondary"
               onClick={() => {
                 setSeconds(0);
+                setRound("core");
                 setPhase("ready");
               }}
             >
@@ -706,10 +787,59 @@ function MockInterviewStep() {
         </Card>
       </div>
     );
+  if (phase === "follow-up")
+    return (
+      <div className="space-y-5">
+        <InterviewFlow phase={phase} round={round} />
+        <section className="grid overflow-hidden border-y border-[var(--border)] bg-[var(--surface)] lg:grid-cols-[.8fr_1.2fr]">
+          <div className="border-b border-[var(--border)] bg-[var(--brand-soft)] p-6 sm:p-8 lg:border-b-0 lg:border-r">
+            <p className="font-mono text-[10px] font-black text-[var(--brand)]">
+              ANSWER CAPTURED
+            </p>
+            <h2 className="mt-4 text-xl font-black tracking-[-.04em]">
+              첫 답변에서 다음 질문을 찾았어요
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
+              처음부터 다시 묻지 않습니다. 방금 말한 “기록 기준”을 더 구체적으로
+              설명하면 답변의 깊이가 드러납니다.
+            </p>
+          </div>
+          <div className="p-6 sm:p-8">
+            <p className="text-xs font-black text-[var(--brand)]">
+              {persona.name} · 꼬리질문
+            </p>
+            <p className="mt-4 text-xl font-black leading-8 sm:text-2xl">
+              그때 기록 기준을 바꾼 결정이 결과에 어떤 차이를 만들었나요?
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs leading-5 text-[var(--text-secondary)]">
+                완료 기준 · 변화 전후를 한 문장씩 설명하기
+              </p>
+              <Button
+                size="lg"
+                onClick={() => {
+                  setRound("follow-up");
+                  setSeconds(0);
+                  setPhase("recording");
+                }}
+              >
+                <Mic2 className="size-5" /> 꼬리질문 답변 시작
+              </Button>
+            </div>
+          </div>
+        </section>
+        <StudentCoachGuide stage="mock-interview" />
+      </div>
+    );
   return (
-    <Card className="surface-contrast relative min-h-[34rem] overflow-hidden border-0 p-6 text-center sm:p-10">
+    <div className="space-y-5">
+      <InterviewFlow phase={phase} round={round} />
+      <Card className="surface-contrast relative min-h-[34rem] overflow-hidden border-0 p-6 text-center sm:p-10">
       <button
-        onClick={() => setPhase("select")}
+        onClick={() => {
+          setRound("core");
+          setPhase("select");
+        }}
         className="absolute left-5 top-5 inline-flex items-center gap-1 text-xs font-bold opacity-60"
       >
         <ChevronLeft className="size-4" />
@@ -727,12 +857,15 @@ function MockInterviewStep() {
         </div>
         <p className="mt-5 text-xs font-black text-[var(--mint)]">
           {phase === "recording"
-            ? "답변을 듣고 있어요"
+            ? round === "core"
+              ? "핵심 답변을 듣고 있어요"
+              : "꼬리질문 답변을 듣고 있어요"
             : `${persona.name} · 첫 질문`}
         </p>
         <h2 className="mt-5 text-balance text-xl font-black leading-8 sm:text-2xl">
-          과학 동아리의 실험 결과가 예상과 달랐을 때, 무엇을 기준으로 다음
-          행동을 결정했나요?
+          {round === "core"
+            ? "과학 동아리의 실험 결과가 예상과 달랐을 때, 무엇을 기준으로 다음 행동을 결정했나요?"
+            : "그때 기록 기준을 바꾼 결정이 결과에 어떤 차이를 만들었나요?"}
         </h2>
         {phase === "recording" ? (
           <div className="mt-10">
@@ -759,7 +892,9 @@ function MockInterviewStep() {
               variant="secondary"
               size="lg"
               className="mt-8 border-transparent bg-white text-[var(--brand-on-white)]"
-              onClick={() => setPhase("feedback")}
+              onClick={() =>
+                setPhase(round === "core" ? "follow-up" : "feedback")
+              }
             >
               <Square className="size-4 fill-current" />
               답변 마치기
@@ -773,7 +908,11 @@ function MockInterviewStep() {
             <Button
               size="lg"
               className="mt-7 bg-[var(--coral)] hover:bg-[var(--coral)]"
-              onClick={() => setPhase("recording")}
+              onClick={() => {
+                setRound("core");
+                setSeconds(0);
+                setPhase("recording");
+              }}
             >
               <Mic2 className="size-5" />
               답변 시작
@@ -785,7 +924,11 @@ function MockInterviewStep() {
           </div>
         )}
       </div>
-    </Card>
+      </Card>
+      {phase === "ready" ? (
+        <StudentCoachGuide stage="mock-interview" />
+      ) : null}
+    </div>
   );
 }
 

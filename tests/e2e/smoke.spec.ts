@@ -4,7 +4,7 @@ async function visit(page: Page, path: string) {
   await page.goto(path, { waitUntil: "domcontentloaded" });
 }
 
-test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ page }) => {
+test("랜딩의 GSAP 히어로 모션이 오류 없이 준비된다", async ({ page }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
   page.on("console", (message) => {
@@ -17,21 +17,27 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
       name: "자소서가 끝나면, 말할 준비가 시작됩니다.",
     }),
   ).toBeVisible();
-  await expect(page.locator("[data-lottie-orbit] svg")).toBeVisible();
-  await expect(page.getByTestId("landing-hero-preview")).toBeVisible();
-  await expect(page.locator(".liquid-glass-section").first()).toBeVisible();
+  await expect(page.getByTestId("landing-hero-art")).toBeVisible();
+  const visibleHeroArt = page.locator("[data-motion-waterfall-art]:visible");
+  await expect(visibleHeroArt).toHaveCount(3);
   const productCards = page.locator(
     ".landing-product-stage [data-motion-product-card]",
   );
   await expect(productCards).toHaveCount(3);
-  await page.waitForTimeout(1_000);
-  const transform = await page
-    .locator("[data-motion-float]")
-    .evaluate((element) => getComputedStyle(element).transform);
-  expect(transform).not.toBe("none");
-  await productCards.first().scrollIntoViewIfNeeded();
+  await expect
+    .poll(
+      () =>
+        visibleHeroArt
+          .first()
+          .evaluate((element) => getComputedStyle(element).transform),
+      { timeout: 3_000 },
+    )
+    .toBe("none");
+  await page.getByTestId("landing-product-stage").scrollIntoViewIfNeeded();
   await page.waitForTimeout(900);
-  await expect(productCards.first()).toBeVisible();
+  await expect(
+    page.locator(".landing-product-stage [data-motion-product-card]").first(),
+  ).toBeVisible();
   await page.getByTestId("landing-mentors").scrollIntoViewIfNeeded();
   await expect(page.getByRole("heading", { name: "공다경" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "박영중" })).toBeVisible();
@@ -39,9 +45,9 @@ test("랜딩의 GSAP·Lottie 모션이 오류 없이 준비된다", async ({ pag
   await expect(
     page.getByRole("heading", { name: "준비 방식에 맞게 선택하세요" }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "출시 안내 받기" })).toHaveCount(
-    3,
-  );
+  await expect(
+    page.getByTestId("landing-pricing").getByRole("link"),
+  ).toHaveCount(3);
   expect(
     consoleErrors.filter((message) =>
       /hydration|hydrated|server rendered html/i.test(message),
@@ -291,9 +297,7 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
   ).toBe(true);
 });
 
-test("운영자가 코칭 레시피를 설정하고 승인한다", async ({
-  page,
-}) => {
+test("운영자가 코칭 레시피를 설정하고 승인한다", async ({ page }) => {
   await visit(page, "/signup");
   await page.getByRole("radio", { name: "교사" }).click();
   await page.getByLabel("이름", { exact: true }).fill("박소장");
@@ -303,7 +307,9 @@ test("운영자가 코칭 레시피를 설정하고 승인한다", async ({
   await expect(page).toHaveURL(/\/admin$/);
 
   await visit(page, "/admin/prompts");
-  await expect(page.getByRole("heading", { name: "코칭 설계실" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "코칭 설계실" }),
+  ).toBeVisible();
   await page
     .getByLabel("교사가 입력한 프롬프트")
     .fill("학생의 판단 근거를 먼저 확인하고, 다음 행동을 한 가지 제안합니다.");

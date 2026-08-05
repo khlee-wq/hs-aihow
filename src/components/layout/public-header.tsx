@@ -40,7 +40,7 @@ export function PublicHeader() {
           </Link>
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          <div className="hidden min-[380px]:block">
+          <div className="hidden sm:block">
             <ThemeToggle />
           </div>
           <Link
