@@ -12,6 +12,25 @@ const weeklyActivitySchema = z.object({
   value: z.number().min(0).max(100),
 });
 
+const admissionsInsightSchema = z.object({
+  id: z.string().trim().min(1),
+  label: z.string().trim().min(1),
+  title: z.string().trim().min(1),
+  summary: z.string().trim().min(1),
+  signal: z.string().trim().min(1),
+  access: z.enum(["open", "preview", "locked"]),
+});
+
+const admissionsOutlookSchema = z.object({
+  category: z.string().trim().min(1),
+  period: z.string().trim().min(1),
+  headline: z.string().trim().min(1),
+  summary: z.string().trim().min(1),
+  revealedCount: z.number().int().nonnegative(),
+  totalCount: z.number().int().positive(),
+  insights: z.array(admissionsInsightSchema).min(1).max(3),
+});
+
 export const dashboardSnapshotSchema = z.object({
   school: z.string().trim().min(1),
   schoolShort: z.string().trim().min(1),
@@ -21,6 +40,7 @@ export const dashboardSnapshotSchema = z.object({
   weeklyDelta: z.number().int(),
   readinessSignals: z.array(readinessSignalSchema),
   weeklyActivity: z.array(weeklyActivitySchema),
+  admissionsOutlook: admissionsOutlookSchema.nullable(),
 });
 
 export type DashboardSnapshot = z.infer<typeof dashboardSnapshotSchema>;
@@ -46,6 +66,44 @@ export const dashboardSnapshot = dashboardSnapshotSchema.parse({
     { day: "토", value: 78 },
     { day: "오늘", value: 52 },
   ],
+  admissionsOutlook: {
+    category: "전국단위 자사고",
+    period: "2026학년도 지원 데이터 기준",
+    headline: "지원자가 줄었다고, 준비가 쉬워진 건 아니에요.",
+    summary:
+      "중3 학생 수는 늘었지만 특목·자사고 모집 자리는 줄었습니다. 지원자 수 하나보다 학교 유형과 모집 인원을 함께 봐야 해요.",
+    revealedCount: 1,
+    totalCount: 3,
+    insights: [
+      {
+        id: "capacity-window",
+        label: "이번 공개 인사이트",
+        title: "준비할 수 있는 자리는 더 촘촘해졌어요",
+        summary:
+          "학생 수는 늘고 모집 인원은 줄었습니다. 지원 학교를 정했다면 서류 근거와 말하기 준비를 한 단계 먼저 시작할 시점이에요.",
+        signal: "학생 수 ↑ · 모집 인원 ↓",
+        access: "open",
+      },
+      {
+        id: "category-shift",
+        label: "유형별 변화",
+        title: "모든 학교가 같은 방향은 아니에요",
+        summary:
+          "외고·국제고는 관심이 늘었지만 자사고·과학고는 학교별 차이가 더 커졌어요.",
+        signal: "유형별 흐름이 엇갈림",
+        access: "preview",
+      },
+      {
+        id: "school-reading",
+        label: "선택 학교 상세 해석",
+        title: "비슷한 경쟁률 안에도 다른 준비 신호가 있어요",
+        summary:
+          "전형별 모집 인원과 지원 흐름을 함께 읽어야 실제 준비 우선순위를 알 수 있어요.",
+        signal: "구독에서 전체 공개",
+        access: "locked",
+      },
+    ],
+  },
 });
 
 export const nextStepCopy: Record<

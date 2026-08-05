@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "./logo";
-import { ThemeToggle } from "./theme-toggle";
 
 export function PublicHeader() {
   return (
@@ -40,9 +39,6 @@ export function PublicHeader() {
           </Link>
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          <div className="hidden sm:block">
-            <ThemeToggle />
-          </div>
           <Link
             href="/login"
             className="hidden min-h-10 items-center px-3 text-sm font-bold sm:inline-flex"

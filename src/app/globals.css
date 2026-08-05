@@ -271,11 +271,6 @@ body {
   width: clamp(15rem, 23vw, 22rem);
   aspect-ratio: 584 / 760;
 }
-.dark .landing-hero-object img {
-  mix-blend-mode: screen;
-  filter: invert(0.88) hue-rotate(164deg) saturate(0.72) contrast(1.08);
-  opacity: 0.58;
-}
 .landing-product-stage {
   position: relative;
   width: 100%;

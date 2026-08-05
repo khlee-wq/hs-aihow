@@ -2,7 +2,10 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function visit(page: Page, path: string) {
   await page.goto(path, { waitUntil: "domcontentloaded" });
-  await expect(page.locator("html")).toHaveAttribute("data-app-hydrated", "true");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-app-hydrated",
+    "true",
+  );
   const authForm = page.getByTestId("auth-form");
   if ((await authForm.count()) > 0) {
     await expect(authForm).toHaveAttribute("data-hydrated", "true");
@@ -20,14 +23,9 @@ async function dismissFirstVisitTour(page: Page) {
   await expect(dialog).toBeHidden();
 }
 
-async function expectAuthThemeToggle(page: Page, projectName: string) {
+async function expectPublicThemeToggleRemoved(page: Page) {
   const toggle = page.getByRole("button", { name: /현재 .* 테마/ });
-  if (projectName === "mobile") {
-    await expect(toggle).toBeHidden();
-    return;
-  }
-  await expect(toggle).toBeVisible();
-  await expect(toggle.locator("svg")).toHaveCount(0);
+  await expect(toggle).toHaveCount(0);
 }
 
 async function submitAuthForm(page: Page) {
@@ -43,7 +41,12 @@ async function submitAuthForm(page: Page) {
   });
   await expect(submit).toBeVisible();
   await expect(submit).toBeEnabled();
-  await submit.click();
+  // 기본 버튼은 hover 시 살짝 떠오릅니다. CI의 포인터가 버튼 경계에 걸리면
+  // hover 진입·해제가 반복되어 click의 stable 검사가 끝나지 않을 수 있으므로,
+  // 실제 키보드 접근 흐름으로 폼 제출을 검증합니다.
+  await submit.focus();
+  await expect(submit).toBeFocused();
+  await submit.press("Enter");
 }
 
 test("랜딩의 GSAP 히어로 모션이 오류 없이 준비된다", async ({ page }) => {
@@ -129,7 +132,7 @@ test("브랜드 톤 미리보기가 Iris와 Deep Teal을 즉시 전환한다", a
   await expect(page).toHaveURL(/palette=teal/);
 });
 
-test("320px 공개 헤더는 테마·시작하기를 줄바꿈 없이 정리한다", async ({
+test("320px 공개 헤더는 로그인·시작하기를 줄바꿈 없이 정리한다", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 720 });
@@ -156,9 +159,31 @@ test("320px 공개 헤더는 테마·시작하기를 줄바꿈 없이 정리한�
   expect(layout.insideHeader).toBe(true);
 });
 
+test("공개 화면은 저장된 설정과 무관하게 라이트 테마만 사용한다", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("aihow-theme", "dark");
+  });
+  await visit(page, "/");
+
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-force-theme",
+    "light",
+  );
+  await expectPublicThemeToggleRemoved(page);
+  expect(
+    await page.evaluate(() => ({
+      colorScheme: document.documentElement.style.colorScheme,
+      storedTheme: window.localStorage.getItem("aihow-theme"),
+    })),
+  ).toEqual({ colorScheme: "light", storedTheme: "dark" });
+});
+
 test("학생이 가입하고 준비 화면으로 진입한다", async ({ page }, testInfo) => {
   await visit(page, "/signup?plan=all");
-  await expectAuthThemeToggle(page, testInfo.project.name);
+  await expectPublicThemeToggleRemoved(page);
   await page.getByLabel("이름", { exact: true }).fill("김하우");
   await page.getByLabel("이메일", { exact: true }).fill("student@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
@@ -184,7 +209,46 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(
     page.getByRole("progressbar", { name: "전체 준비 진행률" }),
   ).toBeVisible();
+  await expect(page.getByTestId("admissions-outlook")).toBeVisible();
+  await expect(page.getByTestId("admissions-insight-deck")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "민사고 상세 해석 보기" }),
+  ).toBeVisible();
   await dismissFirstVisitTour(page);
+  const detailButton = page.getByRole("button", {
+    name: "민사고 상세 해석 보기",
+  });
+  await detailButton.focus();
+  await detailButton.press("Enter");
+  await expect(
+    page.getByRole("dialog", {
+      name: "학교별 해석과 반복 훈련을 한 흐름으로 이어가세요",
+    }),
+  ).toBeVisible();
+  const overlayLayout = await page
+    .getByTestId("app-dialog-overlay")
+    .evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return {
+        bodyLocked: getComputedStyle(document.body).overflow === "hidden",
+        height: rect.height,
+        parent: element.parentElement?.tagName,
+        viewportHeight: window.innerHeight,
+        viewportWidth: window.innerWidth,
+        width: rect.width,
+      };
+    });
+  expect(overlayLayout.parent).toBe("BODY");
+  expect(overlayLayout.bodyLocked).toBe(true);
+  expect(
+    Math.abs(overlayLayout.width - overlayLayout.viewportWidth),
+  ).toBeLessThan(1);
+  expect(
+    Math.abs(overlayLayout.height - overlayLayout.viewportHeight),
+  ).toBeLessThan(1);
+  const closeMembership = page.getByRole("button", { name: "확인했어요" });
+  await closeMembership.focus();
+  await closeMembership.press("Enter");
   if (testInfo.project.name === "mobile") {
     await expect(page.getByTestId("student-mobile-nav")).toBeVisible();
     await expect(page.getByTestId("student-desktop-nav")).toBeHidden();
@@ -237,7 +301,32 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   else await practiceLink.click();
   await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
   await expect(
-    page.getByText("예상 질문 퀘스트", { exact: true }),
+    page.getByRole("heading", {
+      name: "자소서에서 물어볼 이야기를 함께 찾아볼게요",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "이유를 이어 말할 질문 선택의 이유 잠김",
+    }),
+  ).toBeDisabled();
+  await page
+    .getByRole("textbox", { name: "이 질문에 대한 내 답변" })
+    .fill(
+      "실험 결과가 예상과 달랐을 때 기록 기준을 다시 세우고 팀원과 변인을 하나씩 확인했습니다.",
+    );
+  await page.getByRole("button", { name: "답변 제출" }).click();
+  await expect(page.getByRole("status")).toContainText("다음 질문 열림");
+  await expect(
+    page.getByRole("button", {
+      name: "이유를 이어 말할 질문 선택의 이유",
+    }),
+  ).toBeEnabled();
+  await page.getByRole("button", { name: "다음 질문" }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "여러 해결 방법 중 기록 방식을 다시 점검하기로 한 이유는 무엇인가요?",
+    }),
   ).toBeVisible();
   const forbiddenApi = await page.request.get("/api/question-rules");
   expect(forbiddenApi.status()).toBe(403);
@@ -268,7 +357,7 @@ test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 �
   page,
 }, testInfo) => {
   await visit(page, "/signup");
-  await expectAuthThemeToggle(page, testInfo.project.name);
+  await expectPublicThemeToggleRemoved(page);
   await page.getByRole("radio", { name: "교사" }).click();
   await page.getByLabel("이름", { exact: true }).fill("이소장");
   await page.getByLabel("이메일", { exact: true }).fill("expert@example.com");

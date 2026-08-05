@@ -27,6 +27,7 @@ import { deriveProgress, journeySteps } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/stores/app-store";
 import { type DashboardSnapshot, nextStepCopy } from "./dashboard-model";
+import { AdmissionsOutlook } from "./admissions-outlook";
 import {
   DashboardInlineSkeleton,
   DashboardMetricSkeleton,
@@ -488,6 +489,13 @@ export function StudentDashboard({
         </div>
       </section>
 
+      <AdmissionsOutlook
+        school={data?.schoolShort ?? "관심 학교"}
+        data={data?.admissionsOutlook}
+        loading={isLoading}
+        onOpenDetail={() => setMembershipOpen(true)}
+      />
+
       <section aria-labelledby="journey-title" data-motion-reveal>
         <div className="mb-5 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
           <div data-motion-item>
@@ -683,16 +691,17 @@ export function StudentDashboard({
         open={membershipOpen}
         onClose={() => setMembershipOpen(false)}
         eyebrow="Membership guide"
-        title="반복 훈련이 필요한 시점에 구독을 선택하세요"
+        title="학교별 해석과 반복 훈련을 한 흐름으로 이어가세요"
         purpose="notice"
+        className="sm:max-w-2xl"
       >
-        <div className="mt-6 grid divide-y divide-[var(--border)] border-y border-[var(--border)] text-sm">
+        <div className="mt-6 grid divide-y divide-[var(--border)] border-y border-[var(--border)] text-sm sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {[
             ["무료 분석", "자소서 근거와 첫 예상 질문을 확인"],
             ["AIHOW 코치 구독", "분석·질문 훈련·영상 가이드를 준비 기록과 연결"],
-            ["전문가 진단 이용권", "필요한 결과물 하나를 소장님에게 검수 요청"],
+            ["학교별 입시 브리핑", "유형·전형·모집 흐름을 내 준비 순서로 해석"],
           ].map(([label, detail]) => (
-            <div key={label} className="py-3.5">
+            <div key={label} className="py-4 sm:px-4 sm:first:pl-0 sm:last:pr-0">
               <p className="font-bold">{label}</p>
               <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{detail}</p>
             </div>
@@ -702,7 +711,9 @@ export function StudentDashboard({
           가격·이용 한도·응답 정책은 운영 기준이 확정된 뒤 안내합니다.
         </p>
         <div className="mt-5 flex justify-end">
-          <Button onClick={() => setMembershipOpen(false)}>확인했어요</Button>
+          <Button className="w-full sm:w-auto" onClick={() => setMembershipOpen(false)}>
+            확인했어요
+          </Button>
         </div>
       </AppDialog>
       <AppDialog

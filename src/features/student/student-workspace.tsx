@@ -1,6 +1,5 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,18 +7,14 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Circle,
   Clock3,
   Download,
   FileText,
   Lightbulb,
-  LockKeyhole,
   Mic2,
   Printer,
   RotateCcw,
-  Save,
   ShieldCheck,
-  Sparkles,
   Square,
   UploadCloud,
   Volume2,
@@ -30,10 +25,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { analysisPoints, journeySteps, questions } from "@/lib/mock-data";
+import { analysisPoints, journeySteps } from "@/lib/mock-data";
 import { cn, sleep } from "@/lib/utils";
 import { type JourneyStep, useAppStore } from "@/stores/app-store";
 import { StudentCoachGuide } from "@/features/video-guides/student-coach-guide";
+import { QuestionPractice } from "./question-practice";
 
 export function StudentWorkspace({ step }: { step: JourneyStep }) {
   const normalizedStep = step;
@@ -107,7 +103,7 @@ export function StudentWorkspace({ step }: { step: JourneyStep }) {
         ) : normalizedStep === "analysis" ? (
           <AnalysisStep />
         ) : normalizedStep === "practice" ? (
-          <PracticeStep />
+          <QuestionPractice />
         ) : normalizedStep === "mock-interview" ? (
           <MockInterviewStep />
         ) : (
@@ -369,187 +365,6 @@ function AnalysisStep() {
         >
           질문 연습 시작 <ArrowRight className="size-4" />
         </Link>
-      </div>
-    </div>
-  );
-}
-
-function PracticeStep() {
-  const [index, setIndex] = useState(0);
-  const question = questions[index];
-  const answers = useAppStore((state) => state.draftAnswers);
-  const saveAnswer = useAppStore((state) => state.saveAnswer);
-  const completeStep = useAppStore((state) => state.completeStep);
-  const [answer, setAnswer] = useState(answers[question.id] ?? "");
-  const [saved, setSaved] = useState(Boolean(answers[question.id]));
-  const mutation = useMutation({
-    mutationFn: async () => {
-      await sleep(620);
-      saveAnswer(question.id, answer);
-      return true;
-    },
-    onSuccess: () => setSaved(true),
-  });
-  const go = (nextIndex: number) => {
-    const nextQuestion = questions[nextIndex];
-    setAnswer(answers[nextQuestion.id] ?? "");
-    setSaved(Boolean(answers[nextQuestion.id]));
-    setIndex(nextIndex);
-  };
-  return (
-    <div className="space-y-5">
-      <Card className="p-4 sm:p-5">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-extrabold">예상 질문 퀘스트</p>
-            <p className="mt-1 text-[11px] text-[var(--text-tertiary)]">
-              핵심 질문 {index + 1}/{questions.length}
-            </p>
-          </div>
-          <div className="w-40 sm:w-60">
-            <Progress
-              value={((index + (saved ? 1 : 0)) / questions.length) * 100}
-            />
-          </div>
-        </div>
-      </Card>
-      <div className="grid gap-5 lg:grid-cols-[1fr_18rem]">
-        <Card className="p-6 sm:p-8">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-[var(--coral-soft)] px-3 py-1.5 text-[10px] font-black text-[var(--coral)]">
-              {question.category}
-            </span>
-            <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1.5 text-[10px] font-black text-[var(--text-secondary)]">
-              우선순위 {question.priority}
-            </span>
-          </div>
-          <h2 className="mt-6 text-balance text-xl font-black leading-8 tracking-[-.03em] sm:text-2xl">
-            {question.question}
-          </h2>
-          <div className="mt-6 rounded-[var(--radius-md)] bg-[var(--brand-soft)] p-4">
-            <p className="text-xs font-black text-[var(--brand)]">
-              자소서에서 가져온 근거
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              {question.source}
-            </p>
-          </div>
-          <label className="mt-6 block text-sm font-extrabold" htmlFor="answer">
-            내 답변
-          </label>
-          <textarea
-            id="answer"
-            value={answer}
-            onChange={(event) => {
-              setAnswer(event.target.value);
-              setSaved(false);
-            }}
-            className="mt-2 min-h-52 w-full resize-y rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] p-4 text-sm leading-7 outline-none focus:border-[var(--brand)]"
-            placeholder="완벽하게 쓰려 하지 말고, 내 경험과 행동부터 적어 보세요."
-          />
-          <div className="mt-3 flex items-center justify-between text-xs">
-            <span className="text-[var(--text-tertiary)]">
-              {answer.length}자 · 작성 내용은 이 기기에 저장돼요
-            </span>
-            {saved ? (
-              <span className="flex items-center gap-1 font-bold text-[var(--success)]">
-                <Check className="size-3" />
-                저장됨
-              </span>
-            ) : null}
-          </div>
-          <div className="mt-6 flex flex-col-reverse justify-between gap-3 sm:flex-row">
-            <Button
-              variant="ghost"
-              disabled={index === 0}
-              onClick={() => go(index - 1)}
-            >
-              <ChevronLeft className="size-4" />
-              이전 질문
-            </Button>
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                loading={mutation.isPending}
-                disabled={answer.trim().length < 10}
-                onClick={() => mutation.mutate()}
-              >
-                <Save className="size-4" />
-                답변 저장
-              </Button>
-              {index < questions.length - 1 ? (
-                <Button disabled={!saved} onClick={() => go(index + 1)}>
-                  다음 질문 <ChevronRight className="size-4" />
-                </Button>
-              ) : (
-                <Link
-                  href="/applications/demo/mock-interview"
-                  onClick={() => completeStep("practice")}
-                  className={cn(
-                    "inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]",
-                    !saved && "pointer-events-none opacity-50",
-                  )}
-                >
-                  연습 완료 <ArrowRight className="size-4" />
-                </Link>
-              )}
-            </div>
-          </div>
-        </Card>
-        <aside className="space-y-4">
-          <Card className="shadow-none">
-            <div className="flex items-center gap-2 text-sm font-extrabold">
-              <Lightbulb className="size-4 text-[var(--warning)]" />
-              답변 힌트
-            </div>
-            <p className="mt-3 text-xs leading-6 text-[var(--text-secondary)]">
-              {question.tip}
-            </p>
-          </Card>
-          <Card
-            className={cn(
-              "shadow-none transition-opacity",
-              saved ? "opacity-100" : "opacity-55",
-            )}
-          >
-            <div className="flex items-center gap-2 text-sm font-extrabold">
-              {saved ? (
-                <Sparkles className="size-4 text-[var(--brand)]" />
-              ) : (
-                <LockKeyhole className="size-4" />
-              )}
-              꼬리질문
-            </div>
-            <p className="mt-3 text-xs leading-6 text-[var(--text-secondary)]">
-              {saved
-                ? "팀원들의 기록 방식과 본인의 방식은 무엇이 달랐나요?"
-                : "답변을 저장하면 전문가 기준에 따른 꼬리질문이 열려요."}
-            </p>
-          </Card>
-          <Card className="shadow-none">
-            <p className="text-xs font-extrabold">질문 목록</p>
-            <div className="mt-3 grid gap-2">
-              {questions.map((item, questionIndex) => (
-                <button
-                  key={item.id}
-                  onClick={() => go(questionIndex)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-[var(--radius-xs)] p-2 text-left text-xs font-bold",
-                    index === questionIndex &&
-                      "bg-[var(--brand-soft)] text-[var(--brand)]",
-                  )}
-                >
-                  {answers[item.id] ? (
-                    <CheckCircle2 className="size-4 text-[var(--success)]" />
-                  ) : (
-                    <Circle className="size-4 text-[var(--text-tertiary)]" />
-                  )}
-                  {item.category}
-                </button>
-              ))}
-            </div>
-          </Card>
-        </aside>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/lib/session-shared";
 
@@ -55,7 +56,7 @@ export function FirstVisitTour({
     };
   }, [open, step.selector]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
   const closeTour = () => {
     setIndex(0);
     onClose();
@@ -85,8 +86,8 @@ export function FirstVisitTour({
     ? Math.max(16, Math.min(rect.left, window.innerWidth - tooltipWidth - 16))
     : Math.max(16, (window.innerWidth - tooltipWidth) / 2);
 
-  return (
-    <div className="fixed inset-0 z-[95]" role="presentation">
+  return createPortal(
+    <div className="fixed inset-0 z-[110]" role="presentation">
       <div className="absolute inset-0 bg-[color-mix(in_srgb,var(--surface-inverse)_18%,transparent)] backdrop-blur-[2px]" />
       {rect ? (
         <div
@@ -118,6 +119,7 @@ export function FirstVisitTour({
           </div>
         </div>
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }

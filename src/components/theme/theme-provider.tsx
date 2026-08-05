@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { THEME_SCOPE_EVENT } from "./public-light-theme";
 
 export type Theme = "light" | "dark" | "system";
 type ThemeContextValue = { theme: Theme; setTheme: (theme: Theme) => void };
@@ -32,7 +33,9 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
   });
 
   const applyTheme = useCallback((nextTheme: Theme) => {
-    const resolved = resolvedTheme(nextTheme);
+    const forcedTheme = document.documentElement.dataset.forceTheme;
+    const resolved =
+      forcedTheme === "light" ? "light" : resolvedTheme(nextTheme);
     document.documentElement.classList.toggle("dark", resolved === "dark");
     document.documentElement.style.colorScheme = resolved;
   }, []);
@@ -46,8 +49,19 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
         applyTheme("system");
       }
     };
+    const onThemeScopeChange = () => applyTheme(theme);
     query.addEventListener("change", onSystemThemeChange);
-    return () => query.removeEventListener("change", onSystemThemeChange);
+    document.documentElement.addEventListener(
+      THEME_SCOPE_EVENT,
+      onThemeScopeChange,
+    );
+    return () => {
+      query.removeEventListener("change", onSystemThemeChange);
+      document.documentElement.removeEventListener(
+        THEME_SCOPE_EVENT,
+        onThemeScopeChange,
+      );
+    };
   }, [applyTheme, theme]);
 
   const setTheme = useCallback(

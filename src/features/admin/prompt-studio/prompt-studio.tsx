@@ -159,11 +159,13 @@ export function PromptStudio() {
     <div className="space-y-7 float-in" data-testid="prompt-studio">
       <header className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
         <div>
-          <p className="eyebrow">교사 코칭 설계실</p>
-          <h1 className="heading-lg mt-3">코칭 설계실</h1>
+          <p className="eyebrow">AI 수업 기준</p>
+          <h1 className="heading-lg mt-3">
+            학생에게 건넬 코칭 기준을 정하세요
+          </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            교사가 입력한 프롬프트와 승인된 학교 기준으로 AI 초안을 만들고,
-            승인된 결과만 학생에게 적용합니다.
+            학교와 단계에 맞는 교사 지침을 정하면, AI가 같은 기준으로 학생의
+            답변을 돕습니다. 확인한 기준만 학생 화면에 반영됩니다.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -180,20 +182,32 @@ export function PromptStudio() {
 
       <section
         className="grid overflow-hidden border-y border-[var(--border)] sm:grid-cols-3"
-        aria-label="교사 코칭 프롬프트 적용 흐름"
+        aria-label="교사 코칭 기준 적용 흐름"
       >
         {[
-          ["01", "코칭 레시피 선택", "단계·학교별 기준을 조합해 자동 적용"],
-          ["02", "교사 프롬프트 입력", "지침·어조·꼬리질문 깊이를 구분해 반영"],
-          ["03", "AI 미리보기 후 승인", "승인된 버전이 학생별 상황에 맞춰 자동 반영"],
+          ["01", "수업 기준 고르기", "단계와 학교에 맞는 기준을 선택합니다."],
+          [
+            "02",
+            "교사 지침 더하기",
+            "말투와 확인할 이야기를 수업에 맞게 정합니다.",
+          ],
+          [
+            "03",
+            "학생 화면 미리보기",
+            "학생이 받을 도움을 먼저 확인하고 적용합니다.",
+          ],
         ].map(([number, title, detail]) => (
           <div
             key={number}
             className="border-b border-[var(--border)] p-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"
           >
-            <p className="font-mono text-[10px] font-bold text-[var(--brand)]">{number}</p>
+            <p className="font-mono text-[10px] font-bold text-[var(--brand)]">
+              {number}
+            </p>
             <p className="mt-2 text-sm font-black">{title}</p>
-            <p className="mt-1 text-[11px] leading-5 text-[var(--text-secondary)]">{detail}</p>
+            <p className="mt-1 text-[11px] leading-5 text-[var(--text-secondary)]">
+              {detail}
+            </p>
           </div>
         ))}
       </section>
@@ -253,7 +267,7 @@ export function PromptStudio() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-black text-[var(--brand)]">
-                  STEP 1 · 기준 설정
+                  첫 번째 · 기준 정하기
                 </p>
                 <h2 className="mt-2 text-lg font-black">
                   {selectedStage.label}의 판단 방식을 정합니다
@@ -267,7 +281,7 @@ export function PromptStudio() {
                     : "bg-[var(--warning-soft)] text-[var(--warning)]",
                 )}
               >
-                v{draft.version} ·{" "}
+                적용 기준 {draft.version} ·{" "}
                 {draft.status === "approved" ? "승인됨" : "편집 중"}
               </span>
             </div>
@@ -315,10 +329,10 @@ export function PromptStudio() {
               className="mt-5 block text-sm font-bold"
               htmlFor="coaching-instruction"
             >
-              교사가 입력한 프롬프트
+              교사 지침
             </label>
             <p className="mt-1 text-[11px] leading-5 text-[var(--text-tertiary)]">
-              AI 공통 규칙과 구분되는, 이 단계·학교에만 적용할 교사 지침입니다.
+              공통 원칙에 더해, 이 단계와 학교에 맞춰 덧붙일 교사 기준입니다.
             </p>
             <textarea
               id="coaching-instruction"
@@ -332,10 +346,10 @@ export function PromptStudio() {
             <div className="mt-5">
               <div className="flex items-center justify-between gap-4">
                 <label className="text-sm font-bold" htmlFor="follow-up-depth">
-                  꼬리질문 깊이
+                  질문을 이어가는 정도
                 </label>
                 <strong className="text-sm text-[var(--brand)]">
-                  {draft.followUpDepth}단계
+                  {draft.followUpDepth}번째 질문까지
                 </strong>
               </div>
               <input
@@ -351,8 +365,8 @@ export function PromptStudio() {
               />
               <div className="mt-1 flex justify-between text-[10px] font-bold text-[var(--text-tertiary)]">
                 <span>핵심 확인</span>
-                <span>근거 추적</span>
-                <span>압박 검증</span>
+                <span>이유 더 묻기</span>
+                <span>새 상황에 적용</span>
               </div>
             </div>
           </Card>
@@ -364,7 +378,7 @@ export function PromptStudio() {
               </span>
               <div>
                 <p className="text-xs font-black text-[var(--success)]">
-                  STEP 2 · 적용 원칙
+                  두 번째 · 지켜야 할 원칙
                 </p>
                 <h2 className="mt-1 font-black">AI 공통 안전 규칙</h2>
               </div>
@@ -403,12 +417,10 @@ export function PromptStudio() {
         <Card className="h-fit p-0 xl:sticky xl:top-24">
           <div className="p-5 sm:p-6">
             <p className="text-xs font-black text-[var(--brand)]">
-              STEP 3 · 적용 결과 확인
+              세 번째 · 학생 화면 확인
             </p>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg font-black">
-                코칭 결과 미리보기
-              </h2>
+              <h2 className="text-lg font-black">코칭 결과 미리보기</h2>
               <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-[10px] font-black text-[var(--text-secondary)]">
                 데모 학생 · 민사고
               </span>
@@ -490,16 +502,15 @@ export function PromptStudio() {
             <div className="flex items-start gap-3 text-xs leading-5 text-[var(--text-secondary)]">
               <CircleAlert className="mt-0.5 size-4 shrink-0 text-[var(--warning)]" />
               <p>
-                현재는 로컬 데모 저장 방식입니다. 계정과 데이터베이스가 연결되면
-                작성자·수정 이력·승인 버전을 그대로 기록하도록 분리해
-                두었습니다.
+                지금은 화면에서 기준을 확인하는 단계입니다. 계정 연결 뒤에는
+                작성자·수정 이력·적용 기준을 같은 흐름으로 기록합니다.
               </p>
             </div>
             <Link
               href="/admin/prompts"
               className="mt-5 flex min-h-11 items-center justify-between text-sm font-black"
             >
-              코칭 레시피 전체 보기{" "}
+              수업 기준 전체 보기{" "}
               <span className="flex items-center text-[var(--brand)]">
                 이동 <ChevronRight className="size-4" />
               </span>
@@ -511,17 +522,17 @@ export function PromptStudio() {
       <Card className="overflow-hidden bg-[var(--brand-soft)]">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <p className="eyebrow">Knowledge loop</p>
+            <p className="eyebrow">수업 기준의 흐름</p>
             <h2 className="mt-2 text-lg font-black">
               승인한 기준이 다음 코칭에 이어집니다
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-              교사 프롬프트 → AI 초안 → 레시피 승인 → 학생별 자동 적용 순서로
-              교사의 판단 방식을 제품 안에 축적합니다.
+              교사 지침 → AI 미리보기 → 수업 기준 확인 → 학생별 적용 순서로
+              교사의 판단 방식을 수업 안에 쌓아 갑니다.
             </p>
           </div>
           <ol className="flex flex-wrap items-center gap-2 text-[10px] font-black text-[var(--text-secondary)]">
-            {["프롬프트 입력", "초안 생성", "레시피 승인", "자동 적용"].map(
+            {["교사 지침", "AI 미리보기", "기준 확인", "학생에게 적용"].map(
               (item, index) => (
                 <li key={item} className="flex items-center gap-2">
                   <span className="grid size-7 place-items-center rounded-full bg-[var(--surface)] text-[var(--brand)]">

@@ -42,7 +42,7 @@ const studentNav = [
 const adminNav = [
   { href: "/admin", label: "수업 개요", icon: Gauge },
   { href: "/admin/questions", label: "질문 설계", icon: MessageSquareText },
-  { href: "/admin/prompts", label: "코칭 레시피", icon: Sparkles },
+  { href: "/admin/prompts", label: "수업 기준", icon: Sparkles },
   { href: "/admin/videos", label: "영상 연결", icon: Video },
   { href: "/admin/schools", label: "학교 데이터", icon: School },
   { href: "/admin/metrics", label: "학습 인사이트", icon: BarChart3 },
@@ -213,11 +213,17 @@ function ExpertShell({
   return (
     <div className="min-h-[100svh] overflow-x-clip bg-[var(--canvas)]">
       <header className="teacher-navigation liquid-glass app-navigation sticky top-3 z-30 mx-3 mt-3 flex min-h-16 items-center gap-4 rounded-[1.25rem] px-4 md:mx-[var(--space-page)] md:px-5">
-        <div className="shrink-0 sm:hidden"><Logo compact /></div>
-        <div className="hidden shrink-0 sm:block"><Logo /></div>
+        <div className="shrink-0 sm:hidden">
+          <Logo compact />
+        </div>
+        <div className="hidden shrink-0 sm:block">
+          <Logo />
+        </div>
         <div className="hidden min-w-0 border-l border-[var(--border)] pl-4 xl:block">
           <p className="text-xs font-black">교사 워크스페이스</p>
-          <p className="mt-0.5 text-[10px] text-[var(--text-tertiary)]">2027학년도 고입 수업 설계</p>
+          <p className="mt-0.5 text-[10px] text-[var(--text-tertiary)]">
+            2027학년도 고입 수업 설계
+          </p>
         </div>
         <nav
           className="ml-auto hidden items-center gap-0.5 lg:flex"

@@ -28,12 +28,7 @@ import { QuestionRulesPanel } from "./question-rules/question-rules-panel";
 import { VideoGuidesPanel } from "../video-guides/video-guides-panel";
 
 type AdminSection =
-  | "home"
-  | "questions"
-  | "prompts"
-  | "videos"
-  | "schools"
-  | "metrics";
+  "home" | "questions" | "prompts" | "videos" | "schools" | "metrics";
 const validSections = new Set<AdminSection>([
   "home",
   "questions",
@@ -86,10 +81,10 @@ function AdminHome() {
       <PageHeader
         eyebrow="교사 워크스페이스"
         title="수업 기준이 학생의 연습을 이끕니다"
-        description="교사의 노하우를 질문·피드백 레시피로 설계하고, 학교 자료를 바로 적용 가능한 기준으로 정리하세요."
+        description="교사의 노하우를 질문과 피드백 기준으로 정리하고, 학교 자료를 학생의 준비 흐름에 맞게 연결하세요."
         action={
           <Link href="/admin/prompts" className={buttonVariants()}>
-            <Plus className="size-4" />새 코칭 레시피
+            <Plus className="size-4" />새 수업 기준
           </Link>
         }
       />
@@ -97,7 +92,7 @@ function AdminHome() {
       <section className="grid gap-4 sm:grid-cols-3">
         <Stat
           icon={FileCheck2}
-          label="활성 코칭 레시피"
+          label="적용 중인 수업 기준"
           value="12"
           change="이번 주 +2"
           tone="coral"
@@ -121,9 +116,10 @@ function AdminHome() {
         <Card className="overflow-hidden p-0" data-tour="admin-prompt-recipes">
           <div className="flex items-center justify-between border-b border-[var(--border)] p-5">
             <div>
-              <h2 className="font-black">내 수업에 적용 중인 레시피</h2>
+              <h2 className="font-black">내 수업에 적용 중인 기준</h2>
               <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                교사가 정한 기준은 학생 수와 관계없이 각 준비 단계에 자동 적용됩니다.
+                교사가 정한 기준은 학생 수와 관계없이 각 준비 단계에 자동
+                적용됩니다.
               </p>
             </div>
             <Link
@@ -135,9 +131,24 @@ function AdminHome() {
           </div>
           <div className="divide-y divide-[var(--border)]">
             {[
-              ["자소서 분석", "공통", "근거를 먼저 짚고 다음 행동 제안", "v3.2"],
-              ["예상 질문", "민사고", "학교 관점과 꼬리질문 깊이 반영", "v2.4"],
-              ["답변 피드백", "공통", "학생의 말투를 살린 구체적 피드백", "v1.8"],
+              [
+                "자소서 분석",
+                "공통",
+                "근거를 먼저 짚고 다음 행동 제안",
+                "기준 3.2",
+              ],
+              [
+                "예상 질문",
+                "민사고",
+                "학교 관점과 이어 묻는 질문 반영",
+                "기준 2.4",
+              ],
+              [
+                "답변 피드백",
+                "공통",
+                "학생의 말투를 살린 구체적 피드백",
+                "기준 1.8",
+              ],
             ].map(([stage, school, rule, version]) => (
               <div key={stage} className="flex items-center gap-4 p-5">
                 <span className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--brand-soft)] text-[var(--brand)]">
@@ -145,9 +156,13 @@ function AdminHome() {
                 </span>
                 <span className="min-w-0 flex-1">
                   <strong className="block text-sm">{stage}</strong>
-                  <span className="mt-1 block text-xs text-[var(--text-secondary)]">{school} · {rule}</span>
+                  <span className="mt-1 block text-xs text-[var(--text-secondary)]">
+                    {school} · {rule}
+                  </span>
                 </span>
-                <span className="text-[10px] font-bold text-[var(--text-tertiary)]">{version}</span>
+                <span className="text-[10px] font-bold text-[var(--text-tertiary)]">
+                  {version}
+                </span>
               </div>
             ))}
           </div>
@@ -198,10 +213,15 @@ function AdminHome() {
                 <p className="text-xs font-bold text-[var(--text-secondary)]">
                   이번 주 학습 흐름
                 </p>
-                <p className="mt-1 text-sm font-black">질문 연습 전환이 가장 낮아요</p>
+                <p className="mt-1 text-sm font-black">
+                  질문 연습 전환이 가장 낮아요
+                </p>
               </div>
             </div>
-            <div className="mt-5 grid grid-cols-4 gap-1" aria-label="이번 주 학습 단계 흐름">
+            <div
+              className="mt-5 grid grid-cols-4 gap-1"
+              aria-label="이번 주 학습 단계 흐름"
+            >
               {[
                 ["자소서", "64", "100"],
                 ["질문", "43", "67"],
@@ -209,16 +229,30 @@ function AdminHome() {
                 ["노트", "12", "19"],
               ].map(([label, count, rate], index) => (
                 <div key={label} className="min-w-0">
-                  <p className="text-[10px] font-bold text-[var(--text-tertiary)]">{label}</p>
-                  <p className="mt-1 text-base font-black tracking-[-.04em]">{count}</p>
+                  <p className="text-[10px] font-bold text-[var(--text-tertiary)]">
+                    {label}
+                  </p>
+                  <p className="mt-1 text-base font-black tracking-[-.04em]">
+                    {count}
+                  </p>
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--surface-muted)]">
-                    <div className="h-full rounded-full bg-[var(--brand)]" style={{ width: `${rate}%` }} />
+                    <div
+                      className="h-full rounded-full bg-[var(--brand)]"
+                      style={{ width: `${rate}%` }}
+                    />
                   </div>
-                  {index < 3 ? <span className="mt-1 block text-[9px] text-[var(--text-tertiary)]">{rate}%</span> : null}
+                  {index < 3 ? (
+                    <span className="mt-1 block text-[9px] text-[var(--text-tertiary)]">
+                      {rate}%
+                    </span>
+                  ) : null}
                 </div>
               ))}
             </div>
-            <Link href="/admin/metrics" className="mt-5 flex items-center justify-between text-xs font-extrabold text-[var(--brand)]">
+            <Link
+              href="/admin/metrics"
+              className="mt-5 flex items-center justify-between text-xs font-extrabold text-[var(--brand)]"
+            >
               학습 인사이트에서 원인 보기 <ChevronRight className="size-4" />
             </Link>
           </Card>
@@ -233,10 +267,10 @@ const coachGuideSteps = [
     eyebrow: "01 · 수업 기준",
     title: "반복할 판단 기준을 수업에 담으세요",
     description:
-      "개별 학생의 결과를 하나씩 확인하지 않습니다. 자소서·질문·면접 단계별로 교사의 판단 방식을 레시피로 정하면 학생 상황에 맞춰 자동 적용됩니다.",
-    action: "코칭 레시피 열기",
+      "개별 학생의 결과를 하나씩 확인하지 않습니다. 자소서·질문·면접 단계별로 교사의 판단 방식을 수업 기준으로 정하면 학생 상황에 맞춰 적용됩니다.",
+    action: "수업 기준 열기",
     href: "/admin/prompts",
-    note: "교사의 노하우 → 단계별 레시피 → 학생별 자동 적용",
+    note: "교사의 노하우 → 단계별 수업 기준 → 학생별 적용",
   },
   {
     eyebrow: "02 · 학교 데이터",
@@ -272,13 +306,21 @@ function CoachStartGuide() {
         <p className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand)]">
           <BookOpenCheck className="size-4" /> 교사 수업 도구
         </p>
-        <h2 id="coach-start-title" className="mt-3 text-2xl font-black tracking-[-.045em]">
+        <h2
+          id="coach-start-title"
+          className="mt-3 text-2xl font-black tracking-[-.045em]"
+        >
           내 수업 기준을 세 곳에서 설계하세요
         </h2>
         <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
-          메뉴를 외울 필요는 없습니다. 학생에게 어떤 학습 경험을 만들지 기준으로, 수업 설계에 필요한 도구만 연결합니다.
+          메뉴를 외울 필요는 없습니다. 학생에게 어떤 학습 경험을 만들지
+          기준으로, 수업 설계에 필요한 도구만 연결합니다.
         </p>
-        <div className="mt-6 flex flex-wrap gap-2" role="tablist" aria-label="수업 설계 시작 가이드">
+        <div
+          className="mt-6 flex flex-wrap gap-2"
+          role="tablist"
+          aria-label="수업 설계 시작 가이드"
+        >
           {coachGuideSteps.map((step, index) => (
             <button
               key={step.eyebrow}
@@ -302,8 +344,12 @@ function CoachStartGuide() {
         <p className="font-mono text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand)]">
           {active.eyebrow}
         </p>
-        <h3 className="mt-3 text-xl font-black tracking-[-.035em]">{active.title}</h3>
-        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{active.description}</p>
+        <h3 className="mt-3 text-xl font-black tracking-[-.035em]">
+          {active.title}
+        </h3>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
+          {active.description}
+        </p>
         <div className="mt-5 flex items-start gap-3 border-y border-[var(--border)] py-3.5 text-xs leading-5 text-[var(--text-secondary)]">
           <PlayCircle className="mt-0.5 size-4 shrink-0 text-[var(--brand)]" />
           {active.note}
@@ -392,35 +438,66 @@ function Schools() {
             <FileUp className="size-5" />
           </span>
           <span>
-            <strong className="block text-lg tracking-[-.03em]">PDF 또는 엑셀 자료를 놓아 주세요</strong>
+            <strong className="block text-lg tracking-[-.03em]">
+              PDF 또는 엑셀 자료를 놓아 주세요
+            </strong>
             <span className="mt-2 block text-sm leading-6 text-[var(--text-secondary)]">
-              모집요강 PDF는 OCR로 항목·일정·지원 조건을, 경쟁률 엑셀은 학교·전형·연도별 표를 읽어 옵니다.
+              모집요강 PDF는 OCR로 항목·일정·지원 조건을, 경쟁률 엑셀은
+              학교·전형·연도별 표를 읽어 옵니다.
             </span>
           </span>
           <span className="mt-5 inline-flex w-fit items-center gap-2 text-xs font-black text-[var(--brand)]">
-            파일 선택 <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+            파일 선택{" "}
+            <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
           </span>
           <input
             className="hidden"
             type="file"
             accept="application/pdf,.pdf,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            onChange={(event) => setSelectedFileName(event.target.files?.[0]?.name ?? "")}
+            onChange={(event) =>
+              setSelectedFileName(event.target.files?.[0]?.name ?? "")
+            }
           />
         </label>
         <div className="grid content-center gap-4 p-5 sm:p-7">
           <p className="eyebrow">Import flow</p>
           {[
-            ["01", "원본 보관", "비공개 자료는 권한 있는 교사만 볼 수 있는 저장소에 보관"],
-            ["02", "자동 추출", "OCR·표 파서가 학교, 전형, 일정, 경쟁률 후보를 분리"],
-            ["03", "확인 후 적용", "추출 초안을 확인한 항목만 학생 준비 화면에 반영"],
+            [
+              "01",
+              "원본 보관",
+              "비공개 자료는 권한 있는 교사만 볼 수 있는 저장소에 보관",
+            ],
+            [
+              "02",
+              "자동 추출",
+              "OCR·표 파서가 학교, 전형, 일정, 경쟁률 후보를 분리",
+            ],
+            [
+              "03",
+              "확인 후 적용",
+              "추출 초안을 확인한 항목만 학생 준비 화면에 반영",
+            ],
           ].map(([number, title, detail]) => (
-            <div key={number} className="flex gap-3 border-t border-[var(--border)] pt-3 first:border-t-0 first:pt-0">
-              <span className="font-mono text-[10px] font-bold text-[var(--brand)]">{number}</span>
-              <span><strong className="block text-sm">{title}</strong><span className="mt-1 block text-xs leading-5 text-[var(--text-secondary)]">{detail}</span></span>
+            <div
+              key={number}
+              className="flex gap-3 border-t border-[var(--border)] pt-3 first:border-t-0 first:pt-0"
+            >
+              <span className="font-mono text-[10px] font-bold text-[var(--brand)]">
+                {number}
+              </span>
+              <span>
+                <strong className="block text-sm">{title}</strong>
+                <span className="mt-1 block text-xs leading-5 text-[var(--text-secondary)]">
+                  {detail}
+                </span>
+              </span>
             </div>
           ))}
           {selectedFileName ? (
-            <p role="status" className="border-t border-[var(--border)] pt-4 text-xs font-bold text-[var(--success)]">
+            <p
+              role="status"
+              className="border-t border-[var(--border)] pt-4 text-xs font-bold text-[var(--success)]"
+            >
               선택됨 · {selectedFileName} — 서버 연결 후 자동 추출을 시작합니다.
             </p>
           ) : null}
