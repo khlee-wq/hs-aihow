@@ -199,9 +199,9 @@ body {
 .landing-hero {
   position: relative;
   display: grid;
-  min-height: max(46rem, calc(100svh - 1rem));
+  min-height: max(43rem, calc(90svh - 1rem));
   align-items: start;
-  padding-block: clamp(7rem, 14vh, 9rem) clamp(15rem, 25vh, 19rem);
+  padding-block: clamp(6.5rem, 12vh, 8rem) clamp(11.5rem, 18vh, 14rem);
   background: color-mix(in srgb, #faf9f6 96%, var(--canvas));
 }
 .landing-hero::before {
@@ -372,7 +372,7 @@ body {
 @media (max-width: 639px) {
   .landing-hero {
     min-height: 0;
-    padding-block: 5.5rem 27rem;
+    padding-block: 5rem 24.625rem;
   }
   .landing-hero-copy {
     text-align: center;
@@ -393,18 +393,18 @@ body {
     );
   }
   .landing-hero-object--document {
-    bottom: 9.25rem;
+    bottom: 8.125rem;
     left: -2.25rem;
     top: auto;
     width: min(47vw, 12rem);
   }
   .landing-hero-object--question {
-    bottom: 1.25rem;
+    bottom: 0.125rem;
     left: 50%;
     width: min(39vw, 9.75rem);
   }
   .landing-hero-object--microphone {
-    bottom: 7.75rem;
+    bottom: 6.625rem;
     right: -2.7rem;
     top: auto;
     width: min(51vw, 13rem);
@@ -441,8 +441,8 @@ body {
 }
 @media (min-width: 640px) and (max-width: 1023px) {
   .landing-hero {
-    min-height: 49rem;
-    padding-block: 7rem 18rem;
+    min-height: 44rem;
+    padding-block: 6.5rem 15rem;
   }
   .landing-hero-object--document {
     bottom: -1rem;
