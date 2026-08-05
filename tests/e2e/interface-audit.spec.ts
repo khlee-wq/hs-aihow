@@ -25,6 +25,7 @@ async function visit(page: Page, path: string) {
   // UI 검사는 load 이벤트보다 화면의 핵심 요소를 기다립니다. 동적 모션 청크가
   // 늦게 로드돼도 CI의 라우팅 검증이 불필요하게 실패하지 않게 합니다.
   await page.goto(path, { waitUntil: "domcontentloaded" });
+  await expect(page.locator("html")).toHaveAttribute("data-app-hydrated", "true");
 }
 
 function contrastRatio(foreground: string, background: string) {
@@ -286,7 +287,11 @@ test("상품 준비 시퀀스는 모든 화면에서 스크롤 가능한 하나�
 
 test("데스크톱에서 모바일로 전환해도 랜딩 모션이 화면 폭을 밀어내지 않는다", async ({
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== "desktop",
+    "데스크톱 컨텍스트의 런타임 뷰포트 전환만 한 번 검증합니다.",
+  );
   await page.setViewportSize({ width: 1280, height: 900 });
   await visit(page, "/");
   await page.waitForTimeout(1_000);

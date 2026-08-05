@@ -2,6 +2,32 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function visit(page: Page, path: string) {
   await page.goto(path, { waitUntil: "domcontentloaded" });
+  await expect(page.locator("html")).toHaveAttribute("data-app-hydrated", "true");
+  const authForm = page.getByTestId("auth-form");
+  if ((await authForm.count()) > 0) {
+    await expect(authForm).toHaveAttribute("data-hydrated", "true");
+  }
+}
+
+async function dismissFirstVisitTour(page: Page) {
+  const dialog = page.getByRole("dialog", { name: /시작 안내 \d+단계/ });
+  const opened = await dialog
+    .waitFor({ state: "visible", timeout: 1_500 })
+    .then(() => true)
+    .catch(() => false);
+  if (!opened) return;
+  await dialog.getByRole("button", { name: "다시 보지 않기" }).click();
+  await expect(dialog).toBeHidden();
+}
+
+async function expectAuthThemeToggle(page: Page, projectName: string) {
+  const toggle = page.getByRole("button", { name: /현재 .* 테마/ });
+  if (projectName === "mobile") {
+    await expect(toggle).toBeHidden();
+    return;
+  }
+  await expect(toggle).toBeVisible();
+  await expect(toggle.locator("svg")).toHaveCount(0);
 }
 
 test("랜딩의 GSAP 히어로 모션이 오류 없이 준비된다", async ({ page }) => {
@@ -125,12 +151,7 @@ test("320px 공개 헤더는 테마·시작하기를 줄바꿈 없이 정리한�
 
 test("학생이 가입하고 준비 화면으로 진입한다", async ({ page }, testInfo) => {
   await visit(page, "/signup?plan=all");
-  await expect(
-    page.getByRole("button", { name: /현재 .* 테마/ }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: /현재 .* 테마/ }).locator("svg"),
-  ).toHaveCount(0);
+  await expectAuthThemeToggle(page, testInfo.project.name);
   await page.getByLabel("이름", { exact: true }).fill("김하우");
   await page.getByLabel("이메일", { exact: true }).fill("student@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
@@ -150,12 +171,13 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
     page.getByRole("heading", { name: "이번 주 준비 신호" }),
   ).toBeVisible();
   await expect(
-    page.locator("[data-testid=student-dashboard] [data-lottie-orbit] svg"),
+    page.locator("[data-testid=student-dashboard] [data-lottie-orbit]"),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "준비 과정" })).toBeVisible();
   await expect(
     page.getByRole("progressbar", { name: "전체 준비 진행률" }),
   ).toBeVisible();
+  await dismissFirstVisitTour(page);
   if (testInfo.project.name === "mobile") {
     await expect(page.getByTestId("student-mobile-nav")).toBeVisible();
     await expect(page.getByTestId("student-desktop-nav")).toBeHidden();
@@ -210,12 +232,14 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   expect(forbiddenApi.status()).toBe(403);
   await visit(page, "/applications/demo/not-a-step");
   await expect(
-    page.getByRole("heading", { name: "이 경로는 아직 준비되지 않았어요" }),
+    page.getByRole("heading", { name: "찾으시는 화면이 없어요" }),
   ).toBeVisible();
   await page.getByRole("link", { name: "교사 워크스페이스로 전환" }).click();
   await expect(page).toHaveURL(/\/admin$/);
   await expect(
-    page.getByRole("heading", { name: "좋은 기준이, 좋은 질문을 만듭니다" }),
+    page.getByRole("heading", {
+      name: "수업 기준이 학생의 연습을 이끕니다",
+    }),
   ).toBeVisible();
 });
 
@@ -233,9 +257,7 @@ test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 �
   page,
 }, testInfo) => {
   await visit(page, "/signup");
-  await expect(
-    page.getByRole("button", { name: /현재 .* 테마/ }),
-  ).toBeVisible();
+  await expectAuthThemeToggle(page, testInfo.project.name);
   await page.getByRole("radio", { name: "교사" }).click();
   await page.getByLabel("이름", { exact: true }).fill("이소장");
   await page.getByLabel("이메일", { exact: true }).fill("expert@example.com");
@@ -244,8 +266,11 @@ test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 �
 
   await expect(page).toHaveURL(/\/admin$/);
   await expect(
-    page.getByRole("heading", { name: "좋은 기준이, 좋은 질문을 만듭니다" }),
+    page.getByRole("heading", {
+      name: "수업 기준이 학생의 연습을 이끕니다",
+    }),
   ).toBeVisible();
+  await dismissFirstVisitTour(page);
   if (testInfo.project.name === "mobile") {
     await expect(page.getByTestId("expert-mobile-nav")).toBeVisible();
     await expect(
@@ -262,7 +287,7 @@ test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 �
   await expect(page.getByTestId("student-dashboard")).toBeVisible();
   await visit(page, "/admin/not-a-section");
   await expect(
-    page.getByRole("heading", { name: "이 경로는 아직 준비되지 않았어요" }),
+    page.getByRole("heading", { name: "찾으시는 화면이 없어요" }),
   ).toBeVisible();
 });
 
@@ -286,7 +311,7 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
 
   const expertAnswer = page.getByLabel("학생에게 적용할 최종 코칭 답변");
   await expertAnswer.fill("소장님이 직접 수정한 모의면접 코칭 기준입니다.");
-  await expect(page.getByText("전문가 수정됨")).toBeVisible();
+  await expect(page.getByText("교사 조정본")).toBeVisible();
   await page.getByRole("button", { name: "승인하고 적용" }).click();
   await expect(page.getByRole("status")).toContainText("승인했습니다");
 

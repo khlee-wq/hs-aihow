@@ -9,7 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,10 @@ const schema = z.object({
 });
 type FormValues = z.infer<typeof schema>;
 
+const subscribeToHydration = () => () => undefined;
+const getClientHydrationState = () => true;
+const getServerHydrationState = () => false;
+
 export function AuthForm({
   mode,
   nextPath,
@@ -35,6 +39,11 @@ export function AuthForm({
   plan?: string;
   reason?: "session-expired";
 }) {
+  const hydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getClientHydrationState,
+    getServerHydrationState,
+  );
   const [serverError, setServerError] = useState("");
   const {
     register,
@@ -49,6 +58,7 @@ export function AuthForm({
       role: "user",
     },
   });
+
   const submit = handleSubmit(async (values, event) => {
     setServerError("");
     try {
@@ -196,6 +206,8 @@ export function AuthForm({
           </div>
           <form
             id="aihow-auth-form"
+            data-testid="auth-form"
+            data-hydrated={hydrated ? "true" : "false"}
             onSubmit={submit}
             className="mt-6 grid gap-5"
           >
@@ -239,7 +251,13 @@ export function AuthForm({
                 {serverError}
               </p>
             ) : null}
-            <Button type="submit" size="lg" full loading={isSubmitting}>
+            <Button
+              type="submit"
+              size="lg"
+              full
+              loading={isSubmitting}
+              disabled={!hydrated}
+            >
               {mode === "signup" ? "가입하고 시작하기" : "내 준비로 들어가기"}
               <Sparkles className="size-4" />
             </Button>
