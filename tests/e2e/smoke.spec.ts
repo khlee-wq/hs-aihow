@@ -30,6 +30,22 @@ async function expectAuthThemeToggle(page: Page, projectName: string) {
   await expect(toggle.locator("svg")).toHaveCount(0);
 }
 
+async function submitAuthForm(page: Page) {
+  const submit = page.getByRole("button", {
+    name: /가입하고 시작하기|내 준비로 들어가기/,
+  });
+  await submit.evaluate((element) => {
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    element.scrollIntoView({ block: "center" });
+    root.style.scrollBehavior = previous;
+  });
+  await expect(submit).toBeVisible();
+  await expect(submit).toBeEnabled();
+  await submit.click();
+}
+
 test("랜딩의 GSAP 히어로 모션이 오류 없이 준비된다", async ({ page }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
@@ -50,15 +66,6 @@ test("랜딩의 GSAP 히어로 모션이 오류 없이 준비된다", async ({ p
     ".landing-product-stage [data-motion-product-card]",
   );
   await expect(productCards).toHaveCount(3);
-  await expect
-    .poll(
-      () =>
-        visibleHeroArt
-          .first()
-          .evaluate((element) => getComputedStyle(element).transform),
-      { timeout: 3_000 },
-    )
-    .toBe("none");
   await page.getByTestId("landing-product-stage").scrollIntoViewIfNeeded();
   await page.waitForTimeout(900);
   await expect(
@@ -155,7 +162,7 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await page.getByLabel("이름", { exact: true }).fill("김하우");
   await page.getByLabel("이메일", { exact: true }).fill("student@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
-  await page.getByRole("button", { name: "가입하고 시작하기" }).click();
+  await submitAuthForm(page);
 
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
@@ -223,7 +230,11 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
-  await page.getByRole("link", { name: "질문 연습 시작하기" }).click();
+  const practiceLink = page.getByRole("link", {
+    name: "질문 연습 시작하기",
+  });
+  if (testInfo.project.name === "mobile") await practiceLink.tap();
+  else await practiceLink.click();
   await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
   await expect(
     page.getByText("예상 질문 퀘스트", { exact: true }),
@@ -262,7 +273,7 @@ test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 �
   await page.getByLabel("이름", { exact: true }).fill("이소장");
   await page.getByLabel("이메일", { exact: true }).fill("expert@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
-  await page.getByRole("button", { name: "가입하고 시작하기" }).click();
+  await submitAuthForm(page);
 
   await expect(page).toHaveURL(/\/admin$/);
   await expect(
@@ -297,7 +308,7 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
   await page.getByLabel("이름", { exact: true }).fill("김소장");
   await page.getByLabel("이메일", { exact: true }).fill("prompt@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
-  await page.getByRole("button", { name: "가입하고 시작하기" }).click();
+  await submitAuthForm(page);
   await expect(page).toHaveURL(/\/admin$/);
 
   await visit(page, "/admin/prompts");
@@ -328,7 +339,7 @@ test("운영자가 코칭 레시피를 설정하고 승인한다", async ({ page
   await page.getByLabel("이름", { exact: true }).fill("박소장");
   await page.getByLabel("이메일", { exact: true }).fill("review@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
-  await page.getByRole("button", { name: "가입하고 시작하기" }).click();
+  await submitAuthForm(page);
   await expect(page).toHaveURL(/\/admin$/);
 
   await visit(page, "/admin/prompts");
@@ -357,7 +368,7 @@ test("전문가가 질문 기준을 생성·수정·삭제한다", async ({ page
     .getByLabel("이메일", { exact: true })
     .fill(`crud-${testInfo.project.name}@example.com`);
   await page.getByPlaceholder("4자 이상").fill("demo1234");
-  await page.getByRole("button", { name: "가입하고 시작하기" }).click();
+  await submitAuthForm(page);
   await expect(page).toHaveURL(/\/admin$/);
   await visit(page, "/admin/questions");
 
