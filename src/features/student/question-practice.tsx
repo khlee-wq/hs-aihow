@@ -221,9 +221,9 @@ export function QuestionPractice() {
 
       <nav
         aria-label="질문군 선택"
-        className="overflow-x-auto border-y border-[var(--border)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="border-y border-[var(--border)]"
       >
-        <div className="grid min-w-[42rem] grid-cols-3 md:min-w-0">
+        <div className="grid grid-cols-3">
           {questionTracks.map((item, itemIndex) => {
             const active = itemIndex === trackIndex;
             const done = item.priorities.filter(
@@ -236,15 +236,15 @@ export function QuestionPractice() {
                 aria-current={active ? "step" : undefined}
                 onClick={() => selectTrack(itemIndex)}
                 className={cn(
-                  "relative min-h-[6.4rem] cursor-pointer border-r border-[var(--border)] px-5 py-4 text-left last:border-r-0",
+                  "relative min-w-0 cursor-pointer border-r border-[var(--border)] px-3 py-3 text-left last:border-r-0 sm:min-h-[6.4rem] sm:px-5 sm:py-4",
                   active && "bg-[var(--brand-soft)] text-[var(--text-primary)]",
                 )}
               >
-                <span className="font-mono text-[10px] font-black text-[var(--brand)]">
+                <span className="font-mono text-[9px] font-black text-[var(--brand)] sm:text-[10px]">
                   0{itemIndex + 1} · {done}/{item.priorities.length}
                 </span>
-                <strong className="mt-2 block text-sm">{item.category}</strong>
-                <span className="mt-1 block text-xs text-[var(--text-secondary)]">
+                <strong className="mt-1.5 block text-xs sm:mt-2 sm:text-sm">{item.category}</strong>
+                <span className="mt-1 block hidden text-xs text-[var(--text-secondary)] sm:block">
                   {item.title}
                 </span>
               </button>

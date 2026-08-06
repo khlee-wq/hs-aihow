@@ -199,14 +199,14 @@ export function ResponseReviewPanel() {
                 placeholder="학생, 학교, 입력 내용 검색"
               />
             </label>
-            <div className="mt-2 flex gap-1 overflow-x-auto">
+            <div className="mt-2 grid grid-cols-4 gap-1">
               {(["전체", "pending", "draft", "approved"] as const).map(
                 (item) => (
                   <button
                     key={item}
                     onClick={() => setFilter(item)}
                     className={cn(
-                      "min-h-9 shrink-0 rounded-[var(--radius-xs)] px-3 text-[11px] font-black",
+                      "min-h-9 min-w-0 rounded-[var(--radius-xs)] px-1.5 text-[10px] font-black sm:px-3 sm:text-[11px]",
                       filter === item
                         ? "bg-[var(--brand)] text-[var(--text-on-brand)]"
                         : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]",

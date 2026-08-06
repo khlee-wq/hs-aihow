@@ -438,15 +438,15 @@ function InterviewFlow({
   return (
     <nav
       aria-label="모의면접 진행 단계"
-      className="overflow-x-auto border-y border-[var(--border)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="border-y border-[var(--border)]"
     >
-      <ol className="grid min-w-[43rem] grid-cols-5 sm:min-w-0">
+      <ol className="grid grid-cols-5">
         {interviewFlow.map(([title, description], index) => (
           <li
             key={title}
             aria-current={index === current ? "step" : undefined}
             className={cn(
-              "relative border-r border-[var(--border)] px-4 py-4 last:border-r-0",
+              "relative min-w-0 border-r border-[var(--border)] px-2 py-3 last:border-r-0 sm:px-4 sm:py-4",
               index === current && "bg-[var(--brand-soft)]",
             )}
           >
@@ -460,8 +460,8 @@ function InterviewFlow({
             >
               {index < current ? "DONE" : `0${index + 1}`}
             </span>
-            <strong className="mt-2 block text-sm">{title}</strong>
-            <span className="mt-1 block text-[11px] text-[var(--text-secondary)]">
+            <strong className="mt-1.5 block text-[11px] leading-4 sm:mt-2 sm:text-sm">{title}</strong>
+            <span className="mt-1 hidden text-[11px] text-[var(--text-secondary)] sm:block">
               {description}
             </span>
             {index === current ? (

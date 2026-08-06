@@ -305,6 +305,11 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
       name: "자소서에서 물어볼 이야기를 함께 찾아볼게요",
     }),
   ).toBeVisible();
+  expect(
+    await page.getByLabel("질문군 선택").evaluate(
+      (element) => element.scrollWidth <= element.clientWidth,
+    ),
+  ).toBe(true);
   await expect(
     page.getByRole("button", {
       name: "이유를 이어 말할 질문 선택의 이유 잠김",
@@ -402,7 +407,9 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
 
   await visit(page, "/admin/prompts");
   await expect(
-    page.getByRole("heading", { name: "코칭 설계실" }),
+    page.getByRole("heading", {
+      name: "학생에게 건넬 코칭 기준을 정하세요",
+    }),
   ).toBeVisible();
   await page.getByRole("button", { name: /04 모의면접/ }).click();
   await expect(
@@ -422,7 +429,7 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
   ).toBe(true);
 });
 
-test("운영자가 코칭 레시피를 설정하고 승인한다", async ({ page }) => {
+test("교사가 수업 기준을 설정하고 승인한다", async ({ page }) => {
   await visit(page, "/signup");
   await page.getByRole("radio", { name: "교사" }).click();
   await page.getByLabel("이름", { exact: true }).fill("박소장");
@@ -433,7 +440,9 @@ test("운영자가 코칭 레시피를 설정하고 승인한다", async ({ page
 
   await visit(page, "/admin/prompts");
   await expect(
-    page.getByRole("heading", { name: "코칭 설계실" }),
+    page.getByRole("heading", {
+      name: "학생에게 건넬 코칭 기준을 정하세요",
+    }),
   ).toBeVisible();
   await page
     .getByLabel("교사가 입력한 프롬프트")

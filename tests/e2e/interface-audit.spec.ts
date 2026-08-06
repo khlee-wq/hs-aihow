@@ -25,7 +25,10 @@ async function visit(page: Page, path: string) {
   // UI 검사는 load 이벤트보다 화면의 핵심 요소를 기다립니다. 동적 모션 청크가
   // 늦게 로드돼도 CI의 라우팅 검증이 불필요하게 실패하지 않게 합니다.
   await page.goto(path, { waitUntil: "domcontentloaded" });
-  await expect(page.locator("html")).toHaveAttribute("data-app-hydrated", "true");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-app-hydrated",
+    "true",
+  );
 }
 
 function contrastRatio(foreground: string, background: string) {
@@ -131,6 +134,25 @@ async function expectPrimaryTitle(page: Page) {
   await expect(
     page.locator("main").getByRole("heading", { level: 1 }).first(),
   ).toBeVisible();
+}
+
+async function expectStepNavigationFitsItsContainer(page: Page, label: string) {
+  const navigation = page.getByLabel(label);
+  await expect(navigation).toBeVisible();
+
+  const layout = await navigation.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      overflowX: style.overflowX,
+    };
+  });
+
+  // 준비 단계는 순서를 한눈에 비교하는 UI입니다. 작은 화면에서 다음 항목이
+  // 옆으로 숨는 방식이 다시 들어오지 않도록, 별도의 가로 스크롤을 금지합니다.
+  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth + 1);
+  expect(layout.overflowX).not.toMatch(/auto|scroll/);
 }
 
 function isWebKitRscPrefetchNoise(message: string) {
@@ -417,6 +439,12 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
     for (const path of studentPaths) {
       await visit(page, path);
       await expectPrimaryTitle(page);
+      if (path === "/applications/demo/practice") {
+        await expectStepNavigationFitsItsContainer(page, "질문군 선택");
+      }
+      if (path === "/applications/demo/mock-interview") {
+        await expectStepNavigationFitsItsContainer(page, "모의면접 진행 단계");
+      }
       await expectInterfaceFitsViewport(page);
     }
   }
