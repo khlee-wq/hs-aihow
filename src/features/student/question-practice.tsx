@@ -15,7 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppDialog } from "@/components/ui/app-dialog";
 import { cn } from "@/lib/utils";
@@ -56,6 +56,8 @@ const questionOrderLabels = [
   "생각을 넓힐 질문",
 ] as const;
 
+const questionTutorialStorageKey = "aihow-question-practice-tutorial-seen";
+
 const coachSteps = [
   {
     icon: FileText,
@@ -81,7 +83,7 @@ const coachSteps = [
 export function QuestionPractice() {
   const [trackIndex, setTrackIndex] = useState(0);
   const [priorityIndex, setPriorityIndex] = useState(0);
-  const [isCoachGuideOpen, setIsCoachGuideOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const answers = useAppStore((state) => state.draftAnswers);
   const saveAnswer = useAppStore((state) => state.saveAnswer);
   const completeStep = useAppStore((state) => state.completeStep);
@@ -103,6 +105,24 @@ export function QuestionPractice() {
   const isLastQuestion = priorityIndex === track.priorities.length - 1;
   const isLastTrack = trackIndex === questionTracks.length - 1;
   const currentOrderLabel = questionOrderLabels[priorityIndex];
+
+  useEffect(() => {
+    if (window.localStorage.getItem(questionTutorialStorageKey)) return;
+    const openTutorial = window.requestAnimationFrame(() => {
+      setIsTutorialOpen(true);
+    });
+    return () => window.cancelAnimationFrame(openTutorial);
+  }, []);
+
+  const closeTutorial = ({ focusAnswer = false } = {}) => {
+    window.localStorage.setItem(questionTutorialStorageKey, "true");
+    setIsTutorialOpen(false);
+    if (focusAnswer) {
+      window.requestAnimationFrame(() => {
+        document.getElementById("question-answer")?.focus();
+      });
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -177,11 +197,11 @@ export function QuestionPractice() {
               <span>AI가 도와주는 순서</span>
               <button
                 type="button"
-                onClick={() => setIsCoachGuideOpen(true)}
+                onClick={() => setIsTutorialOpen(true)}
                 className="inline-flex cursor-pointer items-center gap-1.5 text-[var(--mint)] hover:text-white"
                 aria-haspopup="dialog"
               >
-                <Sparkles className="size-3.5" /> 어떻게 도와주나요?
+                <Sparkles className="size-3.5" /> 연습 안내 보기
               </button>
             </div>
             <div className="mt-4 grid gap-2">
@@ -219,10 +239,7 @@ export function QuestionPractice() {
         </div>
       </div>
 
-      <nav
-        aria-label="질문군 선택"
-        className="border-y border-[var(--border)]"
-      >
+      <nav aria-label="질문군 선택" className="border-y border-[var(--border)]">
         <div className="grid grid-cols-3">
           {questionTracks.map((item, itemIndex) => {
             const active = itemIndex === trackIndex;
@@ -243,7 +260,9 @@ export function QuestionPractice() {
                 <span className="font-mono text-[9px] font-black text-[var(--brand)] sm:text-[10px]">
                   0{itemIndex + 1} · {done}/{item.priorities.length}
                 </span>
-                <strong className="mt-1.5 block text-xs sm:mt-2 sm:text-sm">{item.category}</strong>
+                <strong className="mt-1.5 block text-xs sm:mt-2 sm:text-sm">
+                  {item.category}
+                </strong>
                 <span className="mt-1 block hidden text-xs text-[var(--text-secondary)] sm:block">
                   {item.title}
                 </span>
@@ -531,26 +550,41 @@ export function QuestionPractice() {
       </div>
 
       <AppDialog
-        open={isCoachGuideOpen}
-        onClose={() => setIsCoachGuideOpen(false)}
-        eyebrow="AI 준비 코치"
-        title="AI가 질문을 고르는 방식"
+        open={isTutorialOpen}
+        onClose={() => closeTutorial()}
+        eyebrow="질문 연습 안내"
+        title="외운 답 대신, 내 판단이 드러나는 이야기를 만들어요"
         className="max-w-2xl"
       >
         <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
-          AI는 질문을 많이 보여주기보다, 자소서와 지금까지의 답변을 바탕으로
-          먼저 준비하면 좋은 이야기를 골라 드립니다.
+          전문가의 면접 기준을 따라 자소서 속 장면을 꺼내고, 그때의 판단과 다음
+          행동까지 차례로 정리합니다. 한 질문씩 답하면 다음 질문이 자연스럽게
+          이어집니다.
         </p>
-        <ol className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="mt-6 rounded-[var(--radius-md)] bg-[var(--brand-soft)] p-4 sm:p-5">
+          <p className="font-mono text-[10px] font-black tracking-[.16em] text-[var(--brand)]">
+            이번 수업의 출발점
+          </p>
+          <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
+            <h3 className="text-lg font-black">{track.category}</h3>
+            <span className="text-xs font-bold text-[var(--text-secondary)]">
+              {track.source}
+            </span>
+          </div>
+          <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
+            {track.summary}
+          </p>
+        </div>
+        <ol className="mt-5 grid gap-2 sm:grid-cols-3">
           {coachSteps.map(({ icon: StepIcon, number, title, description }) => (
             <li
               key={number}
               className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface-muted)] p-4"
             >
-              <span className="grid size-9 place-items-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
+              <span className="grid size-8 place-items-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
                 <StepIcon className="size-4" />
               </span>
-              <span className="mt-5 block font-mono text-[10px] font-black tracking-[.16em] text-[var(--brand)]">
+              <span className="mt-4 block font-mono text-[10px] font-black tracking-[.16em] text-[var(--brand)]">
                 {number}
               </span>
               <h3 className="mt-2 text-sm font-black">{title}</h3>
@@ -562,12 +596,15 @@ export function QuestionPractice() {
         </ol>
         <div className="mt-5 border-t border-[var(--border)] pt-5">
           <p className="text-sm font-bold leading-6">
-            외운 답을 만드는 대신, 내 경험을 한 장면씩 꺼내 말할 수 있도록 돕는
-            것이 이 연습의 목표예요.
+            첫 질문부터 완벽하게 답하려 하지 않아도 괜찮아요. 실제 장면과 내
+            행동을 먼저 적으면, 다음 질문이 답변의 깊이를 더해 줍니다.
           </p>
-          <div className="mt-5 flex justify-end">
-            <Button onClick={() => setIsCoachGuideOpen(false)}>
-              질문 연습 이어가기 <ArrowRight className="size-4" />
+          <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button variant="ghost" onClick={() => closeTutorial()}>
+              나중에 할게요
+            </Button>
+            <Button onClick={() => closeTutorial({ focusAnswer: true })}>
+              첫 질문 시작하기 <ArrowRight className="size-4" />
             </Button>
           </div>
         </div>

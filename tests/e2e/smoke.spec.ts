@@ -305,10 +305,16 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
       name: "자소서에서 물어볼 이야기를 함께 찾아볼게요",
     }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "외운 답 대신, 내 판단이 드러나는 이야기를 만들어요",
+    }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "첫 질문 시작하기" }).click();
   expect(
-    await page.getByLabel("질문군 선택").evaluate(
-      (element) => element.scrollWidth <= element.clientWidth,
-    ),
+    await page
+      .getByLabel("질문군 선택")
+      .evaluate((element) => element.scrollWidth <= element.clientWidth),
   ).toBe(true);
   await expect(
     page.getByRole("button", {
