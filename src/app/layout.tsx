@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import "@fontsource-variable/noto-sans-kr";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 

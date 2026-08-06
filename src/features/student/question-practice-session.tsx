@@ -43,9 +43,16 @@ export function QuestionPracticeSession({
 }) {
   const router = useRouter();
   const persistedAnswers = useAppStore((state) => state.draftAnswers);
+  const practiceDrafts = useAppStore((state) => state.practiceDrafts);
+  const practiceDraftUpdatedAt = useAppStore(
+    (state) => state.practiceDraftUpdatedAt,
+  );
   const saveAnswer = useAppStore((state) => state.saveAnswer);
+  const savePracticeDraft = useAppStore((state) => state.savePracticeDraft);
+  const clearPracticeDraft = useAppStore((state) => state.clearPracticeDraft);
   const completeStep = useAppStore((state) => state.completeStep);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isProgressReady, setIsProgressReady] = useState(false);
   const [localAnswers, setLocalAnswers] = useState<Record<string, string>>({});
   const [feedbackByQuestion, setFeedbackByQuestion] = useState<
     Record<string, QuestionPracticeResponse>
@@ -57,11 +64,15 @@ export function QuestionPracticeSession({
   const questionScene = useRef<HTMLDivElement>(null);
   const feedbackPanel = useRef<HTMLDivElement>(null);
   const motionDirection = useRef<1 | -1>(1);
+  const draftSnapshot = useRef({ questionId: "", answer: "", savedAnswer: "" });
 
   const current = flatQuestions[currentIndex];
   const { track, question, trackIndex, priorityIndex } = current;
   const answer =
-    localAnswers[question.id] ?? persistedAnswers[question.id] ?? "";
+    localAnswers[question.id] ??
+    practiceDrafts[question.id] ??
+    persistedAnswers[question.id] ??
+    "";
   const savedAnswer = persistedAnswers[question.id] ?? "";
   const currentFeedback = feedbackByQuestion[question.id];
   const currentQuestion = generatedQuestions[question.id] ?? question.question;
@@ -69,18 +80,89 @@ export function QuestionPracticeSession({
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === flatQuestions.length - 1;
   const progress = ((currentIndex + 1) / totalQuestionPriorities) * 100;
+  const isDraftSaved =
+    Boolean(answer.trim()) && practiceDrafts[question.id] === answer;
 
   useEffect(() => {
+    const markProgressReady = () => setIsProgressReady(true);
+    const unsubscribe =
+      useAppStore.persist.onFinishHydration(markProgressReady);
+    if (useAppStore.persist.hasHydrated()) markProgressReady();
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!isProgressReady) return;
     if (hasRestoredProgress.current) return;
     hasRestoredProgress.current = true;
+    const latestDraftId = Object.entries(practiceDraftUpdatedAt)
+      .filter(([questionId]) => Boolean(practiceDrafts[questionId]))
+      .sort((left, right) => right[1] - left[1])[0]?.[0];
+    const latestDraftIndex = latestDraftId
+      ? flatQuestions.findIndex(
+          ({ question: item }) => item.id === latestDraftId,
+        )
+      : -1;
     const nextIncomplete = flatQuestions.findIndex(
       ({ question: item }) => !persistedAnswers[item.id],
     );
     const restoreProgress = window.requestAnimationFrame(() => {
-      if (nextIncomplete > 0) setCurrentIndex(nextIncomplete);
+      const resumeIndex =
+        latestDraftIndex >= 0 ? latestDraftIndex : nextIncomplete;
+      if (resumeIndex > 0) setCurrentIndex(resumeIndex);
     });
     return () => window.cancelAnimationFrame(restoreProgress);
-  }, [persistedAnswers]);
+  }, [
+    isProgressReady,
+    persistedAnswers,
+    practiceDraftUpdatedAt,
+    practiceDrafts,
+  ]);
+
+  useEffect(() => {
+    draftSnapshot.current = {
+      questionId: question.id,
+      answer,
+      savedAnswer,
+    };
+  }, [answer, question.id, savedAnswer]);
+
+  useEffect(() => {
+    if (!isProgressReady) return;
+    if (isSaved || practiceDrafts[question.id] === answer) return;
+    const autosave = window.setTimeout(() => {
+      savePracticeDraft(question.id, answer);
+    }, 450);
+    return () => window.clearTimeout(autosave);
+  }, [
+    answer,
+    isProgressReady,
+    isSaved,
+    practiceDrafts,
+    question.id,
+    savePracticeDraft,
+  ]);
+
+  useEffect(() => {
+    const flushCurrentDraft = () => {
+      if (!useAppStore.persist.hasHydrated()) return;
+      const snapshot = draftSnapshot.current;
+      if (snapshot.answer.trim() !== snapshot.savedAnswer) {
+        savePracticeDraft(snapshot.questionId, snapshot.answer);
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") flushCurrentDraft();
+    };
+
+    window.addEventListener("pagehide", flushCurrentDraft);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      flushCurrentDraft();
+      window.removeEventListener("pagehide", flushCurrentDraft);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [savePracticeDraft]);
 
   useEffect(() => {
     const scene = questionScene.current;
@@ -185,6 +267,7 @@ export function QuestionPracticeSession({
       }),
     onSuccess: (result) => {
       saveAnswer(question.id, answer.trim());
+      clearPracticeDraft(question.id);
       setFeedbackByQuestion((currentFeedbacks) => ({
         ...currentFeedbacks,
         [question.id]: result,
@@ -220,11 +303,13 @@ export function QuestionPracticeSession({
     <section
       className="practice-session-canvas liquid-glass-group relative mx-auto flex min-h-[calc(100svh-3.75rem)] max-w-[100rem] flex-col overflow-hidden px-[var(--space-page)] sm:min-h-[calc(100svh-4.25rem)]"
       aria-labelledby="practice-session-question"
+      aria-busy={!isProgressReady}
+      data-progress-ready={isProgressReady}
     >
       <div className="relative z-10 pt-5 sm:pt-7" data-motion-reveal>
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-[10px] font-black tracking-[.16em] text-[var(--brand)]">
+            <p className="student-kicker text-[var(--brand)]">
               {track.category} · {questionOrderLabels[priorityIndex]}
             </p>
             <p className="mt-1 text-xs text-[var(--text-secondary)]">
@@ -272,7 +357,7 @@ export function QuestionPracticeSession({
 
           <h1
             id="practice-session-question"
-            className="mt-5 max-w-4xl break-keep text-[clamp(1.5rem,3.2vw,2.55rem)] font-black leading-[1.26] tracking-[-.045em]"
+            className="student-question-title mt-5"
             data-question-motion
           >
             {currentQuestion}
@@ -329,6 +414,7 @@ export function QuestionPracticeSession({
           <textarea
             id="practice-answer"
             value={answer}
+            disabled={!isProgressReady}
             onChange={(event) => {
               setLocalAnswers((currentAnswers) => ({
                 ...currentAnswers,
@@ -351,8 +437,17 @@ export function QuestionPracticeSession({
                 role="status"
                 className="inline-flex items-center gap-1.5 font-bold text-[var(--success)]"
               >
-                <Check className="size-3.5" /> 저장됨
+                <Check className="size-3.5" /> 답변 저장됨
               </span>
+            ) : isDraftSaved ? (
+              <span
+                role="status"
+                className="inline-flex items-center gap-1.5 font-bold text-[var(--brand)]"
+              >
+                <Check className="size-3.5" /> 임시 저장됨
+              </span>
+            ) : answer.trim() ? (
+              <span role="status">자동 저장 중…</span>
             ) : null}
           </div>
 

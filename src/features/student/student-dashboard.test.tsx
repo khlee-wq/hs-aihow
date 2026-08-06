@@ -11,7 +11,7 @@ vi.mock("@/components/motion/journey-orbit", () => ({
 afterEach(() => cleanup());
 
 describe("StudentDashboard loading boundaries", () => {
-  it("keeps the page structure and only skeletonizes server data slots", () => {
+  it("keeps actions visible while every server-backed region is loading", () => {
     useAppStore.setState({ completedSteps: ["essay", "analysis"] });
     const { container } = render(<StudentDashboard />);
 
@@ -19,15 +19,15 @@ describe("StudentDashboard loading boundaries", () => {
       "aria-busy",
       "true",
     );
-    expect(
-      screen.getByRole("heading", { name: /다음은 질문 연습입니다/ }),
-    ).toBeVisible();
+    expect(screen.getByTestId("dashboard-header-skeleton")).toBeVisible();
+    expect(screen.getByTestId("dashboard-workspace-skeleton")).toBeVisible();
     expect(
       screen.getByRole("link", { name: "질문 연습 시작하기" }),
     ).toBeVisible();
     expect(screen.getByRole("heading", { name: "준비 과정" })).toBeVisible();
     expect(screen.getAllByTestId("dashboard-metric-skeleton")).toHaveLength(2);
     expect(screen.getByTestId("readiness-data-skeleton")).toBeVisible();
+    expect(screen.getByTestId("dashboard-insight-skeleton")).toBeVisible();
     expect(screen.getByTestId("weekly-activity-skeleton")).toBeVisible();
     expect(screen.getByTestId("admissions-outlook-skeleton")).toBeVisible();
     expect(container.querySelector("p div, h1 div")).toBeNull();
@@ -41,7 +41,10 @@ describe("StudentDashboard loading boundaries", () => {
       "false",
     );
     expect(screen.queryByTestId("dashboard-metric-skeleton")).toBeNull();
+    expect(screen.queryByTestId("dashboard-header-skeleton")).toBeNull();
+    expect(screen.queryByTestId("dashboard-workspace-skeleton")).toBeNull();
     expect(screen.queryByTestId("readiness-data-skeleton")).toBeNull();
+    expect(screen.queryByTestId("dashboard-insight-skeleton")).toBeNull();
     expect(screen.queryByTestId("weekly-activity-skeleton")).toBeNull();
     expect(screen.queryByTestId("admissions-outlook-skeleton")).toBeNull();
     expect(screen.getByText("48m")).toBeVisible();

@@ -44,6 +44,7 @@
   --shadow-brand: 0 18px 38px rgba(24, 123, 114, 0.2);
   --space-page: clamp(1rem, 3vw, 2.5rem);
   --content-wide: 90rem;
+  --content-workspace: 92rem;
   --content-reading: 50rem;
   --motion-fast: 140ms;
   --motion-base: 220ms;

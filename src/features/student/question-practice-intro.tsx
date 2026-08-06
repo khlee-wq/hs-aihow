@@ -15,9 +15,14 @@ import {
   questionTracks,
   totalQuestionPriorities,
 } from "./question-practice-data";
+import { LearningIntroHero } from "./learning-intro-hero";
 
 export function QuestionPracticeIntro() {
   const answers = useAppStore((state) => state.draftAnswers);
+  const practiceDrafts = useAppStore((state) => state.practiceDrafts);
+  const practiceDraftUpdatedAt = useAppStore(
+    (state) => state.practiceDraftUpdatedAt,
+  );
   const completedCount = useMemo(
     () =>
       questionTracks.reduce(
@@ -28,7 +33,27 @@ export function QuestionPracticeIntro() {
       ),
     [answers],
   );
-  const hasStarted = completedCount > 0;
+  const resumeState = useMemo(() => {
+    const questions = questionTracks.flatMap((track) => track.priorities);
+    const latestDraftId = Object.entries(practiceDraftUpdatedAt)
+      .filter(([questionId]) => Boolean(practiceDrafts[questionId]))
+      .sort((left, right) => right[1] - left[1])[0]?.[0];
+    const latestDraftIndex = latestDraftId
+      ? questions.findIndex((question) => question.id === latestDraftId)
+      : -1;
+    const nextIncompleteIndex = questions.findIndex(
+      (question) => !answers[question.id],
+    );
+
+    return {
+      draftCount: Object.values(practiceDrafts).filter(Boolean).length,
+      resumeIndex:
+        latestDraftIndex >= 0
+          ? latestDraftIndex
+          : Math.max(0, nextIncompleteIndex),
+    };
+  }, [answers, practiceDraftUpdatedAt, practiceDrafts]);
+  const hasStarted = completedCount > 0 || resumeState.draftCount > 0;
 
   return (
     <section
@@ -36,35 +61,24 @@ export function QuestionPracticeIntro() {
       aria-labelledby="question-practice-intro-title"
       data-testid="question-practice-intro"
     >
-      <div
-        className="learning-intro-hero relative z-10 mx-auto max-w-5xl text-center"
-        data-motion-hero
+      <LearningIntroHero
+        icon={MessageSquareText}
+        eyebrow="질문 연습"
+        title="준비한 이야기를 질문으로 꺼내볼까요?"
+        copy="열두 문제를 한꺼번에 푸는 시험이 아닙니다. 실제 경험을 찾고, 판단의 이유를 말하고, 새로운 상황까지 생각을 넓히는 세 번의 연습입니다."
+        titleId="question-practice-intro-title"
       >
-        <span className="learning-intro-icon mx-auto grid size-13 place-items-center rounded-[1.1rem] bg-[color-mix(in_srgb,var(--surface-raised)_62%,transparent)] text-[var(--brand)] shadow-[inset_0_1px_0_color-mix(in_srgb,white_65%,transparent),var(--shadow-sm)] backdrop-blur-xl lg:size-10 lg:rounded-[.9rem]">
-          <MessageSquareText className="size-6 lg:size-5" />
-        </span>
-        <p className="learning-intro-eyebrow mt-5 font-mono text-[10px] font-black tracking-[.18em] text-[var(--brand)] lg:mt-2">
-          AIHOW QUESTION JOURNEY
-        </p>
-        <h1
-          id="question-practice-intro-title"
-          className="learning-intro-title mx-auto mt-4 max-w-3xl break-keep text-[clamp(1.8rem,4.2vw,3.7rem)] font-black leading-[1.15] tracking-[-.055em] lg:mt-2 lg:text-[clamp(2.3rem,3.4vw,3rem)] lg:leading-[1.06]"
-        >
-          준비한 이야기를
-          <br />
-          질문으로 꺼내볼까요?
-        </h1>
-        <p className="learning-intro-copy mx-auto mt-5 max-w-2xl break-keep text-sm leading-7 text-[var(--text-secondary)] sm:text-base sm:leading-8 lg:mt-3 lg:max-w-none lg:text-sm lg:leading-6 xl:whitespace-nowrap">
-          열두 문제를 한꺼번에 푸는 시험이 아닙니다. 실제 경험을 찾고, 판단의
-          이유를 말하고, 새로운 상황까지 생각을 넓히는 세 번의 연습입니다.
-        </p>
         <div
           className="learning-intro-action mt-6 flex flex-col items-center lg:mt-3"
           data-motion-reveal
         >
           <Link
             href="/applications/demo/practice/session"
-            className="group inline-flex min-h-13 items-center gap-3 rounded-[var(--radius-md)] bg-[var(--text-primary)] px-7 text-sm font-black text-[var(--canvas)] shadow-[0_18px_40px_color-mix(in_srgb,var(--surface-inverse)_16%,transparent)] transition-[transform,background,box-shadow] hover:-translate-y-1 hover:bg-[var(--brand)] hover:shadow-[0_22px_44px_color-mix(in_srgb,var(--brand)_22%,transparent)] lg:min-h-11 lg:px-6 lg:text-xs"
+            className={`group inline-flex min-h-13 items-center gap-3 rounded-[var(--radius-md)] px-7 text-sm font-black text-[var(--canvas)] transition-[transform,background,box-shadow] hover:-translate-y-1 hover:bg-[var(--brand)] hover:shadow-[0_22px_44px_color-mix(in_srgb,var(--brand)_22%,transparent)] lg:min-h-11 lg:px-6 lg:text-xs ${
+              hasStarted
+                ? "bg-[var(--brand)] shadow-[0_18px_42px_color-mix(in_srgb,var(--brand)_26%,transparent)]"
+                : "bg-[var(--text-primary)] shadow-[0_18px_40px_color-mix(in_srgb,var(--surface-inverse)_16%,transparent)]"
+            }`}
             data-motion-item
           >
             {hasStarted ? (
@@ -72,7 +86,9 @@ export function QuestionPracticeIntro() {
             ) : (
               <MessageSquareText className="size-4" />
             )}
-            {hasStarted ? "이어서 질문 연습하기" : "질문 연습 시작하기"}
+            {hasStarted
+              ? `${resumeState.resumeIndex + 1}번째 질문부터 이어하기`
+              : "질문 연습 시작하기"}
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
           </Link>
           <div
@@ -86,10 +102,16 @@ export function QuestionPracticeIntro() {
               <Check className="size-3.5 text-[var(--success)]" /> 답변 자동
               저장
             </span>
-            <span>언제든 이어서 진행</span>
+            <span className={hasStarted ? "font-bold text-[var(--brand)]" : ""}>
+              {resumeState.draftCount > 0
+                ? `작성 중 답변 ${resumeState.draftCount}개 보관됨`
+                : completedCount > 0
+                  ? `완료한 답변 ${completedCount}개 저장됨`
+                  : "언제든 이어서 진행"}
+            </span>
           </div>
         </div>
-      </div>
+      </LearningIntroHero>
 
       <div
         className="practice-question-glass practice-intro-map relative z-10 mx-auto mt-8 w-full max-w-6xl overflow-hidden rounded-[1.6rem] sm:mt-10 lg:mt-4"

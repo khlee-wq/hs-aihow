@@ -3,25 +3,23 @@
 import {
   ArrowLeft,
   ArrowRight,
+  BookOpenCheck,
   Check,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Clock3,
-  Download,
   FileText,
+  Eye,
   Lightbulb,
   Mic2,
-  Printer,
   ScanSearch,
   Scale,
   RotateCcw,
   ShieldCheck,
   Square,
   UploadCloud,
-  Volume2,
   Waves,
-  WandSparkles,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -33,14 +31,22 @@ import { cn, sleep } from "@/lib/utils";
 import { type JourneyStep, useAppStore } from "@/stores/app-store";
 import { StudentCoachGuide } from "@/features/video-guides/student-coach-guide";
 import { QuestionPracticeIntro } from "./question-practice-intro";
+import { LearningIntroHero } from "./learning-intro-hero";
+import {
+  demoFinalNoteDocument,
+  FinalNotePaper,
+  FinalNotePreviewDialog,
+} from "./final-note-preview";
 
 export function StudentWorkspace({ step }: { step: JourneyStep }) {
   const normalizedStep = step;
   const completed = useAppStore((state) => state.completedSteps);
   const meta = journeySteps.find((item) => item.id === normalizedStep)!;
 
+  if (normalizedStep === "essay") return <EssayStep />;
   if (normalizedStep === "practice") return <QuestionPracticeIntro />;
   if (normalizedStep === "mock-interview") return <MockInterviewStep />;
+  if (normalizedStep === "cheat-sheet") return <CheatSheetStep />;
 
   return (
     <div className="grid gap-6 xl:grid-cols-[13rem_minmax(0,1fr)]">
@@ -105,13 +111,7 @@ export function StudentWorkspace({ step }: { step: JourneyStep }) {
             />
           </div>
         </header>
-        {normalizedStep === "essay" ? (
-          <EssayStep />
-        ) : normalizedStep === "analysis" ? (
-          <AnalysisStep />
-        ) : (
-          <CheatSheetStep />
-        )}
+        <AnalysisStep />
       </div>
     </div>
   );
@@ -135,40 +135,35 @@ function EssayStep() {
   };
   if (status === "ready")
     return (
-      <Card className="grid min-h-[30rem] place-items-center text-center">
-        <div className="max-w-md">
-          <span className="mx-auto grid size-16 place-items-center rounded-[var(--radius-lg)] bg-[var(--brand-soft)] text-[var(--brand)]">
-            <UploadCloud className="size-7" />
-          </span>
-          <h2 className="mt-6 text-xl font-black">
-            완성한 자소서를 올려 주세요
-          </h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
-            PDF 파일만 가능하며, 업로드 후 추출된 문장을 직접 확인할 수 있어요.
-            데모 파일은 서버에 저장되지 않습니다.
-          </p>
-          <Button className="mt-7" onClick={simulateUpload}>
+      <section className="practice-session-canvas liquid-glass-group relative grid min-h-[calc(100svh-7rem)] place-items-center overflow-hidden rounded-[2rem] px-5 py-12 text-center sm:px-8">
+        <LearningIntroHero
+          icon={UploadCloud}
+          eyebrow="자소서 원문 확인"
+          title="자소서 문장부터 정확히 확인할게요"
+          copy="업로드한 문장을 먼저 확인한 뒤, 면접에서 근거로 사용할 경험을 찾아갑니다. PDF 원본은 데모 서버에 남지 않아요."
+          titleId="essay-upload-title"
+        >
+          <Button className="mt-7" size="lg" onClick={simulateUpload}>
             <UploadCloud className="size-4" />
             데모 PDF 업로드
           </Button>
-          <p className="mt-4 text-xs text-[var(--text-tertiary)]">
-            PDF · 최대 10MB
+          <p className="mt-4 text-[11px] text-[var(--text-tertiary)]">
+            PDF · 최대 10MB · 추출 후 직접 확인
           </p>
-        </div>
-      </Card>
+        </LearningIntroHero>
+      </section>
     );
   if (status === "uploading")
     return (
-      <Card className="grid min-h-[30rem] place-items-center">
-        <div className="w-full max-w-md text-center">
-          <span className="mx-auto grid size-16 place-items-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
-            <FileText className="size-7 animate-pulse" />
-          </span>
-          <h2 className="mt-6 text-xl font-black">자소서를 읽고 있어요</h2>
-          <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            페이지와 문단 구조를 확인하는 중입니다.
-          </p>
-          <div className="mt-8">
+      <section className="practice-session-canvas liquid-glass-group relative grid min-h-[calc(100svh-7rem)] place-items-center overflow-hidden rounded-[2rem] px-5 py-12">
+        <LearningIntroHero
+          icon={FileText}
+          eyebrow="자소서 확인 중"
+          title="자소서의 흐름을 읽고 있어요"
+          copy="페이지, 문단, 강조할 경험을 순서대로 확인합니다."
+          titleId="essay-processing-title"
+        >
+          <div className="practice-question-glass mt-8 rounded-[1.2rem] p-5 text-left">
             <Progress value={progress} label="텍스트 추출" />
           </div>
           <Button
@@ -178,95 +173,114 @@ function EssayStep() {
           >
             업로드 취소
           </Button>
-        </div>
-      </Card>
+        </LearningIntroHero>
+      </section>
     );
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] bg-[var(--mint-soft)] px-4 py-3 text-sm">
-        <span className="flex items-center gap-2 font-extrabold text-[var(--success)]">
-          <CheckCircle2 className="size-5" />
-          원문 3페이지를 정확히 읽었어요
-        </span>
-        <button
-          onClick={() => setStatus("ready")}
-          className="text-xs font-bold text-[var(--text-secondary)] underline underline-offset-4"
+    <section className="student-one-page-workspace practice-session-canvas liquid-glass-group relative flex flex-col overflow-hidden rounded-[2rem] px-4 py-7 sm:px-7 sm:py-9 lg:px-7">
+      <div className="workspace-page-content relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col">
+        <LearningIntroHero
+          icon={FileText}
+          eyebrow="자소서 원문"
+          title="자소서 문장을 면접의 근거로 바꿔볼게요"
+          copy="추출된 원문을 먼저 확인하고, 설명이 더 필요한 표현은 다음 분석과 질문 연습으로 연결합니다."
+          titleId="essay-workspace-title"
+        />
+
+        <article
+          className="practice-question-glass workspace-page-panel mt-7 flex flex-1 flex-col overflow-hidden rounded-[1.7rem] lg:mt-3"
+          data-motion-reveal
         >
-          다른 파일 올리기
-        </button>
-      </div>
-      <Card className="p-0">
-        <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
-          <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-[var(--radius-sm)] bg-[var(--coral-soft)] text-[var(--coral)]">
-              <FileText className="size-4" />
-            </span>
-            <div>
-              <p className="text-sm font-extrabold">
-                민사고_자기소개서_최종.pdf
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] px-5 py-4 sm:px-7">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-3">
+                <span className="grid size-9 place-items-center rounded-[.85rem] bg-[var(--coral-soft)] text-[var(--coral)]">
+                  <FileText className="size-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-extrabold">
+                    민사고_자기소개서_최종.pdf
+                  </p>
+                  <p className="text-[11px] text-[var(--text-tertiary)]">
+                    3페이지 · 원본 7일 뒤 자동 삭제
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setStatus("ready")}
+                className="cursor-pointer text-xs font-black text-[var(--brand)]"
+              >
+                다른 파일로 바꾸기
+              </button>
+            </div>
+            <WorkspaceStatus
+              icon={CheckCircle2}
+              title="원문 확인 완료"
+              detail="3페이지 · 문단 구조 확인"
+            />
+          </div>
+          <div className="workspace-panel-scroll grid min-h-0 flex-1 overflow-y-auto lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <div className="space-y-5 p-6 text-sm leading-8 sm:p-8 lg:space-y-3 lg:p-6 lg:leading-7">
+              <p>
+                <mark className="bg-[color-mix(in_srgb,var(--brand-soft)_72%,transparent)] px-1.5 py-0.5 text-[var(--text-primary)]">
+                  과학 동아리에서 수질에 따른 식물 생장 차이를 탐구했습니다.
+                </mark>{" "}
+                처음에는 결과가 예상과 달라 당황했지만, 팀원들과 온도와 빛의
+                양을 다시 기록하며 변인을 하나씩 점검했습니다.
               </p>
-              <p className="text-[11px] text-[var(--text-tertiary)]">
-                3페이지 · 원본 7일 뒤 자동 삭제
+              <p>
+                이 과정에서 정답을 빠르게 찾는 것보다 관찰한 내용을 정확히
+                남기고 질문을 바꾸는 일이 중요하다는 것을 배웠습니다.
+              </p>
+              <p>
+                <mark className="bg-[color-mix(in_srgb,var(--warning-soft)_78%,transparent)] px-1.5 py-0.5 text-[var(--text-primary)]">
+                  다양한 탐구 활동을 이어가고 싶어 민사고에 지원했습니다.
+                </mark>{" "}
+                스스로 계획하고 동료와 지식을 나누는 환경에서 과학적 질문을 더
+                깊게 발전시키고 싶습니다.
               </p>
             </div>
-          </div>
-          <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-[10px] font-black">
-            OCR 확인
-          </span>
-        </div>
-        <div className="grid lg:grid-cols-[1fr_18rem]">
-          <article className="space-y-5 p-6 text-sm leading-8 sm:p-8">
-            <p>
-              <mark className="rounded bg-[var(--brand-soft)] px-1 text-[var(--text-primary)]">
-                과학 동아리에서 수질에 따른 식물 생장 차이를 탐구했습니다.
-              </mark>{" "}
-              처음에는 결과가 예상과 달라 당황했지만, 팀원들과 온도와 빛의 양을
-              다시 기록하며 변인을 하나씩 점검했습니다.
-            </p>
-            <p>
-              이 과정에서 정답을 빠르게 찾는 것보다 관찰한 내용을 정확히 남기고
-              질문을 바꾸는 일이 중요하다는 것을 배웠습니다.
-            </p>
-            <p>
-              <mark className="rounded bg-[var(--warning-soft)] px-1 text-[var(--text-primary)]">
-                다양한 탐구 활동을 이어가고 싶어 민사고에 지원했습니다.
-              </mark>{" "}
-              스스로 계획하고 동료와 지식을 나누는 환경에서 과학적 질문을 더
-              깊게 발전시키고 싶습니다.
-            </p>
-          </article>
-          <aside className="border-t border-[var(--border)] bg-[var(--surface-muted)] p-5 lg:border-l lg:border-t-0">
-            <p className="text-xs font-black">확인이 필요한 표현</p>
-            <div className="mt-4 rounded-[var(--radius-sm)] bg-[var(--surface)] p-4">
-              <p className="text-xs font-extrabold text-[var(--warning)]">
-                연결을 더 구체적으로
+            <aside className="border-t border-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] bg-[color-mix(in_srgb,var(--brand-soft)_32%,transparent)] p-6 lg:border-l lg:border-t-0 lg:p-6">
+              <p className="student-kicker text-[9px] text-[var(--brand)]">
+                다음 준비
               </p>
-              <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
+              <h2 className="mt-3 text-lg font-black">
+                한 문장만 더 구체적으로
+              </h2>
+              <p className="mt-3 text-xs leading-6 text-[var(--text-secondary)]">
                 “다양한 탐구 활동”이 내 경험과 어떻게 이어지는지 다음 분석
                 단계에서 살펴볼게요.
               </p>
-            </div>
-            <div className="mt-5 text-xs leading-6 text-[var(--text-secondary)]">
-              <p className="font-extrabold text-[var(--text-primary)]">
-                보관 상태
-              </p>
-              <p className="mt-2">원본: 임시 보관</p>
-              <p>추출문: 이 기기 데모</p>
-              <p>외부 AI 전송: 없음</p>
-            </div>
-          </aside>
-        </div>
-      </Card>
-      <div className="flex justify-end">
-        <Link
-          href="/applications/demo/analysis"
-          onClick={() => completeStep("essay")}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-[var(--text-on-brand)]"
-        >
-          내용 확인 완료 <ArrowRight className="size-4" />
-        </Link>
+              <dl className="mt-7 divide-y divide-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] border-y border-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] text-xs lg:mt-4">
+                {[
+                  ["원본", "임시 보관"],
+                  ["추출문", "이 기기 데모"],
+                  ["외부 전송", "없음"],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex justify-between gap-3 py-3">
+                    <dt className="text-[var(--text-secondary)]">{label}</dt>
+                    <dd className="font-black">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </aside>
+          </div>
+          <footer className="flex flex-col items-center gap-3 border-t border-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] px-5 py-5 text-center sm:px-7 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:py-3">
+            <p className="max-w-xl text-[11px] leading-5 text-[var(--text-secondary)] lg:text-left">
+              표시된 문장은 다음 분석에서 질문의 근거로 사용됩니다.
+            </p>
+            <Link
+              href="/applications/demo/analysis"
+              onClick={() => completeStep("essay")}
+              className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-[var(--text-on-brand)]"
+            >
+              내용 확인 완료 <ArrowRight className="size-4" />
+            </Link>
+            <span className="hidden lg:block" aria-hidden />
+          </footer>
+        </article>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -506,29 +520,13 @@ function MockInterviewStep() {
         aria-labelledby="mock-interview-intro-title"
         data-testid="mock-interview-intro"
       >
-        <div
-          className="learning-intro-hero relative z-10 mx-auto max-w-5xl text-center"
-          data-motion-hero
-        >
-          <span className="learning-intro-icon mx-auto grid size-13 place-items-center rounded-[1.1rem] bg-[color-mix(in_srgb,var(--surface-raised)_62%,transparent)] text-[var(--brand)] shadow-[inset_0_1px_0_color-mix(in_srgb,white_65%,transparent),var(--shadow-sm)] backdrop-blur-xl lg:size-10 lg:rounded-[.9rem]">
-            <Mic2 className="size-6 lg:size-5" />
-          </span>
-          <p className="learning-intro-eyebrow mt-5 font-mono text-[10px] font-black tracking-[.18em] text-[var(--brand)] lg:mt-2">
-            AIHOW SPEAKING PRACTICE
-          </p>
-          <h1
-            id="mock-interview-intro-title"
-            className="learning-intro-title mx-auto mt-4 max-w-3xl break-keep text-[clamp(1.8rem,4.2vw,3.7rem)] font-black leading-[1.15] tracking-[-.055em] lg:mt-2 lg:text-[clamp(2.3rem,3.4vw,3rem)] lg:leading-[1.06]"
-          >
-            오늘은 어떤 방식으로
-            <br />
-            말하기를 연습할까요?
-          </h1>
-          <p className="learning-intro-copy mx-auto mt-5 max-w-2xl break-keep text-sm leading-7 text-[var(--text-secondary)] sm:text-base sm:leading-8 lg:mt-3 lg:max-w-none lg:text-sm lg:leading-6 xl:whitespace-nowrap">
-            난이도를 고르는 대신, 지금 보완하고 싶은 말하기 감각을 선택하세요.
-            같은 경험도 질문 방식에 따라 다른 답을 끌어낼 수 있어요.
-          </p>
-        </div>
+        <LearningIntroHero
+          icon={Mic2}
+          eyebrow="말하기 연습"
+          title="오늘은 어떤 방식으로 말하기를 연습할까요?"
+          copy="난이도를 고르는 대신, 지금 보완하고 싶은 말하기 감각을 선택하세요. 같은 경험도 질문 방식에 따라 다른 답을 끌어낼 수 있어요."
+          titleId="mock-interview-intro-title"
+        />
 
         <InterviewFlow phase={phase} round={round} />
 
@@ -837,152 +835,83 @@ function Metric({ title, value }: { title: string; value: string }) {
 function CheatSheetStep() {
   const completeStep = useAppStore((state) => state.completeStep);
   const [saved, setSaved] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  const markAsExported = () => {
+    setSaved(true);
+    completeStep("cheat-sheet");
+  };
+
   return (
-    <div className="space-y-5">
-      <div className="no-print flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2 rounded-full bg-[var(--mint-soft)] px-4 py-2 text-xs font-extrabold text-[var(--success)]">
-          <CheckCircle2 className="size-4" />
-          준비 결과를 한 장으로 정리했어요
-        </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => window.print()}>
-            <Printer className="size-4" />
-            인쇄
-          </Button>
-          <Button
-            onClick={() => {
-              setSaved(true);
-              completeStep("cheat-sheet");
-            }}
+    <section className="student-one-page-workspace practice-session-canvas liquid-glass-group relative flex flex-col overflow-hidden rounded-[2rem] px-4 py-7 sm:px-7 sm:py-9 lg:px-7">
+      <div className="workspace-page-content relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col">
+        <div className="no-print">
+          <LearningIntroHero
+            icon={BookOpenCheck}
+            eyebrow="면접 전 최종 정리"
+            title="면접 직전, 이 한 장만 기억하세요"
+            copy="자소서에서 찾은 근거와 질문 연습, 말하기 피드백을 마지막 확인 순서로 정리했습니다."
+            titleId="cheat-sheet-workspace-title"
           >
-            <Download className="size-4" />
-            PDF 저장
-          </Button>
-        </div>
-      </div>
-      <article className="surface mx-auto max-w-[52rem] overflow-hidden bg-[var(--surface)] p-6 sm:p-10">
-        <header className="flex flex-col justify-between gap-5 border-b-2 border-[var(--text-primary)] pb-7 sm:flex-row sm:items-end">
-          <div>
-            <p className="eyebrow">AIHOW Final note</p>
-            <h2 className="mt-3 text-3xl font-black tracking-[-.05em]">
-              김하우의 면접 한 장
-            </h2>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              민족사관고등학교 · 2027학년도
-            </p>
-          </div>
-          <div className="text-left text-xs leading-6 text-[var(--text-secondary)] sm:text-right">
-            <p>
-              완성도 <strong className="text-[var(--text-primary)]">84%</strong>
-            </p>
-            <p>최근 연습 2026.08.01</p>
-          </div>
-        </header>
-        <section className="mt-8">
-          <NoteTitle number="01" title="나를 설명하는 한 문장" />
-          <blockquote className="mt-4 rounded-[var(--radius-md)] bg-[var(--brand-soft)] p-5 text-lg font-black leading-8 text-[var(--brand)]">
-            “결과보다 과정을 기록하며, 다음 질문을 스스로 만드는 탐구자”
-          </blockquote>
-        </section>
-        <div className="mt-8 grid gap-8 sm:grid-cols-2">
-          <section>
-            <NoteTitle number="02" title="꼭 말할 경험 3가지" />
-            <ol className="mt-4 grid gap-4">
-              {[
-                "수질과 식물 생장 실험에서 변인을 다시 기록한 경험",
-                "환경 프로젝트에서 팀의 기준을 합의한 경험",
-                "실패한 가설을 질문으로 바꾸어 탐구를 이어간 경험",
-              ].map((item, index) => (
-                <li key={item} className="flex gap-3 text-sm leading-6">
-                  <span className="font-black text-[var(--brand)]">
-                    {index + 1}
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ol>
-          </section>
-          <section>
-            <NoteTitle number="03" title="학교와 연결할 키워드" />
-            <div className="mt-4 flex flex-wrap gap-2">
-              {[
-                "자율 탐구",
-                "공동체",
-                "과정 기록",
-                "질문 확장",
-                "지식 나눔",
-              ].map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-[var(--surface-muted)] px-3 py-2 text-xs font-extrabold"
-                >
-                  #{tag}
-                </span>
-              ))}
+            <div className="mt-5 flex flex-wrap justify-center gap-2 lg:mt-2">
+              <Button
+                variant="secondary"
+                className="lg:min-h-10 lg:px-4 lg:text-xs"
+                onClick={() => setPreviewOpen(true)}
+              >
+                <Eye className="size-4" />
+                A4 미리보기
+              </Button>
+              <Button
+                className="lg:min-h-10 lg:px-4 lg:text-xs"
+                onClick={() => setPreviewOpen(true)}
+              >
+                PDF로 저장
+              </Button>
             </div>
-          </section>
+          </LearningIntroHero>
         </div>
-        <section className="mt-8 border-t border-[var(--border)] pt-8">
-          <NoteTitle number="04" title="답변할 때 기억할 것" />
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <Reminder
-              icon={Clock3}
-              title="70초 안에"
-              text="상황보다 행동에 시간을 쓰기"
-            />
-            <Reminder
-              icon={WandSparkles}
-              title="근거부터"
-              text="자소서 문장과 내 행동 연결"
-            />
-            <Reminder
-              icon={Volume2}
-              title="한 박자 쉬기"
-              text="꼬리질문을 끝까지 듣기"
-            />
+
+        <FinalNotePaper document={demoFinalNoteDocument} />
+        <FinalNotePreviewDialog
+          document={demoFinalNoteDocument}
+          open={previewOpen}
+          onClose={() => setPreviewOpen(false)}
+          onExport={markAsExported}
+        />
+        {saved ? (
+          <div
+            role="status"
+            className="surface-contrast no-print fixed bottom-24 left-1/2 z-50 -translate-x-1/2 px-5 py-3 text-xs font-bold"
+          >
+            파이널 노트를 저장했어요
           </div>
-        </section>
-        <footer className="mt-9 flex items-center justify-between border-t border-[var(--border)] pt-5 text-[10px] text-[var(--text-tertiary)]">
-          <span>AIHOW · 학생이 직접 작성하고 연습한 내용을 요약했습니다.</span>
-          <span>1 / 1</span>
-        </footer>
-      </article>
-      {saved ? (
-        <div
-          role="status"
-          className="surface-contrast no-print fixed bottom-24 left-1/2 z-50 -translate-x-1/2 px-5 py-3 text-xs font-bold"
-        >
-          파이널 노트를 저장했어요
-        </div>
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
-function NoteTitle({ number, title }: { number: string; title: string }) {
-  return (
-    <h3 className="flex items-center gap-3 text-sm font-black">
-      <span className="text-[var(--brand)]">{number}</span>
-      {title}
-    </h3>
-  );
-}
-function Reminder({
+function WorkspaceStatus({
+  detail,
   icon: Icon,
   title,
-  text,
+  value,
 }: {
-  icon: typeof Clock3;
+  detail: string;
+  icon?: LucideIcon;
   title: string;
-  text: string;
+  value?: string;
 }) {
   return (
-    <div className="rounded-[var(--radius-md)] border border-[var(--border)] p-4">
-      <Icon className="size-5 text-[var(--brand)]" />
-      <p className="mt-4 text-sm font-black">{title}</p>
-      <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-        {text}
-      </p>
+    <div className="practice-context-glass flex shrink-0 items-center gap-3 rounded-[1rem] px-3.5 py-1.5 text-left text-xs">
+      <span className="grid size-8 place-items-center rounded-full bg-[var(--mint-soft)] font-mono text-[11px] font-black text-[var(--success)]">
+        {Icon ? <Icon className="size-4" /> : value}
+      </span>
+      <div className="leading-5 text-[var(--text-secondary)]">
+        <p className="font-black text-[var(--text-primary)]">{title}</p>
+        <p>{detail}</p>
+      </div>
     </div>
   );
 }

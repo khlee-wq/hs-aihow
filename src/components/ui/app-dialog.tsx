@@ -45,10 +45,12 @@ export function AppDialog({
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     const previousPaddingRight = document.body.style.paddingRight;
-    const scrollbarGap = window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarGap =
+      window.innerWidth - document.documentElement.clientWidth;
 
     document.body.style.overflow = "hidden";
-    if (scrollbarGap > 0) document.body.style.paddingRight = `${scrollbarGap}px`;
+    if (scrollbarGap > 0)
+      document.body.style.paddingRight = `${scrollbarGap}px`;
 
     const focusFrame = window.requestAnimationFrame(() => {
       if (!dialog || dialog.contains(document.activeElement)) return;
@@ -95,7 +97,7 @@ export function AppDialog({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain bg-[var(--surface-overlay)] p-0 backdrop-blur-[1px] sm:items-center sm:p-6"
+      className="viewport-overlay fixed z-[100] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain bg-[var(--surface-overlay)] p-0 backdrop-blur-[1px] sm:items-center sm:p-6"
       role="presentation"
       data-testid="app-dialog-overlay"
       onMouseDown={(event) => {
@@ -105,11 +107,13 @@ export function AppDialog({
       <section
         ref={dialogRef}
         className={cn(
-          "surface max-h-[min(92dvh,48rem)] w-full overflow-y-auto rounded-b-none bg-[var(--surface)] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-md)] outline-none sm:rounded-[var(--radius-lg)] sm:p-7",
+          "surface max-h-[min(92dvh,48rem)] w-full overflow-y-auto overscroll-contain rounded-b-none bg-[var(--surface)] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-md)] outline-none [scrollbar-gutter:stable] sm:rounded-[var(--radius-lg)] sm:p-7",
           purpose === "notice" && "max-w-xl",
           purpose === "confirmation" && "max-w-md",
-          purpose === "danger" && "max-w-md border-[color-mix(in_srgb,var(--danger)_32%,var(--border))]",
-          purpose === "session" && "max-w-md border-[color-mix(in_srgb,var(--warning)_32%,var(--border))]",
+          purpose === "danger" &&
+            "max-w-md border-[color-mix(in_srgb,var(--danger)_32%,var(--border))]",
+          purpose === "session" &&
+            "max-w-md border-[color-mix(in_srgb,var(--warning)_32%,var(--border))]",
           className,
         )}
         role="dialog"
@@ -121,7 +125,10 @@ export function AppDialog({
         <div className="flex items-start justify-between gap-4">
           <div>
             {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-            <h2 id={titleId} className="mt-2 text-xl font-black tracking-[-.035em]">
+            <h2
+              id={titleId}
+              className="mt-2 text-xl font-black tracking-[-.035em]"
+            >
               {title}
             </h2>
           </div>

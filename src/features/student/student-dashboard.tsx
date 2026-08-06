@@ -29,7 +29,9 @@ import { useAppStore } from "@/stores/app-store";
 import { type DashboardSnapshot, nextStepCopy } from "./dashboard-model";
 import { AdmissionsOutlook } from "./admissions-outlook";
 import {
+  DashboardHeaderSkeleton,
   DashboardInlineSkeleton,
+  DashboardInsightSkeleton,
   DashboardMetricSkeleton,
   ReadinessDataSkeleton,
   WeeklyActivityDataSkeleton,
@@ -106,66 +108,48 @@ export function StudentDashboard({
         className="grid gap-7 border-b border-[var(--border)] pb-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
         data-motion-reveal
       >
-        <div data-motion-item>
-          <p className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[var(--brand)]">
-            <span className="size-1.5 rounded-full bg-[var(--brand)]" />
-            Prep control · 2027
-          </p>
-          <h1 className="mt-4 max-w-4xl break-keep text-balance text-[clamp(1.85rem,4vw,3rem)] font-bold leading-[1.08] tracking-[-.052em]">
-            {name ? name : <DashboardInlineSkeleton className="w-[5.5em]" />}
-            님, 다음은 {nextStep.title}입니다.
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            {isLoading ? (
-              <>
-                현재 데이터에서 가장 영향이 큰 한 가지부터 제안합니다. 마지막
-                동기화는 <DashboardInlineSkeleton />
-                입니다.
-              </>
-            ) : data ? (
-              <>
-                현재 데이터에서 가장 영향이 큰 한 가지부터 제안합니다. 마지막
-                동기화는 {data.savedAt}입니다.
-              </>
-            ) : (
-              "아직 연결된 준비 데이터가 없습니다. 첫 단계를 시작하면 이 화면에 학습 신호가 쌓입니다."
-            )}
-          </p>
-        </div>
-        <div
-          className="surface overflow-hidden grid grid-cols-2 bg-[var(--surface)] text-xs md:min-w-[17rem]"
-          data-motion-item
-        >
-          <div className="border-r border-[var(--border)] px-4 py-3.5">
-            <p className="font-mono text-[9px] uppercase tracking-[.12em] text-[var(--text-tertiary)]">
-              Target
-            </p>
-            <p className="mt-1.5 flex items-center gap-2 font-bold">
-              <CalendarDays className="size-3.5 text-[var(--warning)]" />
-              {isLoading ? (
-                <DashboardInlineSkeleton />
-              ) : data ? (
-                `D-${data.daysLeft}`
-              ) : (
-                "미등록"
-              )}
-            </p>
-          </div>
-          <div className="px-4 py-3.5">
-            <p className="font-mono text-[9px] uppercase tracking-[.12em] text-[var(--text-tertiary)]">
-              Workspace
-            </p>
-            <p className="mt-1.5 truncate font-bold">
-              {isLoading ? (
-                <DashboardInlineSkeleton />
-              ) : data ? (
-                data.schoolShort
-              ) : (
-                "미등록"
-              )}
-            </p>
-          </div>
-        </div>
+        {isLoading ? (
+          <DashboardHeaderSkeleton />
+        ) : (
+          <>
+            <div data-motion-item>
+              <p className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[.16em] text-[var(--brand)]">
+                <span className="size-1.5 rounded-full bg-[var(--brand)]" />
+                Prep control · 2027
+              </p>
+              <h1 className="mt-4 max-w-4xl break-keep text-balance text-[clamp(1.85rem,4vw,3rem)] font-bold leading-[1.08] tracking-[-.052em]">
+                {name ?? "학생"}님, 다음은 {nextStep.title}입니다.
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+                {data
+                  ? `현재 데이터에서 가장 영향이 큰 한 가지부터 제안합니다. 마지막 동기화는 ${data.savedAt}입니다.`
+                  : "아직 연결된 준비 데이터가 없습니다. 첫 단계를 시작하면 이 화면에 학습 신호가 쌓입니다."}
+              </p>
+            </div>
+            <div
+              className="surface overflow-hidden grid grid-cols-2 bg-[var(--surface)] text-xs md:min-w-[17rem]"
+              data-motion-item
+            >
+              <div className="border-r border-[var(--border)] px-4 py-3.5">
+                <p className="font-mono text-[9px] uppercase tracking-[.12em] text-[var(--text-tertiary)]">
+                  Target
+                </p>
+                <p className="mt-1.5 flex items-center gap-2 font-bold">
+                  <CalendarDays className="size-3.5 text-[var(--warning)]" />
+                  {data ? `D-${data.daysLeft}` : "미등록"}
+                </p>
+              </div>
+              <div className="px-4 py-3.5">
+                <p className="font-mono text-[9px] uppercase tracking-[.12em] text-[var(--text-tertiary)]">
+                  Workspace
+                </p>
+                <p className="mt-1.5 truncate font-bold">
+                  {data ? data.schoolShort : "미등록"}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </header>
 
       <section
@@ -263,9 +247,7 @@ export function StudentDashboard({
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <Link
-                href={
-                  nextStep.href
-                }
+                href={nextStep.href}
                 className="inline-flex min-h-11 items-center gap-2 bg-[var(--text-primary)] px-5 text-sm font-bold text-[var(--canvas)] transition-[transform,background] hover:-translate-y-0.5 hover:bg-[var(--brand)]"
               >
                 {nextStep.title} 시작하기
@@ -339,11 +321,17 @@ export function StudentDashboard({
               <Sparkles className="size-3.5 text-[var(--brand)]" />
               AI 해석
             </p>
-            <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
-              {data
-                ? "근거 선택은 안정적입니다. 오늘은 답변 구조를 한 번 만들고 소리 내어 말하는 것까지 완료하세요."
-                : "첫 준비 데이터를 연결하면 다음 행동의 이유와 보완 순서를 설명해 드립니다."}
-            </p>
+            <div className="text-xs leading-5 text-[var(--text-secondary)]">
+              {isLoading ? (
+                <DashboardInsightSkeleton />
+              ) : (
+                <p className="mt-2">
+                  {data
+                    ? "근거 선택은 안정적입니다. 오늘은 답변 구조를 한 번 만들고 소리 내어 말하는 것까지 완료하세요."
+                    : "첫 준비 데이터를 연결하면 다음 행동의 이유와 보완 순서를 설명해 드립니다."}
+                </p>
+              )}
+            </div>
           </div>
         </aside>
       </section>
@@ -430,7 +418,11 @@ export function StudentDashboard({
                 School
               </p>
               <p className="mt-2 truncate text-sm font-bold">
-                {data?.schoolShort ?? "관심 학교"}
+                {isLoading ? (
+                  <DashboardInlineSkeleton className="w-16" />
+                ) : (
+                  (data?.schoolShort ?? "관심 학교")
+                )}
               </p>
             </div>
             <div className="p-4">

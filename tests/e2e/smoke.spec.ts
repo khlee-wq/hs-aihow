@@ -15,7 +15,9 @@ async function visit(page: Page, path: string) {
 async function dismissFirstVisitTour(page: Page) {
   const dialog = page.getByRole("dialog", { name: /시작 안내 \d+단계/ });
   const opened = await dialog
-    .waitFor({ state: "visible", timeout: 1_500 })
+    // 가입 직후의 안내는 대시보드 데이터와 함께 준비됩니다. 병렬 CI에서도
+    // 안내가 열린 뒤 닫고 다음 상호작용을 검증하도록 충분히 기다립니다.
+    .waitFor({ state: "visible", timeout: 5_000 })
     .then(() => true)
     .catch(() => false);
   if (!opened) return;
@@ -310,7 +312,7 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(page.getByText("탐구 태도", { exact: true })).toBeVisible();
   await expect(page.getByText("협업 경험", { exact: true })).toBeVisible();
   const sessionLink = page.getByRole("link", {
-    name: /질문 연습 시작하기|이어서 질문 연습하기/,
+    name: /질문 연습 시작하기|\d+번째 질문부터 이어하기/,
   });
   if (testInfo.project.name === "mobile") await sessionLink.tap();
   else await sessionLink.click();

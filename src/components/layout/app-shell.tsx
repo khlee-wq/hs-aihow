@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   BarChart3,
+  BookmarkCheck,
   BookOpenText,
   FileText,
   Gauge,
@@ -14,7 +16,9 @@ import {
   School,
   ShieldCheck,
   Sparkles,
+  CloudCheck,
   Video,
+  type LucideIcon,
 } from "lucide-react";
 import type { DemoSession } from "@/lib/session-shared";
 import { cn } from "@/lib/utils";
@@ -24,7 +28,12 @@ import { ProfileMenu } from "./profile-menu";
 import { ThemeToggle } from "./theme-toggle";
 
 const studentNav = [
-  { href: "/dashboard", label: "오늘", icon: LayoutDashboard },
+  {
+    href: "/dashboard",
+    label: "준비 현황",
+    mobileLabel: "준비",
+    icon: LayoutDashboard,
+  },
   { href: "/applications/demo/essay", label: "자소서", icon: FileText },
   {
     href: "/applications/demo/practice",
@@ -40,17 +49,146 @@ const studentNav = [
 ];
 
 const adminNav = [
-  { href: "/admin", label: "수업 개요", icon: Gauge },
-  { href: "/admin/questions", label: "질문 설계", icon: MessageSquareText },
-  { href: "/admin/prompts", label: "수업 기준", icon: Sparkles },
-  { href: "/admin/videos", label: "영상 연결", icon: Video },
-  { href: "/admin/schools", label: "학교 데이터", icon: School },
-  { href: "/admin/metrics", label: "학습 인사이트", icon: BarChart3 },
+  { href: "/admin", label: "수업 개요", mobileLabel: "수업", icon: Gauge },
+  {
+    href: "/admin/questions",
+    label: "질문 설계",
+    mobileLabel: "질문",
+    icon: MessageSquareText,
+  },
+  {
+    href: "/admin/prompts",
+    label: "수업 기준",
+    mobileLabel: "기준",
+    icon: Sparkles,
+  },
+  {
+    href: "/admin/videos",
+    label: "영상 연결",
+    mobileLabel: "영상",
+    icon: Video,
+  },
+  {
+    href: "/admin/schools",
+    label: "학교 데이터",
+    mobileLabel: "학교",
+    icon: School,
+  },
+  {
+    href: "/admin/metrics",
+    label: "학습 인사이트",
+    mobileLabel: "인사이트",
+    icon: BarChart3,
+  },
 ];
 
 function isActive(pathname: string, href: string) {
   if (href === "/admin" || href === "/dashboard") return pathname === href;
   return pathname.startsWith(href);
+}
+
+type MobileNavItem = {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+  mobileLabel?: string;
+};
+
+function MobileBottomNavigation({
+  ariaLabel,
+  items,
+  pathname,
+  testId,
+  tour,
+}: {
+  ariaLabel: string;
+  items: MobileNavItem[];
+  pathname: string;
+  testId: string;
+  tour: string;
+}) {
+  const [motion, setMotion] = useState<"idle" | "moving">("idle");
+  const [direction, setDirection] = useState<"forward" | "backward">("forward");
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousPathname = useRef(pathname);
+  const activeIndex = Math.max(
+    items.findIndex(({ href }) => isActive(pathname, href)),
+    0,
+  );
+
+  useEffect(() => {
+    if (previousPathname.current === pathname) return;
+    const previousIndex = Math.max(
+      items.findIndex(({ href }) => isActive(previousPathname.current, href)),
+      0,
+    );
+    previousPathname.current = pathname;
+    if (timer.current) clearTimeout(timer.current);
+    setDirection(activeIndex >= previousIndex ? "forward" : "backward");
+    setMotion("moving");
+    timer.current = setTimeout(() => setMotion("idle"), 560);
+  }, [activeIndex, items, pathname]);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
+  const moveHighlight = (targetIndex: number, active: boolean) => {
+    if (active) return;
+    if (timer.current) clearTimeout(timer.current);
+    setDirection(targetIndex >= activeIndex ? "forward" : "backward");
+    setMotion("moving");
+    timer.current = setTimeout(() => setMotion("idle"), 720);
+  };
+
+  return (
+    <nav
+      className="liquid-bottom-nav app-navigation fixed inset-x-3 bottom-[max(.65rem,env(safe-area-inset-bottom))] z-40 grid px-1.5 py-1.5 lg:hidden"
+      aria-label={ariaLabel}
+      data-testid={testId}
+      data-tour={tour}
+      data-active-index={activeIndex}
+      data-nav-direction={direction}
+      data-nav-motion={motion}
+      style={
+        {
+          "--liquid-nav-count": items.length,
+          "--liquid-nav-index": activeIndex,
+        } as CSSProperties
+      }
+    >
+      <span className="liquid-nav-highlight" aria-hidden="true" />
+      {items.map(({ href, label, mobileLabel, icon: Icon }, index) => {
+        const active = isActive(pathname, href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            aria-label={label}
+            onClick={() => moveHighlight(index, active)}
+            className={cn(
+              "liquid-nav-item relative z-10 grid min-h-[3.35rem] min-w-0 place-items-center gap-0.5 px-0.5 text-[9.5px] font-semibold tracking-[-.01em]",
+              active ? "text-[var(--brand)]" : "text-[var(--text-tertiary)]",
+            )}
+            aria-current={active ? "page" : undefined}
+          >
+            <Icon
+              data-menu-icon
+              className={cn(
+                "size-[17px] transition-transform duration-300",
+                active && "-translate-y-px",
+              )}
+              strokeWidth={active ? 2.6 : 1.9}
+            />
+            <span className="max-w-full truncate">{mobileLabel ?? label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
 }
 
 export function AppShell({
@@ -91,7 +229,10 @@ function StudentShell({
   const isPracticeSession = pathname.endsWith("/practice/session");
   const isLearningIntro =
     pathname.endsWith("/practice") || pathname.endsWith("/mock-interview");
-
+  const isCompactWorkspace =
+    isLearningIntro ||
+    pathname.endsWith("/essay") ||
+    pathname.endsWith("/cheat-sheet");
   if (isPracticeSession) {
     return (
       <div
@@ -121,11 +262,16 @@ function StudentShell({
                 민사고 통합 패키지
               </p>
             </div>
+            <span className="ml-auto hidden items-center gap-1.5 text-[10px] font-bold text-[var(--success)] sm:inline-flex">
+              <CloudCheck className="size-3.5" /> 입력 내용 자동 저장
+            </span>
             <Link
               href="/dashboard"
-              className="ml-auto inline-flex min-h-10 items-center px-3 text-xs font-bold text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] sm:px-4"
+              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-[var(--radius-sm)] bg-[var(--brand-soft)] px-3 text-xs font-black text-[var(--brand)] shadow-[inset_0_1px_0_color-mix(in_srgb,white_52%,transparent)] transition-[transform,background] hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--brand-soft)_74%,var(--surface))] sm:px-4"
             >
-              나중에 이어하기
+              <BookmarkCheck className="size-3.5" />
+              <span className="sm:hidden">저장 후 나가기</span>
+              <span className="hidden sm:inline">저장하고 나중에 이어하기</span>
             </Link>
           </div>
         </header>
@@ -143,7 +289,7 @@ function StudentShell({
       data-testid="student-shell"
     >
       <header className="app-navigation pointer-events-none sticky top-3 z-40 px-[var(--space-page)]">
-        <div className="liquid-glass pointer-events-auto mx-auto flex h-16 max-w-[96rem] items-center gap-4 rounded-[1.25rem] px-4 sm:px-5">
+        <div className="liquid-glass workspace-wrap pointer-events-auto flex h-16 items-center gap-4 rounded-[1.25rem] px-4 sm:px-5">
           <Link
             href="/dashboard"
             className="flex shrink-0 items-center gap-2.5 leading-none"
@@ -213,43 +359,19 @@ function StudentShell({
       <main
         className={cn(
           "px-[var(--space-page)] pb-28 pt-8",
-          isLearningIntro ? "lg:pb-3 lg:pt-5" : "lg:pb-14 lg:pt-10",
+          isCompactWorkspace ? "lg:pb-2 lg:pt-4" : "lg:pb-14 lg:pt-10",
         )}
       >
-        <div className="mx-auto max-w-[92rem]">{children}</div>
+        <div className="workspace-wrap">{children}</div>
       </main>
 
-      <nav
-        className="liquid-bottom-nav app-navigation fixed inset-x-3 bottom-[max(.65rem,env(safe-area-inset-bottom))] z-40 grid grid-cols-5 px-1.5 py-1.5 lg:hidden"
-        aria-label="모바일 학생 메뉴"
-        data-testid="student-mobile-nav"
-        data-tour="student-menu"
-      >
-        {studentNav.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "liquid-nav-item relative grid min-h-[3.35rem] place-items-center gap-0.5 text-[9.5px] font-semibold tracking-[-.01em]",
-                active ? "text-[var(--brand)]" : "text-[var(--text-tertiary)]",
-              )}
-              aria-current={active ? "page" : undefined}
-            >
-              <Icon
-                data-menu-icon
-                className={cn(
-                  "size-[17px] transition-transform duration-300",
-                  active && "-translate-y-px",
-                )}
-                strokeWidth={active ? 2.6 : 1.9}
-              />
-              <span>{label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      <MobileBottomNavigation
+        ariaLabel="모바일 학생 메뉴"
+        items={studentNav}
+        pathname={pathname}
+        testId="student-mobile-nav"
+        tour="student-menu"
+      />
       <SessionLifecycle role="user" />
     </div>
   );
@@ -317,35 +439,16 @@ function ExpertShell({
           <ProfileMenu session={session} />
         </div>
       </header>
-      <nav
-        className="teacher-navigation liquid-glass app-navigation no-scrollbar sticky top-[5.25rem] z-20 mx-3 flex max-w-[calc(100vw-1.5rem)] gap-1 overflow-x-auto rounded-[1rem] p-1.5 lg:hidden"
-        aria-label="교사 메뉴"
-        data-testid="expert-mobile-nav"
-        data-tour="admin-menu"
-      >
-        {adminNav.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-[var(--radius-sm)] px-3 text-xs font-bold",
-                active
-                  ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                  : "text-[var(--text-secondary)]",
-              )}
-              aria-current={active ? "page" : undefined}
-            >
-              <Icon data-menu-icon className="size-4" />
-              {label}
-            </Link>
-          );
-        })}
-      </nav>
-      <main className="px-[var(--space-page)] py-8 pb-28 md:py-10 md:pb-12">
+      <main className="px-[var(--space-page)] py-8 pb-28 md:py-10 lg:pb-12">
         <div className="mx-auto max-w-[92rem]">{children}</div>
       </main>
+      <MobileBottomNavigation
+        ariaLabel="모바일 교사 메뉴"
+        items={adminNav}
+        pathname={pathname}
+        testId="expert-mobile-nav"
+        tour="admin-menu"
+      />
       <SessionLifecycle role="admin" />
     </div>
   );
