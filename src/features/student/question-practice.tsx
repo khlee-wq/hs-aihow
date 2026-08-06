@@ -15,7 +15,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppDialog } from "@/components/ui/app-dialog";
 import { cn } from "@/lib/utils";
@@ -56,8 +57,6 @@ const questionOrderLabels = [
   "생각을 넓힐 질문",
 ] as const;
 
-const questionTutorialStorageKey = "aihow-question-practice-tutorial-seen";
-
 const coachSteps = [
   {
     icon: FileText,
@@ -81,9 +80,12 @@ const coachSteps = [
 ] as const;
 
 export function QuestionPractice() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [trackIndex, setTrackIndex] = useState(0);
   const [priorityIndex, setPriorityIndex] = useState(0);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isFocusModeOpen, setIsFocusModeOpen] = useState(false);
+  const hasOpenedFocusRoute = useRef(false);
   const answers = useAppStore((state) => state.draftAnswers);
   const saveAnswer = useAppStore((state) => state.saveAnswer);
   const completeStep = useAppStore((state) => state.completeStep);
@@ -107,20 +109,38 @@ export function QuestionPractice() {
   const currentOrderLabel = questionOrderLabels[priorityIndex];
 
   useEffect(() => {
-    if (window.localStorage.getItem(questionTutorialStorageKey)) return;
-    const openTutorial = window.requestAnimationFrame(() => {
-      setIsTutorialOpen(true);
+    if (searchParams.get("focus") !== "1" || hasOpenedFocusRoute.current) {
+      return;
+    }
+    hasOpenedFocusRoute.current = true;
+    const openFocusMode = window.requestAnimationFrame(() => {
+      const next = questionTracks
+        .flatMap((item, itemIndex) =>
+          item.priorities.map((priority, nextPriorityIndex) => ({
+            item,
+            itemIndex,
+            priority,
+            nextPriorityIndex,
+          })),
+        )
+        .find(
+          ({ item, priority, nextPriorityIndex }) =>
+            isQuestionUnlocked(item, nextPriorityIndex, answers) &&
+            !answers[priority.id],
+        );
+      if (next) {
+        setTrackIndex(next.itemIndex);
+        setPriorityIndex(next.nextPriorityIndex);
+      }
+      setIsFocusModeOpen(true);
     });
-    return () => window.cancelAnimationFrame(openTutorial);
-  }, []);
+    return () => window.cancelAnimationFrame(openFocusMode);
+  }, [answers, searchParams]);
 
-  const closeTutorial = ({ focusAnswer = false } = {}) => {
-    window.localStorage.setItem(questionTutorialStorageKey, "true");
-    setIsTutorialOpen(false);
-    if (focusAnswer) {
-      window.requestAnimationFrame(() => {
-        document.getElementById("question-answer")?.focus();
-      });
+  const closeFocusMode = () => {
+    setIsFocusModeOpen(false);
+    if (searchParams.get("focus") === "1") {
+      router.replace("/applications/demo/practice", { scroll: false });
     }
   };
 
@@ -197,11 +217,11 @@ export function QuestionPractice() {
               <span>AI가 도와주는 순서</span>
               <button
                 type="button"
-                onClick={() => setIsTutorialOpen(true)}
+                onClick={() => setIsFocusModeOpen(true)}
                 className="inline-flex cursor-pointer items-center gap-1.5 text-[var(--mint)] hover:text-white"
                 aria-haspopup="dialog"
               >
-                <Sparkles className="size-3.5" /> 연습 안내 보기
+                <Sparkles className="size-3.5" /> 집중해서 답하기
               </button>
             </div>
             <div className="mt-4 grid gap-2">
@@ -351,7 +371,10 @@ export function QuestionPractice() {
           </div>
         </aside>
 
-        <article className="min-w-0 p-5 sm:p-7 lg:p-9">
+        <article
+          className="min-w-0 p-5 sm:p-7 lg:p-9"
+          aria-hidden={isFocusModeOpen}
+        >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-[var(--coral-soft)] px-3 py-1.5 text-[10px] font-black text-[var(--coral)]">
@@ -550,62 +573,106 @@ export function QuestionPractice() {
       </div>
 
       <AppDialog
-        open={isTutorialOpen}
-        onClose={() => closeTutorial()}
-        eyebrow="질문 연습 안내"
-        title="외운 답 대신, 내 판단이 드러나는 이야기를 만들어요"
-        className="max-w-2xl"
+        open={isFocusModeOpen}
+        onClose={closeFocusMode}
+        eyebrow={`${track.category} · ${String(priorityIndex + 1).padStart(2, "0")}/${String(track.priorities.length).padStart(2, "0")}`}
+        title={currentQuestion}
+        className="max-w-3xl"
       >
-        <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
-          전문가의 면접 기준을 따라 자소서 속 장면을 꺼내고, 그때의 판단과 다음
-          행동까지 차례로 정리합니다. 한 질문씩 답하면 다음 질문이 자연스럽게
-          이어집니다.
-        </p>
-        <div className="mt-6 rounded-[var(--radius-md)] bg-[var(--brand-soft)] p-4 sm:p-5">
-          <p className="font-mono text-[10px] font-black tracking-[.16em] text-[var(--brand)]">
-            이번 수업의 출발점
-          </p>
-          <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-lg font-black">{track.category}</h3>
-            <span className="text-xs font-bold text-[var(--text-secondary)]">
+        <div className="mt-4 grid gap-3 rounded-[var(--radius-md)] bg-[var(--brand-soft)] p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+          <div>
+            <p className="text-xs font-black text-[var(--brand)]">
+              {question.label} · {question.intent}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
               {track.source}
-            </span>
+            </p>
+          </div>
+          <span className="rounded-full bg-[var(--surface)] px-2.5 py-1 text-[10px] font-black text-[var(--text-secondary)]">
+            {currentOrderLabel}
+          </span>
+        </div>
+
+        <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--border)] p-4">
+          <div className="flex items-center gap-2 text-xs font-black">
+            <Sparkles className="size-4 text-[var(--brand)]" /> 답변을 만들 때
+            확인할 점
           </div>
           <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
-            {track.summary}
+            {question.guide}
           </p>
         </div>
-        <ol className="mt-5 grid gap-2 sm:grid-cols-3">
-          {coachSteps.map(({ icon: StepIcon, number, title, description }) => (
-            <li
-              key={number}
-              className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface-muted)] p-4"
+
+        <label
+          className="mt-5 block text-sm font-extrabold"
+          htmlFor="question-answer-focus"
+        >
+          이 질문에 대한 내 답변
+        </label>
+        <textarea
+          id="question-answer-focus"
+          data-dialog-initial-focus
+          value={answer}
+          onChange={(event) =>
+            setLocalAnswers((current) => ({
+              ...current,
+              [question.id]: event.target.value,
+            }))
+          }
+          className="mt-2 min-h-40 w-full resize-none rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] p-4 text-sm leading-7 outline-none transition-[border-color,box-shadow] placeholder:text-[var(--text-tertiary)] focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_12%,transparent)] sm:min-h-48"
+          placeholder="완성된 문장보다 당시 상황과 내 행동부터 적어 보세요."
+        />
+        <div className="mt-2 flex items-center justify-between gap-3 text-[11px]">
+          <span className="text-[var(--text-tertiary)]">{answer.length}자</span>
+          {currentSaved ? (
+            <span
+              className="flex items-center gap-1.5 font-bold text-[var(--success)]"
+              role="status"
             >
-              <span className="grid size-8 place-items-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
-                <StepIcon className="size-4" />
-              </span>
-              <span className="mt-4 block font-mono text-[10px] font-black tracking-[.16em] text-[var(--brand)]">
-                {number}
-              </span>
-              <h3 className="mt-2 text-sm font-black">{title}</h3>
-              <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
-                {description}
-              </p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-5 border-t border-[var(--border)] pt-5">
-          <p className="text-sm font-bold leading-6">
-            첫 질문부터 완벽하게 답하려 하지 않아도 괜찮아요. 실제 장면과 내
-            행동을 먼저 적으면, 다음 질문이 답변의 깊이를 더해 줍니다.
+              <CheckCircle2 className="size-3.5" /> 저장됨
+            </span>
+          ) : null}
+        </div>
+        {mutation.isError ? (
+          <p
+            className="mt-3 text-xs font-bold text-[var(--danger)]"
+            role="alert"
+          >
+            {mutation.error.message}
           </p>
-          <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button variant="ghost" onClick={() => closeTutorial()}>
-              나중에 할게요
+        ) : null}
+
+        <div className="mt-5 flex flex-col-reverse gap-2 border-t border-[var(--border)] pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <Button variant="ghost" onClick={() => router.push("/dashboard")}>
+            나중에 이어하기
+          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              variant="secondary"
+              loading={mutation.isPending}
+              disabled={answer.trim().length < 10 || currentSaved}
+              onClick={() => mutation.mutate()}
+            >
+              <Save className="size-4" /> 답변 저장
             </Button>
-            <Button onClick={() => closeTutorial({ focusAnswer: true })}>
-              첫 질문 시작하기 <ArrowRight className="size-4" />
-            </Button>
+            {isLastQuestion && isLastTrack ? (
+              <Link
+                href="/applications/demo/mock-interview"
+                onClick={() => completeStep("practice")}
+                aria-disabled={!currentSaved}
+                className={cn(
+                  "inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]",
+                  !currentSaved && "pointer-events-none opacity-45",
+                )}
+              >
+                질문 연습 완료 <ArrowRight className="size-4" />
+              </Link>
+            ) : (
+              <Button disabled={!currentSaved} onClick={goNext}>
+                {isLastQuestion ? "다음 질문군" : "다음 질문"}
+                <ChevronRight className="size-4" />
+              </Button>
+            )}
           </div>
         </div>
       </AppDialog>

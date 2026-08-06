@@ -263,7 +263,11 @@ export function StudentDashboard({
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <Link
-                href={nextStep.href}
+                href={
+                  nextStep.id === "practice"
+                    ? `${nextStep.href}?focus=1`
+                    : nextStep.href
+                }
                 className="inline-flex min-h-11 items-center gap-2 bg-[var(--text-primary)] px-5 text-sm font-bold text-[var(--canvas)] transition-[transform,background] hover:-translate-y-0.5 hover:bg-[var(--brand)]"
               >
                 {nextStep.title} 시작하기
@@ -435,7 +439,9 @@ export function StudentDashboard({
               <p className="font-mono text-[9px] font-bold uppercase tracking-[.12em] text-[var(--text-tertiary)]">
                 Status
               </p>
-              <p className="mt-2 text-sm font-bold text-[var(--warning)]">확인 대기</p>
+              <p className="mt-2 text-sm font-bold text-[var(--warning)]">
+                확인 대기
+              </p>
             </div>
           </div>
         </div>
@@ -474,9 +480,13 @@ export function StudentDashboard({
             </div>
           ))}
         </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3" data-motion-item>
+        <div
+          className="mt-4 flex flex-wrap items-center justify-between gap-3"
+          data-motion-item
+        >
           <p className="flex items-center gap-1.5 text-[11px] leading-5 text-[var(--text-tertiary)]">
-            <FileClock className="size-3.5 shrink-0" /> 공개 전 자료는 확정된 지원 조건으로 안내하지 않습니다.
+            <FileClock className="size-3.5 shrink-0" /> 공개 전 자료는 확정된
+            지원 조건으로 안내하지 않습니다.
           </p>
           <button
             type="button"
@@ -698,12 +708,20 @@ export function StudentDashboard({
         <div className="mt-6 grid divide-y divide-[var(--border)] border-y border-[var(--border)] text-sm sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {[
             ["무료 분석", "자소서 근거와 첫 예상 질문을 확인"],
-            ["AIHOW 코치 구독", "분석·질문 훈련·영상 가이드를 준비 기록과 연결"],
+            [
+              "AIHOW 코치 구독",
+              "분석·질문 훈련·영상 가이드를 준비 기록과 연결",
+            ],
             ["학교별 입시 브리핑", "유형·전형·모집 흐름을 내 준비 순서로 해석"],
           ].map(([label, detail]) => (
-            <div key={label} className="py-4 sm:px-4 sm:first:pl-0 sm:last:pr-0">
+            <div
+              key={label}
+              className="py-4 sm:px-4 sm:first:pl-0 sm:last:pr-0"
+            >
               <p className="font-bold">{label}</p>
-              <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{detail}</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+                {detail}
+              </p>
             </div>
           ))}
         </div>
@@ -711,7 +729,10 @@ export function StudentDashboard({
           가격·이용 한도·응답 정책은 운영 기준이 확정된 뒤 안내합니다.
         </p>
         <div className="mt-5 flex justify-end">
-          <Button className="w-full sm:w-auto" onClick={() => setMembershipOpen(false)}>
+          <Button
+            className="w-full sm:w-auto"
+            onClick={() => setMembershipOpen(false)}
+          >
             확인했어요
           </Button>
         </div>
@@ -724,13 +745,17 @@ export function StudentDashboard({
         purpose="notice"
       >
         <p className="mt-6 border-y border-[var(--border)] py-4 text-sm leading-6 text-[var(--text-secondary)]">
-          관심 학교의 모집요강이 공개되면 공식 원문을 확인합니다. 소장님 검수가 끝난 변경점만 준비 경로와 알림으로 안내합니다.
+          관심 학교의 모집요강이 공개되면 공식 원문을 확인합니다. 소장님 검수가
+          끝난 변경점만 준비 경로와 알림으로 안내합니다.
         </p>
         <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button variant="ghost" onClick={() => setAdmissionsAlertOpen(false)}>
             나중에 설정
           </Button>
-          <Link href="/settings" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]">
+          <Link
+            href="/settings"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]"
+          >
             알림 설정으로 이동 <ChevronRight className="size-4" />
           </Link>
         </div>
