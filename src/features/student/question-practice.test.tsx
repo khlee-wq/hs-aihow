@@ -10,6 +10,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAppStore } from "@/stores/app-store";
 import { QuestionPractice } from "./question-practice";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 function renderPractice() {
   const queryClient = new QueryClient({
     defaultOptions: { mutations: { retry: false } },
@@ -81,9 +86,8 @@ describe("QuestionPractice", () => {
       }),
     ).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("button", { name: "어떻게 도와주나요?" }));
     expect(
-      screen.getByRole("dialog", { name: "AI가 질문을 고르는 방식" }),
+      screen.getByRole("button", { name: "집중해서 답하기" }),
     ).toBeVisible();
   });
 

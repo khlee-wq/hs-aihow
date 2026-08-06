@@ -264,9 +264,7 @@ export function StudentDashboard({
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <Link
                 href={
-                  nextStep.id === "practice"
-                    ? `${nextStep.href}?focus=1`
-                    : nextStep.href
+                  nextStep.href
                 }
                 className="inline-flex min-h-11 items-center gap-2 bg-[var(--text-primary)] px-5 text-sm font-bold text-[var(--canvas)] transition-[transform,background] hover:-translate-y-0.5 hover:bg-[var(--brand)]"
               >

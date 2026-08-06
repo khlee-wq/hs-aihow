@@ -6,6 +6,7 @@ const studentPaths = [
   "/applications/demo/essay",
   "/applications/demo/analysis",
   "/applications/demo/practice",
+  "/applications/demo/practice/session",
   "/applications/demo/mock-interview",
   "/applications/demo/cheat-sheet",
   "/settings",
@@ -440,14 +441,163 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
       await visit(page, path);
       await expectPrimaryTitle(page);
       if (path === "/applications/demo/practice") {
-        await expectStepNavigationFitsItsContainer(page, "질문군 선택");
+        await expect(page.getByTestId("question-practice-intro")).toBeVisible();
+        await expect(
+          page.getByRole("link", {
+            name: /질문 연습 시작하기|이어서 질문 연습하기/,
+          }),
+        ).toBeVisible();
+        await expect(
+          page.getByText("지원 동기", { exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByText("탐구 태도", { exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByText("협업 경험", { exact: true }),
+        ).toBeVisible();
+      }
+      if (path === "/applications/demo/practice/session") {
+        await expect(
+          page.getByTestId("student-practice-session-shell"),
+        ).toBeVisible();
+        await expect(page.getByRole("progressbar")).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "답변 저장" }),
+        ).toBeVisible();
       }
       if (path === "/applications/demo/mock-interview") {
+        await expect(page.getByTestId("mock-interview-intro")).toBeVisible();
+        await expect(
+          page.getByRole("heading", {
+            name: "오늘은 어떤 방식으로 말하기를 연습할까요?",
+          }),
+        ).toBeVisible();
         await expectStepNavigationFitsItsContainer(page, "모의면접 진행 단계");
       }
       await expectInterfaceFitsViewport(page);
     }
   }
+});
+
+test("질문 집중 화면은 움직임 축소 설정에서도 즉시 읽을 수 있다", async ({
+  page,
+}) => {
+  await seedRoleSession(page, "user");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await visit(page, "/applications/demo/practice/session");
+
+  const scene = page.getByTestId("question-practice-scene");
+  await expect(scene).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "과학 동아리 활동에서 가장 오래 고민했던 한 장면을 설명해 보세요.",
+    }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      scene.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return { opacity: style.opacity, transform: style.transform };
+      }),
+    )
+    .toEqual({ opacity: "1", transform: "none" });
+  await expectInterfaceFitsViewport(page);
+});
+
+test("질문 연습 시작 화면은 데스크톱 한 화면 안에서 완결된다", async ({
+  page,
+}) => {
+  await seedRoleSession(page, "user");
+
+  for (const viewport of [
+    { width: 1024, height: 768 },
+    { width: 1280, height: 800 },
+    { width: 1440, height: 900 },
+    { width: 1680, height: 1050 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await visit(page, "/applications/demo/practice");
+    await expect(page.getByTestId("question-practice-intro")).toBeVisible();
+
+    const layout = await page.evaluate(() => {
+      const intro = document.querySelector(
+        "[data-testid=question-practice-intro]",
+      );
+      const map = document.querySelector(".practice-intro-map");
+      return {
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+        introBottom: intro?.getBoundingClientRect().bottom ?? 0,
+        mapBottom: map?.getBoundingClientRect().bottom ?? 0,
+        scrollHeight: document.documentElement.scrollHeight,
+        scrollWidth: document.documentElement.scrollWidth,
+      };
+    });
+
+    expect(layout.scrollHeight).toBeLessThanOrEqual(layout.innerHeight + 1);
+    expect(layout.scrollWidth).toBeLessThanOrEqual(layout.innerWidth);
+    expect(layout.introBottom).toBeGreaterThanOrEqual(layout.innerHeight - 25);
+    expect(layout.mapBottom).toBeGreaterThanOrEqual(layout.innerHeight - 50);
+  }
+});
+
+test("모의면접 시작 화면은 데스크톱 한 화면 안에서 완결된다", async ({
+  page,
+}) => {
+  await seedRoleSession(page, "user");
+
+  for (const viewport of [
+    { width: 1024, height: 768 },
+    { width: 1280, height: 800 },
+    { width: 1440, height: 900 },
+    { width: 1680, height: 1050 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await visit(page, "/applications/demo/mock-interview");
+    await expect(page.getByTestId("mock-interview-intro")).toBeVisible();
+
+    const layout = await page.evaluate(() => {
+      const intro = document.querySelector(
+        "[data-testid=mock-interview-intro]",
+      );
+      const picker = document.querySelector(".mock-interview-picker");
+      return {
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+        introBottom: intro?.getBoundingClientRect().bottom ?? 0,
+        pickerBottom: picker?.getBoundingClientRect().bottom ?? 0,
+        scrollHeight: document.documentElement.scrollHeight,
+        scrollWidth: document.documentElement.scrollWidth,
+      };
+    });
+
+    expect(layout.scrollHeight).toBeLessThanOrEqual(layout.innerHeight + 1);
+    expect(layout.scrollWidth).toBeLessThanOrEqual(layout.innerWidth);
+    expect(layout.introBottom).toBeGreaterThanOrEqual(layout.innerHeight - 25);
+    expect(layout.pickerBottom).toBeGreaterThanOrEqual(layout.innerHeight - 50);
+  }
+});
+
+test("모의면접 방식 선택은 질문 화면으로 자연스럽게 이어진다", async ({
+  page,
+}) => {
+  await seedRoleSession(page, "user");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await visit(page, "/applications/demo/mock-interview");
+
+  const picker = page.getByRole("group", { name: "연습 방식 선택" });
+  const panel = picker.getByRole("button", { name: /학교 면접 위원/ });
+  await panel.click();
+  await expect(panel).toHaveAttribute("aria-pressed", "true");
+  await page
+    .getByRole("button", { name: "학교 면접 위원으로 시작하기" })
+    .click();
+
+  await expect(page.getByRole("button", { name: "답변 시작" })).toBeVisible();
+  await expectStepNavigationFitsItsContainer(page, "모의면접 진행 단계");
+  await expectInterfaceFitsViewport(page);
 });
 
 test("전문가 운영 전 메뉴는 모바일·태블릿·데스크톱에서 완결된다", async ({

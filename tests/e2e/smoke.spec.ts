@@ -299,42 +299,38 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   });
   if (testInfo.project.name === "mobile") await practiceLink.tap();
   else await practiceLink.click();
-  await expect(page).toHaveURL(/\/applications\/demo\/practice\?focus=1$/);
+  await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
+  await expect(page.getByTestId("question-practice-intro")).toBeVisible();
   await expect(
     page.getByRole("heading", {
-      name: "자소서에서 물어볼 이야기를 함께 찾아볼게요",
+      name: "준비한 이야기를 질문으로 꺼내볼까요?",
     }),
   ).toBeVisible();
+  await expect(page.getByText("지원 동기", { exact: true })).toBeVisible();
+  await expect(page.getByText("탐구 태도", { exact: true })).toBeVisible();
+  await expect(page.getByText("협업 경험", { exact: true })).toBeVisible();
+  const sessionLink = page.getByRole("link", {
+    name: /질문 연습 시작하기|이어서 질문 연습하기/,
+  });
+  if (testInfo.project.name === "mobile") await sessionLink.tap();
+  else await sessionLink.click();
+  await expect(page).toHaveURL(/\/applications\/demo\/practice\/session$/);
   await expect(
-    page.getByRole("dialog").getByRole("heading", {
+    page.getByTestId("student-practice-session-shell"),
+  ).toBeVisible();
+  await expect(page.getByTestId("student-mobile-nav")).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", {
       name: "과학 동아리 활동에서 가장 오래 고민했던 한 장면을 설명해 보세요.",
     }),
   ).toBeVisible();
-  expect(
-    await page
-      .getByLabel("질문군 선택")
-      .evaluate((element) => element.scrollWidth <= element.clientWidth),
-  ).toBe(true);
-  await expect(
-    page.getByRole("button", {
-      name: "이유를 이어 말할 질문 선택의 이유 잠김",
-    }),
-  ).toBeDisabled();
   await page
-    .getByRole("dialog")
     .getByRole("textbox", { name: "이 질문에 대한 내 답변" })
     .fill(
       "실험 결과가 예상과 달랐을 때 기록 기준을 다시 세우고 팀원과 변인을 하나씩 확인했습니다.",
     );
   await page.getByRole("button", { name: "답변 저장" }).click();
-  await expect(page.getByRole("dialog").getByRole("status")).toContainText(
-    "저장됨",
-  );
-  await expect(
-    page.getByRole("button", {
-      name: "이유를 이어 말할 질문 선택의 이유",
-    }),
-  ).toBeEnabled();
+  await expect(page.getByRole("status")).toContainText("저장됨");
   await page.getByRole("button", { name: "다음 질문" }).click();
   await expect(
     page.getByRole("heading", {
@@ -453,7 +449,7 @@ test("교사가 수업 기준을 설정하고 승인한다", async ({ page }) =>
     }),
   ).toBeVisible();
   await page
-    .getByLabel("교사가 입력한 프롬프트")
+    .getByLabel("교사 지침")
     .fill("학생의 판단 근거를 먼저 확인하고, 다음 행동을 한 가지 제안합니다.");
   await page.getByRole("button", { name: "승인하고 적용" }).click();
   await expect(page.getByRole("status")).toContainText("승인했습니다");

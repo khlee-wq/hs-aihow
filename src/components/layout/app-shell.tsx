@@ -88,6 +88,55 @@ function StudentShell({
   pathname: string;
   session: DemoSession;
 }) {
+  const isPracticeSession = pathname.endsWith("/practice/session");
+  const isLearningIntro =
+    pathname.endsWith("/practice") || pathname.endsWith("/mock-interview");
+
+  if (isPracticeSession) {
+    return (
+      <div
+        className="min-h-[100svh] overflow-x-clip bg-[var(--canvas)]"
+        data-testid="student-practice-session-shell"
+      >
+        <header className="pointer-events-none sticky top-3 z-40 px-[var(--space-page)]">
+          <div className="liquid-glass pointer-events-auto mx-auto flex h-15 max-w-[88rem] items-center gap-3 rounded-[1.15rem] px-3.5 sm:h-17 sm:px-5">
+            <Link
+              href="/dashboard"
+              className="flex shrink-0 items-center gap-2.5 leading-none"
+              aria-label="오늘의 준비로 돌아가기"
+            >
+              <span className="grid size-7 place-items-center rounded-[var(--radius-xs)] bg-[var(--brand)] text-[10px] font-black text-[var(--text-on-brand)]">
+                A
+              </span>
+              <span className="hidden text-sm font-black tracking-[-.04em] sm:block">
+                AIHOW
+              </span>
+            </Link>
+            <span className="h-5 w-px bg-[var(--border)]" />
+            <div className="min-w-0">
+              <p className="truncate text-xs font-black sm:text-sm">
+                질문 연습
+              </p>
+              <p className="hidden text-[10px] text-[var(--text-tertiary)] sm:block">
+                민사고 통합 패키지
+              </p>
+            </div>
+            <Link
+              href="/dashboard"
+              className="ml-auto inline-flex min-h-10 items-center px-3 text-xs font-bold text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] sm:px-4"
+            >
+              나중에 이어하기
+            </Link>
+          </div>
+        </header>
+        <main className="min-h-[calc(100svh-3.75rem)] sm:min-h-[calc(100svh-4.25rem)]">
+          {children}
+        </main>
+        <SessionLifecycle role="user" />
+      </div>
+    );
+  }
+
   return (
     <div
       className="min-h-[100svh] bg-[var(--canvas)]"
@@ -161,7 +210,12 @@ function StudentShell({
         </div>
       </header>
 
-      <main className="px-[var(--space-page)] pb-28 pt-8 lg:pb-14 lg:pt-10">
+      <main
+        className={cn(
+          "px-[var(--space-page)] pb-28 pt-8",
+          isLearningIntro ? "lg:pb-3 lg:pt-5" : "lg:pb-14 lg:pt-10",
+        )}
+      >
         <div className="mx-auto max-w-[92rem]">{children}</div>
       </main>
 
