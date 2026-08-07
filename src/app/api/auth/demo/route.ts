@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   const { name, email, role, next } = parsed.data;
-  const fallback = role === "admin" ? "/admin" : "/dashboard";
+  const fallback = role === "admin" ? "/admin" : "/onboarding/interest-school";
   const candidate = safeInternalPath(next, fallback);
   const redirect = candidate;
   const response = NextResponse.json({ redirect });

@@ -55,11 +55,13 @@ export function AdmissionsOutlook({
   data,
   loading,
   onOpenDetail,
+  onChangeSchool,
 }: {
   school: string;
   data: AdmissionsOutlookData | null | undefined;
   loading: boolean;
   onOpenDetail: () => void;
+  onChangeSchool: () => void;
 }) {
   if (loading) {
     return (
@@ -121,6 +123,14 @@ export function AdmissionsOutlook({
             지원자 수만 보지 않고, 모집 여건까지 함께 읽어 내 준비 순서를
             정합니다.
           </p>
+          <button
+            type="button"
+            onClick={onChangeSchool}
+            className="mt-3 inline-flex min-h-9 items-center gap-1.5 border border-[var(--border)] px-3 text-xs font-bold text-[var(--text-secondary)] transition-[transform,border-color,color] hover:-translate-y-0.5 hover:border-[var(--border-accent)] hover:text-[var(--text-primary)]"
+          >
+            관심 학교 변경
+            <MoveRight className="size-3" />
+          </button>
         </div>
         <button
           type="button"

@@ -4,6 +4,7 @@ import { safeInternalPath } from "@/lib/utils";
 
 const protectedRoutes = [
   "/dashboard",
+  "/onboarding",
   "/applications",
   "/admin",
   "/settings",

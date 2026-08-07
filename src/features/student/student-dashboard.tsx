@@ -17,7 +17,7 @@ import {
   TimerReset,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { JourneyOrbit } from "@/components/motion/journey-orbit";
 import { AppDialog } from "@/components/ui/app-dialog";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,18 @@ import { useAppStore } from "@/stores/app-store";
 import { type DashboardSnapshot, nextStepCopy } from "./dashboard-model";
 import { AdmissionsOutlook } from "./admissions-outlook";
 import { AdmissionsMapDialog } from "./admissions-map-dialog";
+import {
+  applyInterestSchool,
+  type InterestSchool,
+} from "./interest-school-directory";
+import {
+  InterestSchoolPicker,
+  InterestSchoolPrompt,
+} from "./interest-school-picker";
+import {
+  loadInterestSchoolPreference,
+  saveInterestSchoolPreference,
+} from "./interest-school-preference";
 import { LearningIntroHero } from "./learning-intro-hero";
 import {
   DashboardHeaderSkeleton,
@@ -78,7 +90,30 @@ export function StudentDashboard({
     "flow",
   );
   const [admissionsAlertOpen, setAdmissionsAlertOpen] = useState(false);
+  const [interestSchool, setInterestSchool] = useState<
+    InterestSchool | null | undefined
+  >(undefined);
+  const [interestSchoolPickerOpen, setInterestSchoolPickerOpen] =
+    useState(false);
   const isLoading = data === undefined;
+  const schoolSelectionReady = interestSchool !== undefined;
+  const hasInterestSchool = Boolean(interestSchool);
+  const activeSnapshot =
+    data && interestSchool ? applyInterestSchool(data, interestSchool) : data;
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const preference = loadInterestSchoolPreference();
+      setInterestSchool(preference);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  const selectInterestSchool = (school: InterestSchool) => {
+    saveInterestSchoolPreference(school);
+    setInterestSchool(school);
+    setInterestSchoolPickerOpen(false);
+  };
   const completed = useAppStore((state) => state.completedSteps);
   const progress = deriveProgress(completed);
   const nextStep =
@@ -93,13 +128,13 @@ export function StudentDashboard({
       loading: false,
     },
     {
-      value: data ? `${data.practiceMinutes}m` : "—",
-      note: data ? `+${data.weeklyDelta}분` : "데이터 없음",
+      value: activeSnapshot ? `${activeSnapshot.practiceMinutes}m` : "—",
+      note: activeSnapshot ? `+${activeSnapshot.weeklyDelta}분` : "데이터 없음",
       loading: isLoading,
     },
     {
-      value: data ? `D-${data.daysLeft}` : "—",
-      note: data ? "속도 적정" : "일정 미등록",
+      value: activeSnapshot ? `D-${activeSnapshot.daysLeft}` : "—",
+      note: activeSnapshot ? "속도 적정" : "일정 미등록",
       loading: isLoading,
     },
   ];
@@ -119,11 +154,17 @@ export function StudentDashboard({
               <LearningIntroHero
                 icon={MapPinned}
                 eyebrow="입시 지도"
-                title={`${name ?? "학생"}님, 다음은 ${nextStep.title}입니다.`}
+                title={
+                  hasInterestSchool
+                    ? `${name ?? "학생"}님, 다음은 ${nextStep.title}입니다.`
+                    : "관심 학교부터 골라볼까요?"
+                }
                 copy={
-                  data
-                    ? `${data.schoolShort}의 지원 흐름과 모집 여건을 함께 읽고, 오늘 준비할 순서를 확인해 보세요.`
-                    : "아직 연결된 준비 데이터가 없습니다. 첫 단계를 시작하면 이 화면에 학습 신호가 쌓입니다."
+                  hasInterestSchool && activeSnapshot
+                    ? `${activeSnapshot.schoolShort}의 지원 흐름과 모집 여건을 함께 읽고, 오늘 준비할 순서를 확인해 보세요.`
+                    : schoolSelectionReady
+                      ? "관심 학교를 정하면 지원 흐름과 모집 인원을 바탕으로 내 준비 지도를 만들어 드려요."
+                      : "아직 연결된 준비 데이터가 없습니다. 첫 단계를 시작하면 이 화면에 학습 신호가 쌓입니다."
                 }
                 titleId="student-dashboard-title"
                 motion="waterfall"
@@ -131,15 +172,22 @@ export function StudentDashboard({
             )}
           </header>
 
-          <AdmissionsOutlook
-            school={data?.schoolShort ?? "관심 학교"}
-            data={data?.admissionsOutlook}
-            loading={isLoading}
-            onOpenDetail={() => {
-              setAdmissionsMapView("flow");
-              setAdmissionsMapOpen(true);
-            }}
-          />
+          {!schoolSelectionReady || hasInterestSchool ? (
+            <AdmissionsOutlook
+              school={activeSnapshot?.schoolShort ?? "관심 학교"}
+              data={activeSnapshot?.admissionsOutlook}
+              loading={isLoading || !schoolSelectionReady}
+              onOpenDetail={() => {
+                setAdmissionsMapView("flow");
+                setAdmissionsMapOpen(true);
+              }}
+              onChangeSchool={() => setInterestSchoolPickerOpen(true)}
+            />
+          ) : (
+            <InterestSchoolPrompt
+              onOpen={() => setInterestSchoolPickerOpen(true)}
+            />
+          )}
 
           <section
             className="surface grid grid-cols-2 overflow-hidden bg-[var(--surface)] lg:grid-cols-4"
@@ -413,7 +461,7 @@ export function StudentDashboard({
                     {isLoading ? (
                       <DashboardInlineSkeleton className="w-16" />
                     ) : (
-                      (data?.schoolShort ?? "관심 학교")
+                      (activeSnapshot?.schoolShort ?? "관심 학교")
                     )}
                   </p>
                 </div>
@@ -500,8 +548,8 @@ export function StudentDashboard({
               >
                 {isLoading ? (
                   <DashboardInlineSkeleton className="w-28" />
-                ) : data ? (
-                  data.school
+                ) : activeSnapshot ? (
+                  activeSnapshot.school
                 ) : (
                   "지원 학교 미등록"
                 )}{" "}
@@ -729,9 +777,14 @@ export function StudentDashboard({
         key={admissionsMapView}
         open={admissionsMapOpen}
         onClose={() => setAdmissionsMapOpen(false)}
-        school={data?.schoolShort ?? "관심 학교"}
-        data={data?.admissionsOutlook}
+        school={activeSnapshot?.schoolShort ?? "관심 학교"}
+        data={activeSnapshot?.admissionsOutlook}
         initialView={admissionsMapView}
+      />
+      <InterestSchoolPicker
+        open={interestSchoolPickerOpen}
+        onChoose={selectInterestSchool}
+        onLater={() => setInterestSchoolPickerOpen(false)}
       />
       <AppDialog
         open={admissionsAlertOpen}

@@ -9,18 +9,10 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
   const [motionReady, setMotionReady] = useState(false);
 
   useEffect(() => {
-    let timer: number | undefined;
-    const enableMotion = () => {
-      timer = window.setTimeout(() => setMotionReady(true), 150);
-    };
-
-    if (document.readyState === "complete") enableMotion();
-    else window.addEventListener("load", enableMotion, { once: true });
-
-    return () => {
-      window.removeEventListener("load", enableMotion);
-      if (timer !== undefined) window.clearTimeout(timer);
-    };
+    // 첫 페인트부터 입장 상태를 유지한 뒤 바로 모션을 시작합니다. 이전처럼
+    // load/idle까지 기다리면 화면이 보인 뒤 다시 숨겨져 새로고침 때 깜빡입니다.
+    const frame = window.requestAnimationFrame(() => setMotionReady(true));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -138,26 +130,44 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
             ) ?? [],
           );
           if (waterfallArt.length) {
-            gsap.fromTo(
-              waterfallArt,
-              {
-                autoAlpha: 0,
-                y: (index) => -118 - index * 24,
-                rotate: (index) => [-3.5, 2.5, -2][index] ?? 0,
-                scale: 0.94,
-              },
-              {
-                autoAlpha: 1,
-                y: 0,
-                rotate: 0,
-                scale: 1,
-                duration: 1.05,
-                delay: 0.12,
-                stagger: 0.16,
-                ease: "back.out(1.22)",
-                clearProps: "transform,opacity,visibility",
-              },
-            );
+            const compactHero = window.matchMedia("(max-width: 639px)").matches;
+            waterfallArt.forEach((art, index) => {
+              // 모바일에서는 오브젝트의 최종 자리가 본문 아래입니다. 위에서
+              // 떨어뜨리면 입장 순간 카피를 가로지르므로, 제자리에서 또렷해진 뒤
+              // 가볍게 부유하도록 전환합니다.
+              const dropDistance = compactHero ? 0 : 98 + index * 26;
+              const floatDistance = [-8, -12, -7][index] ?? -8;
+              const floatDuration = [3.6, 4.2, 3.9][index] ?? 3.8;
+
+              gsap.fromTo(
+                art,
+                {
+                  autoAlpha: 0,
+                  y: -dropDistance,
+                  rotate: [-3.5, 2.5, -2][index] ?? 0,
+                  scale: 0.94,
+                },
+                {
+                  autoAlpha: 1,
+                  y: 0,
+                  rotate: 0,
+                  scale: 1,
+                  duration: 0.96 + index * 0.07,
+                  delay: 0.1 + index * 0.14,
+                  ease: "back.out(1.18)",
+                  onComplete: () => {
+                    gsap.to(art, {
+                      y: floatDistance,
+                      rotate: index === 1 ? 1.2 : -1.1,
+                      duration: floatDuration,
+                      repeat: -1,
+                      yoyo: true,
+                      ease: "sine.inOut",
+                    });
+                  },
+                },
+              );
+            });
           }
 
           Array.from(
@@ -371,22 +381,10 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
       disposeMotion = () => context.revert();
     };
 
-    const start = () => void loadMotion();
-    const idleWindow = window as Window & {
-      requestIdleCallback?: (
-        callback: IdleRequestCallback,
-        options?: IdleRequestOptions,
-      ) => number;
-      cancelIdleCallback?: (handle: number) => void;
-    };
-    const idleId = idleWindow.requestIdleCallback?.(start, { timeout: 900 });
-    const timeoutId =
-      idleId === undefined ? window.setTimeout(start, 180) : undefined;
+    void loadMotion();
 
     return () => {
       cancelled = true;
-      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
-      if (idleId !== undefined) idleWindow.cancelIdleCallback?.(idleId);
       disposeMotion?.();
     };
   }, [motionReady, pathname]);
@@ -394,7 +392,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
   return (
     <div
       ref={root}
-      className={`min-h-[100svh]${motionReady ? " motion-ready" : ""}`}
+      className={`min-h-[100svh] ${motionReady ? "motion-ready" : "motion-pending"}`}
     >
       {children}
     </div>

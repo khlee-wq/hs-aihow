@@ -12,10 +12,13 @@ import {
   saveOnboardingPreference,
   shouldShowOnboarding,
 } from "./onboarding-preferences";
+import { loadInterestSchoolPreference } from "@/features/student/interest-school-preference";
 
 const IDLE_LIMIT_MS = 30 * 60 * 1000;
 const WARNING_WINDOW_MS = 5 * 60 * 1000;
 const INTRO_PREVIEW_KEY = "aihow:intro-preview:v1";
+const SKIP_INTRO_AFTER_INTEREST_SCHOOL_KEY =
+  "aihow:skip-intro-after-interest-school:v1";
 
 export function SessionLifecycle({ role }: { role: UserRole }) {
   const pathname = usePathname();
@@ -51,7 +54,9 @@ export function SessionLifecycle({ role }: { role: UserRole }) {
       "scroll",
       "touchstart",
     ];
-    events.forEach((event) => window.addEventListener(event, recordActivity, { passive: true }));
+    events.forEach((event) =>
+      window.addEventListener(event, recordActivity, { passive: true }),
+    );
     const timer = window.setInterval(() => {
       const remaining = IDLE_LIMIT_MS - (Date.now() - lastActivity.current);
       if (remaining <= 0) {
@@ -64,7 +69,9 @@ export function SessionLifecycle({ role }: { role: UserRole }) {
       }
     }, 1000);
     return () => {
-      events.forEach((event) => window.removeEventListener(event, recordActivity));
+      events.forEach((event) =>
+        window.removeEventListener(event, recordActivity),
+      );
       window.clearInterval(timer);
     };
   }, [finishLogout, warningOpen]);
@@ -75,7 +82,8 @@ export function SessionLifecycle({ role }: { role: UserRole }) {
       setWarningOpen(true);
     };
     window.addEventListener("aihow:session-warning-preview", showPreview);
-    return () => window.removeEventListener("aihow:session-warning-preview", showPreview);
+    return () =>
+      window.removeEventListener("aihow:session-warning-preview", showPreview);
   }, []);
 
   useEffect(() => {
@@ -87,12 +95,27 @@ export function SessionLifecycle({ role }: { role: UserRole }) {
       return () => window.cancelAnimationFrame(frame);
     }
     const frame = window.requestAnimationFrame(() => {
+      if (
+        role === "user" &&
+        window.sessionStorage.getItem(SKIP_INTRO_AFTER_INTEREST_SCHOOL_KEY)
+      ) {
+        window.sessionStorage.removeItem(SKIP_INTRO_AFTER_INTEREST_SCHOOL_KEY);
+        setIntroOpen(false);
+        return;
+      }
+      // 학생은 처음에 관심 학교를 고른 뒤에만 작업공간 안내를 받습니다.
+      // 서로 다른 두 모달이 겹쳐 첫 진입의 선택 흐름을 방해하지 않게 합니다.
+      if (role === "user" && !loadInterestSchoolPreference()) {
+        setIntroOpen(false);
+        return;
+      }
       if (window.sessionStorage.getItem(INTRO_PREVIEW_KEY) === role) {
         window.sessionStorage.removeItem(INTRO_PREVIEW_KEY);
         setIntroOpen(true);
         return;
       }
-      if (shouldShowOnboarding(loadOnboardingPreference(role))) setIntroOpen(true);
+      if (shouldShowOnboarding(loadOnboardingPreference(role)))
+        setIntroOpen(true);
     });
     return () => window.cancelAnimationFrame(frame);
   }, [pathname, role]);
@@ -158,7 +181,8 @@ export function SessionLifecycle({ role }: { role: UserRole }) {
               {minutes}:{seconds}
             </p>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              활동이 없으면 열어 둔 준비 화면을 보호하기 위해 자동으로 로그아웃합니다. 계속 이용하면 세션이 연장됩니다.
+              활동이 없으면 열어 둔 준비 화면을 보호하기 위해 자동으로
+              로그아웃합니다. 계속 이용하면 세션이 연장됩니다.
             </p>
           </div>
         </div>

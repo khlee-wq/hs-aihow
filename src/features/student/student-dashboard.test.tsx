@@ -1,5 +1,11 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAppStore } from "@/stores/app-store";
 import { dashboardSnapshot } from "./dashboard-model";
 import { StudentDashboard } from "./student-dashboard";
@@ -9,6 +15,10 @@ vi.mock("@/components/motion/journey-orbit", () => ({
 }));
 
 afterEach(() => cleanup());
+
+beforeEach(() => {
+  window.localStorage.setItem("aihow:interest-school:v1", "minsago");
+});
 
 describe("StudentDashboard loading boundaries", () => {
   it("keeps actions visible while every server-backed region is loading", () => {
@@ -32,8 +42,10 @@ describe("StudentDashboard loading boundaries", () => {
     expect(container.querySelector("p div, h1 div")).toBeNull();
   });
 
-  it("removes data skeletons after the server snapshot arrives", () => {
+  it("removes data skeletons after the server snapshot arrives", async () => {
     render(<StudentDashboard name="김하우" snapshot={dashboardSnapshot} />);
+
+    await screen.findByRole("button", { name: "민사고 준비 지도 보기" });
 
     expect(screen.getByTestId("student-dashboard")).toHaveAttribute(
       "aria-busy",
@@ -95,5 +107,53 @@ describe("StudentDashboard loading boundaries", () => {
     expect(screen.getByText("아직 준비 신호가 없어요")).toBeVisible();
     expect(screen.getByText("아직 집중 기록이 없어요")).toBeVisible();
     expect(screen.queryByTestId("admissions-outlook")).toBeNull();
+  });
+
+  it("lets a student who skipped onboarding set an interest school later", async () => {
+    window.localStorage.removeItem("aihow:interest-school:v1");
+    render(<StudentDashboard name="김하우" snapshot={dashboardSnapshot} />);
+
+    await screen.findByTestId("interest-school-prompt");
+    fireEvent.click(screen.getByRole("button", { name: "학교 찾기" }));
+    const dialog = await screen.findByRole("dialog", {
+      name: "가장 먼저 준비할 학교를 골라볼까요?",
+    });
+    fireEvent.change(within(dialog).getByRole("searchbox"), {
+      target: { value: "민" },
+    });
+    expect(
+      within(dialog).getByRole("button", { name: /민족사관고등학교/ }),
+    ).toBeVisible();
+    expect(
+      within(dialog).queryByRole("button", { name: /한일고/ }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: /민족사관고등학교/ }),
+    );
+    expect(
+      await screen.findByRole("button", { name: "민사고 준비 지도 보기" }),
+    ).toBeVisible();
+    expect(window.localStorage.getItem("aihow:interest-school:v1")).toBe(
+      "minsago",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "관심 학교 변경" }));
+    const reopenedDialog = await screen.findByRole("dialog", {
+      name: "가장 먼저 준비할 학교를 골라볼까요?",
+    });
+    const search = within(reopenedDialog).getByRole("searchbox");
+    fireEvent.change(search, { target: { value: "민" } });
+    fireEvent.click(
+      within(reopenedDialog).getByRole("button", { name: "검색어 지우기" }),
+    );
+    expect(search).toHaveValue("");
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(
+      screen.queryByRole("dialog", {
+        name: "가장 먼저 준비할 학교를 골라볼까요?",
+      }),
+    ).not.toBeInTheDocument();
   });
 });

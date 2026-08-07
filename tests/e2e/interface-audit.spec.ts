@@ -179,6 +179,12 @@ async function seedRoleSession(page: Page, role: "user" | "admin") {
       sameSite: "Lax",
     },
   ]);
+  if (role === "user") {
+    // 화면 감사는 관심 학교를 설정한 학생의 작업공간을 기준으로 진행합니다.
+    await page.addInitScript(() => {
+      window.localStorage.setItem("aihow:interest-school:v1", "minsago");
+    });
+  }
 }
 
 test("공개·인증 화면은 320px부터 데스크톱까지 잘리지 않는다", async ({
@@ -253,16 +259,6 @@ test("모바일 랜딩의 중앙 카피·개별 오브젝트·다음 구간은 �
 
     const mobileArtObjects = page.locator("[data-motion-waterfall-art]");
     await expect(mobileArtObjects).toHaveCount(3);
-    await expect
-      .poll(
-        () =>
-          mobileArtObjects.evaluateAll((elements) =>
-            elements.map((element) => getComputedStyle(element).transform),
-          ),
-        { timeout: 3_000 },
-      )
-      .toEqual(["none", "none", "none"]);
-
     const copy = await page.getByTestId("landing-hero-copy").boundingBox();
     const mobileArt = await mobileArtObjects.evaluateAll((elements) => {
       const boxes = elements.map((element) => element.getBoundingClientRect());

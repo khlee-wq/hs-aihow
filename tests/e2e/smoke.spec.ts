@@ -191,6 +191,10 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await page.getByPlaceholder("4자 이상").fill("demo1234");
   await submitAuthForm(page);
 
+  await expect(page).toHaveURL(/\/onboarding\/interest-school$/);
+  await expect(page.getByTestId("interest-school-onboarding")).toBeVisible();
+  await page.getByRole("searchbox").fill("민");
+  await page.getByRole("button", { name: /민족사관고등학교/ }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
     page.getByRole("heading", { name: "김하우님, 다음은 질문 연습입니다." }),

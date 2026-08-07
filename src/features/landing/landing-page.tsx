@@ -245,7 +245,7 @@ export function LandingPage() {
 
       <section
         id="products"
-        className="scroll-mt-24 py-24 lg:py-32"
+        className="landing-anchor py-24 lg:py-32"
         data-motion-reveal
       >
         <div className="page-wrap">
@@ -324,7 +324,7 @@ export function LandingPage() {
 
       <section
         id="journey"
-        className="journey-stage surface-contrast scroll-mt-24 py-24 lg:py-32"
+        className="landing-anchor journey-stage surface-contrast py-24 lg:py-32"
       >
         <div className="page-wrap">
           <SectionIntro
@@ -359,7 +359,7 @@ export function LandingPage() {
 
       <section
         id="experts"
-        className="scroll-mt-24 overflow-hidden py-24 lg:py-32"
+        className="landing-anchor overflow-hidden py-24 lg:py-32"
         data-motion-reveal
       >
         <div className="page-wrap grid items-center gap-14 lg:grid-cols-2">
@@ -460,7 +460,7 @@ export function LandingPage() {
 
       <section
         id="pricing"
-        className="scroll-mt-24 py-24 lg:py-32"
+        className="landing-anchor py-24 lg:py-32"
         data-motion-reveal
         data-testid="landing-pricing"
       >

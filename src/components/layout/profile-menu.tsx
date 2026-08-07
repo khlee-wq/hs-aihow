@@ -24,7 +24,7 @@ export function ProfileMenu({ session }: { session: DemoSession }) {
   const logout = async () => {
     setLogoutPending(true);
     const response = await fetch("/api/auth/logout", { method: "POST" });
-    if (response.ok) window.location.assign("/");
+    if (response.ok) window.location.assign("/login");
     else setLogoutPending(false);
   };
 
@@ -49,7 +49,9 @@ export function ProfileMenu({ session }: { session: DemoSession }) {
         >
           <div className="border-b border-[var(--border)] px-3 py-2.5">
             <p className="text-sm font-bold">{session.name}</p>
-            <p className="mt-0.5 truncate text-[11px] text-[var(--text-tertiary)]">{session.email}</p>
+            <p className="mt-0.5 truncate text-[11px] text-[var(--text-tertiary)]">
+              {session.email}
+            </p>
           </div>
           <Link
             href="/settings"
@@ -81,7 +83,8 @@ export function ProfileMenu({ session }: { session: DemoSession }) {
         dismissible={!logoutPending}
       >
         <p className="mt-6 border-y border-[var(--border)] py-4 text-sm leading-6 text-[var(--text-secondary)]">
-          준비 진행 상태는 이 기기에 남지만, 현재 역할 세션은 즉시 종료됩니다. 다시 로그인하면 이어서 확인할 수 있어요.
+          준비 진행 상태는 이 기기에 남지만, 현재 역할 세션은 즉시 종료됩니다.
+          다시 로그인하면 이어서 확인할 수 있어요.
         </p>
         <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button variant="ghost" onClick={() => setLogoutOpen(false)}>
