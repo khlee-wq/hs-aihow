@@ -22,7 +22,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { type ReactNode, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -443,9 +444,11 @@ const interviewFlow = [
 function InterviewFlow({
   phase,
   round,
+  className,
 }: {
   phase: InterviewPhase;
   round: InterviewRound;
+  className?: string;
 }) {
   const current =
     phase === "select" || phase === "ready"
@@ -461,7 +464,10 @@ function InterviewFlow({
   return (
     <nav
       aria-label="모의면접 진행 단계"
-      className="practice-question-glass interview-flow overflow-hidden rounded-[1.35rem]"
+      className={cn(
+        "practice-question-glass interview-flow overflow-hidden rounded-[1.35rem]",
+        className,
+      )}
     >
       <ol className="grid grid-cols-5">
         {interviewFlow.map(([title, description], index) => (
@@ -497,11 +503,76 @@ function InterviewFlow({
   );
 }
 
-function MockInterviewStep() {
+function MockInterviewSessionFrame({
+  children,
+  phase,
+  round,
+  personaName,
+  onAbort,
+}: {
+  children: ReactNode;
+  phase: InterviewPhase;
+  round: InterviewRound;
+  personaName: string;
+  onAbort: () => void;
+}) {
+  const isRecording = phase === "recording";
+
+  return (
+    <section
+      className="mock-interview-session-frame student-one-page-workspace practice-session-canvas liquid-glass-group relative mx-auto flex max-w-[100rem] flex-col overflow-hidden rounded-[2rem] px-4 py-6 sm:px-7 sm:py-8 lg:px-8"
+      data-testid="mock-interview-session"
+      aria-label="모의면접 집중 연습"
+    >
+      <div className="learning-canvas-content relative z-10 mx-auto flex min-h-0 flex-1 flex-col">
+        <header className="flex items-center justify-between gap-3 px-1 sm:px-2">
+          <div>
+            <p className="font-mono text-[10px] font-black tracking-[.16em] text-[var(--brand)]">
+              SPEAKING PRACTICE
+            </p>
+            <p className="mt-1 text-xs font-bold text-[var(--text-secondary)]">
+              {personaName}와 한 질문씩 이어가고 있어요
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onAbort}
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[color-mix(in_srgb,var(--text-primary)_9%,transparent)] bg-[color-mix(in_srgb,var(--surface-raised)_56%,transparent)] px-3 text-xs font-bold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
+          >
+            <ChevronLeft className="size-4" />
+            {isRecording ? "중단하고 돌아가기" : "방식 다시 고르기"}
+          </button>
+        </header>
+
+        <div className="practice-question-glass mt-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.7rem]">
+          <InterviewFlow
+            phase={phase}
+            round={round}
+            className="rounded-none border-x-0 border-t-0 bg-transparent shadow-none backdrop-blur-none"
+          />
+          {children}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function MockInterviewSession() {
+  return <MockInterviewStep initialPhase="ready" focused />;
+}
+
+function MockInterviewStep({
+  initialPhase = "select",
+  focused = false,
+}: {
+  initialPhase?: InterviewPhase;
+  focused?: boolean;
+}) {
+  const router = useRouter();
   const selected = useAppStore((state) => state.selectedPersona);
   const selectPersona = useAppStore((state) => state.selectPersona);
   const completeStep = useAppStore((state) => state.completeStep);
-  const [phase, setPhase] = useState<InterviewPhase>("select");
+  const [phase, setPhase] = useState<InterviewPhase>(initialPhase);
   const [round, setRound] = useState<InterviewRound>("core");
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
@@ -513,6 +584,15 @@ function MockInterviewStep() {
     return () => window.clearInterval(timer);
   }, [phase]);
   const persona = personas.find((item) => item.id === selected)!;
+  const discardInterview = () => {
+    setSeconds(0);
+    setRound("core");
+    if (focused) {
+      router.push("/applications/demo/mock-interview");
+      return;
+    }
+    setPhase("select");
+  };
   if (phase === "select")
     return (
       <section
@@ -528,161 +608,185 @@ function MockInterviewStep() {
           titleId="mock-interview-intro-title"
         />
 
-        <InterviewFlow phase={phase} round={round} />
-
         <div
-          className="practice-question-glass mock-interview-picker relative z-10 flex min-h-0 flex-col overflow-hidden rounded-[1.6rem]"
+          className="learning-canvas-content practice-question-glass mock-interview-map relative z-10 mx-auto flex min-h-0 flex-col overflow-hidden rounded-[1.6rem]"
           data-motion-reveal
         >
-          <div className="mock-interview-picker-head flex items-center justify-between gap-4 border-b border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] px-5 py-3 sm:px-6">
-            <div>
-              <p className="text-xs font-black">오늘의 말하기 감각</p>
-              <p className="mt-1 text-[11px] text-[var(--text-secondary)]">
-                선택한 방식은 연습 중 언제든 바꿀 수 있어요.
-              </p>
+          <InterviewFlow
+            phase={phase}
+            round={round}
+            className="rounded-none border-x-0 border-t-0 bg-transparent shadow-none backdrop-blur-none"
+          />
+
+          <div className="mock-interview-picker flex min-h-0 flex-1 flex-col">
+            <div className="mock-interview-picker-head flex items-center justify-between gap-4 border-b border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] px-5 py-3 sm:px-6">
+              <div>
+                <p className="text-xs font-black">오늘의 말하기 감각</p>
+                <p className="mt-1 text-[11px] text-[var(--text-secondary)]">
+                  선택한 방식은 연습 중 언제든 바꿀 수 있어요.
+                </p>
+              </div>
+              <span className="shrink-0 font-mono text-[10px] font-black text-[var(--brand)]">
+                {persona.name} 선택
+              </span>
             </div>
-            <span className="shrink-0 font-mono text-[10px] font-black text-[var(--brand)]">
-              {persona.name} 선택
-            </span>
-          </div>
 
-          <div
-            className="mock-interview-options grid min-h-0 flex-1 divide-y divide-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] md:grid-cols-3 md:divide-x md:divide-y-0"
-            role="group"
-            aria-label="연습 방식 선택"
-          >
-            {personas.map((item, index) => {
-              const PersonaIcon = personaIcons[index];
-              const active = selected === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => selectPersona(item.id)}
-                  className={cn(
-                    "mock-interview-option relative flex min-w-0 cursor-pointer flex-col px-5 py-4 text-left transition-[background,transform,box-shadow] sm:px-6",
-                    active
-                      ? "bg-[color-mix(in_srgb,var(--brand-soft)_56%,transparent)] shadow-[inset_0_1px_0_color-mix(in_srgb,white_54%,transparent)]"
-                      : "hover:bg-[color-mix(in_srgb,var(--surface-raised)_34%,transparent)]",
-                  )}
-                  aria-pressed={active}
-                  data-motion-item
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span
-                      className={cn(
-                        "grid size-10 place-items-center rounded-[.9rem] shadow-[inset_0_1px_0_color-mix(in_srgb,white_52%,transparent)]",
-                        index === 0
-                          ? "bg-[var(--mint-soft)] text-[var(--success)]"
-                          : index === 1
-                            ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                            : "bg-[var(--coral-soft)] text-[var(--coral)]",
-                      )}
-                    >
-                      <PersonaIcon className="size-5" />
-                    </span>
-                    <span
-                      className={cn(
-                        "grid size-6 place-items-center rounded-full transition-colors",
-                        active
-                          ? "bg-[var(--brand)] text-[var(--text-on-brand)]"
-                          : "bg-[color-mix(in_srgb,var(--surface-raised)_64%,transparent)] text-[var(--text-tertiary)]",
-                      )}
-                    >
-                      {active ? (
-                        <Check className="size-3.5" />
-                      ) : (
-                        <span className="size-1.5 rounded-full bg-current" />
-                      )}
-                    </span>
-                  </div>
-                  <h2 className="mt-4 text-base font-black sm:text-lg">
-                    {item.name}
-                  </h2>
-                  <p className="mt-2 break-keep text-xs leading-5 text-[var(--text-secondary)] sm:text-sm sm:leading-6">
-                    {item.description}
-                  </p>
-                  <div className="mt-auto flex gap-2 pt-4">
-                    <span className="rounded-full bg-[color-mix(in_srgb,var(--surface-raised)_62%,transparent)] px-2.5 py-1 text-[10px] font-black">
-                      호흡 {item.pace}
-                    </span>
-                    <span className="rounded-full bg-[color-mix(in_srgb,var(--surface-raised)_62%,transparent)] px-2.5 py-1 text-[10px] font-black">
-                      질문 {item.tone}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mock-interview-picker-footer flex flex-col gap-3 border-t border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <p className="break-keep text-[11px] leading-5 text-[var(--text-secondary)]">
-              선택한 방식으로 핵심 질문 1개와 이어지는 질문 1개를 연습합니다.
-            </p>
-            <Button
-              size="lg"
-              className="shrink-0"
-              onClick={() => {
-                setRound("core");
-                setPhase("ready");
-              }}
+            <div
+              className="mock-interview-options grid min-h-0 flex-1 divide-y divide-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] md:grid-cols-3 md:divide-x md:divide-y-0"
+              role="group"
+              aria-label="연습 방식 선택"
             >
-              {withInstrumentalParticle(persona.name)} 시작하기
-              <ArrowRight className="size-4" />
-            </Button>
+              {personas.map((item, index) => {
+                const PersonaIcon = personaIcons[index];
+                const active = selected === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => selectPersona(item.id)}
+                    className={cn(
+                      "mock-interview-option relative flex min-w-0 cursor-pointer flex-col px-5 py-4 text-left transition-[background,transform,box-shadow] sm:px-6",
+                      active
+                        ? "bg-[color-mix(in_srgb,var(--brand-soft)_56%,transparent)] shadow-[inset_0_1px_0_color-mix(in_srgb,white_54%,transparent)]"
+                        : "hover:bg-[color-mix(in_srgb,var(--surface-raised)_34%,transparent)]",
+                    )}
+                    aria-pressed={active}
+                    data-motion-item
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span
+                        className={cn(
+                          "grid size-10 place-items-center rounded-[.9rem] shadow-[inset_0_1px_0_color-mix(in_srgb,white_52%,transparent)]",
+                          index === 0
+                            ? "bg-[var(--mint-soft)] text-[var(--success)]"
+                            : index === 1
+                              ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                              : "bg-[var(--coral-soft)] text-[var(--coral)]",
+                        )}
+                      >
+                        <PersonaIcon className="size-5" />
+                      </span>
+                      <span
+                        className={cn(
+                          "grid size-6 place-items-center rounded-full transition-colors",
+                          active
+                            ? "bg-[var(--brand)] text-[var(--text-on-brand)]"
+                            : "bg-[color-mix(in_srgb,var(--surface-raised)_64%,transparent)] text-[var(--text-tertiary)]",
+                        )}
+                      >
+                        {active ? (
+                          <Check className="size-3.5" />
+                        ) : (
+                          <span className="size-1.5 rounded-full bg-current" />
+                        )}
+                      </span>
+                    </div>
+                    <h2 className="mt-4 text-base font-black sm:text-lg">
+                      {item.name}
+                    </h2>
+                    <p className="mt-2 break-keep text-xs leading-5 text-[var(--text-secondary)] sm:text-sm sm:leading-6">
+                      {item.description}
+                    </p>
+                    <div className="mt-auto flex gap-2 pt-4">
+                      <span className="rounded-full bg-[color-mix(in_srgb,var(--surface-raised)_62%,transparent)] px-2.5 py-1 text-[10px] font-black">
+                        호흡 {item.pace}
+                      </span>
+                      <span className="rounded-full bg-[color-mix(in_srgb,var(--surface-raised)_62%,transparent)] px-2.5 py-1 text-[10px] font-black">
+                        질문 {item.tone}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mock-interview-picker-footer flex flex-col gap-3 border-t border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <p className="break-keep text-[11px] leading-5 text-[var(--text-secondary)]">
+                선택한 방식으로 핵심 질문 1개와 이어지는 질문 1개를 연습합니다.
+              </p>
+              <Link
+                href="/applications/demo/mock-interview/session"
+                className="hairline-top inline-flex min-h-13 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--brand)] px-7 text-base font-bold text-[var(--text-on-brand)] shadow-[var(--shadow-brand)] transition-[transform,background] hover:-translate-y-0.5 hover:bg-[var(--brand-strong)]"
+              >
+                {withInstrumentalParticle(persona.name)} 시작하기
+                <ArrowRight className="size-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
     );
   if (phase === "feedback")
     return (
-      <div className="space-y-5">
-        <InterviewFlow phase={phase} round={round} />
-        <Card className="text-center">
-          <span className="mx-auto grid size-16 place-items-center rounded-full bg-[var(--mint-soft)] text-[var(--success)]">
-            <CheckCircle2 className="size-8" />
-          </span>
-          <p className="eyebrow mt-6">Practice complete</p>
-          <h2 className="mt-3 text-2xl font-black">
-            첫 답변을 끝까지 잘 말했어요
-          </h2>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-[var(--text-secondary)]">
-            핵심 경험은 분명했어요. 지원 학교와의 연결을 한 문장만 더 구체적으로
-            만들면 더 설득력 있어집니다.
-          </p>
-          <div className="mx-auto mt-8 grid max-w-2xl gap-3 text-left sm:grid-cols-3">
-            <Metric title="근거 구체성" value="86" />
-            <Metric title="답변 구조" value="78" />
-            <Metric title="전달 안정성" value="82" />
-          </div>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setSeconds(0);
-                setRound("core");
-                setPhase("ready");
-              }}
-            >
-              <RotateCcw className="size-4" />
-              다시 연습
-            </Button>
-            <Link
-              href="/applications/demo/cheat-sheet"
-              onClick={() => completeStep("mock-interview")}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]"
-            >
-              파이널 노트 보기 <ArrowRight className="size-4" />
-            </Link>
-          </div>
-        </Card>
-      </div>
+      <MockInterviewSessionFrame
+        phase={phase}
+        round={round}
+        personaName={persona.name}
+        onAbort={discardInterview}
+      >
+        <div className="grid min-h-0 flex-1 place-items-center overflow-y-auto px-5 py-7 sm:px-8 sm:py-10">
+          <section className="practice-context-glass w-full max-w-4xl rounded-[1.6rem] px-5 py-8 text-center sm:px-10 sm:py-10">
+            <span className="mx-auto grid size-16 place-items-center rounded-full bg-[var(--mint-soft)] text-[var(--success)]">
+              <CheckCircle2 className="size-8" />
+            </span>
+            <p className="eyebrow mt-6">연습 마무리</p>
+            <h2 className="mt-3 text-2xl font-black">
+              첫 답변을 끝까지 잘 말했어요
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-[var(--text-secondary)]">
+              핵심 경험은 분명했어요. 지원 학교와의 연결을 한 문장만 더 구체적으로
+              만들면 더 설득력 있어집니다.
+            </p>
+            <div className="mt-8 grid gap-3 text-left lg:grid-cols-[1.1fr_.9fr]">
+              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                <Metric title="근거 구체성" value="86" />
+                <Metric title="답변 구조" value="78" />
+                <Metric title="전달 안정성" value="82" />
+              </div>
+              <aside className="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--brand)_12%,transparent)] bg-[color-mix(in_srgb,var(--brand-soft)_40%,transparent)] p-5">
+                <p className="font-mono text-[10px] font-black tracking-[.12em] text-[var(--brand)]">
+                  다음 답변에서 이어갈 점
+                </p>
+                <ul className="mt-3 space-y-2.5 text-xs leading-5 text-[var(--text-secondary)]">
+                  <li>결과보다 판단 기준을 먼저 꺼내기</li>
+                  <li>지원 학교와 맞닿는 장면 한 줄 덧붙이기</li>
+                  <li>답변 뒤 스스로 질문 하나 더 만들어 보기</li>
+                </ul>
+              </aside>
+            </div>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setSeconds(0);
+                  setRound("core");
+                  setPhase("ready");
+                }}
+              >
+                <RotateCcw className="size-4" />
+                다시 연습
+              </Button>
+              <Link
+                href="/applications/demo/cheat-sheet"
+                onClick={() => completeStep("mock-interview")}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]"
+              >
+                파이널 노트 보기 <ArrowRight className="size-4" />
+              </Link>
+            </div>
+          </section>
+        </div>
+      </MockInterviewSessionFrame>
     );
   if (phase === "follow-up")
     return (
-      <div className="space-y-5">
-        <InterviewFlow phase={phase} round={round} />
-        <section className="grid overflow-hidden border-y border-[var(--border)] bg-[var(--surface)] lg:grid-cols-[.8fr_1.2fr]">
-          <div className="border-b border-[var(--border)] bg-[var(--brand-soft)] p-6 sm:p-8 lg:border-b-0 lg:border-r">
+      <MockInterviewSessionFrame
+        phase={phase}
+        round={round}
+        personaName={persona.name}
+        onAbort={discardInterview}
+      >
+        <section className="grid min-h-0 flex-1 overflow-y-auto lg:grid-cols-[.8fr_1.2fr]">
+          <div className="border-b border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] bg-[color-mix(in_srgb,var(--brand-soft)_64%,transparent)] p-6 sm:p-8 lg:border-b-0 lg:border-r">
             <p className="font-mono text-[10px] font-black text-[var(--brand)]">
               ANSWER CAPTURED
             </p>
@@ -694,7 +798,7 @@ function MockInterviewStep() {
               설명하면 답변의 깊이가 드러납니다.
             </p>
           </div>
-          <div className="p-6 sm:p-8">
+          <div className="flex flex-col justify-center p-6 sm:p-8">
             <p className="text-xs font-black text-[var(--brand)]">
               {persona.name} · 꼬리질문
             </p>
@@ -718,34 +822,27 @@ function MockInterviewStep() {
             </div>
           </div>
         </section>
-        <StudentCoachGuide stage="mock-interview" />
-      </div>
+      </MockInterviewSessionFrame>
     );
   return (
-    <div className="space-y-5">
-      <InterviewFlow phase={phase} round={round} />
-      <Card className="surface-contrast relative min-h-[34rem] overflow-hidden border-0 p-6 text-center sm:p-10">
-        <button
-          onClick={() => {
-            setRound("core");
-            setPhase("select");
-          }}
-          className="absolute left-5 top-5 inline-flex items-center gap-1 text-xs font-bold opacity-60"
-        >
-          <ChevronLeft className="size-4" />
-          면접관 변경
-        </button>
-        <div className="mx-auto mt-10 max-w-2xl">
+    <MockInterviewSessionFrame
+      phase={phase}
+      round={round}
+      personaName={persona.name}
+      onAbort={discardInterview}
+    >
+      <div className="grid min-h-0 flex-1 place-items-center overflow-y-auto px-5 py-7 sm:px-8 sm:py-10">
+        <div className="practice-context-glass w-full max-w-2xl rounded-[1.6rem] px-5 py-8 text-center sm:px-10 sm:py-10">
           <div
             className={cn(
-              "mx-auto grid size-28 place-items-center rounded-full border border-white/15 bg-white/10 text-3xl font-black",
+              "mx-auto grid size-24 place-items-center rounded-full border border-[color-mix(in_srgb,var(--text-primary)_10%,transparent)] bg-[color-mix(in_srgb,var(--surface-raised)_54%,transparent)] text-3xl font-black shadow-[inset_0_1px_0_color-mix(in_srgb,white_58%,transparent)]",
               phase === "recording" &&
-                "ring-8 ring-[color-mix(in_srgb,var(--coral)_22%,transparent)]",
+                "ring-8 ring-[color-mix(in_srgb,var(--coral)_18%,transparent)]",
             )}
           >
             {persona.name.slice(0, 1)}
           </div>
-          <p className="mt-5 text-xs font-black text-[var(--mint)]">
+          <p className="mt-5 text-xs font-black text-[var(--brand)]">
             {phase === "recording"
               ? round === "core"
                 ? "핵심 답변을 듣고 있어요"
@@ -774,14 +871,14 @@ function MockInterviewStep() {
                   />
                 ))}
               </div>
-              <p className="mt-5 font-mono text-2xl font-black">
+              <p className="mt-5 font-mono text-2xl font-black tabular-nums">
                 {String(Math.floor(seconds / 60)).padStart(2, "0")}:
                 {String(seconds % 60).padStart(2, "0")}
               </p>
               <Button
                 variant="secondary"
                 size="lg"
-                className="mt-8 border-transparent bg-white text-[var(--brand-on-white)]"
+                className="mt-8"
                 onClick={() =>
                   setPhase(round === "core" ? "follow-up" : "feedback")
                 }
@@ -792,7 +889,7 @@ function MockInterviewStep() {
             </div>
           ) : (
             <div className="mt-9">
-              <p className="text-sm opacity-55">
+              <p className="text-sm text-[var(--text-secondary)]">
                 준비되면 시작을 눌러 주세요. 최대 2분 동안 답할 수 있어요.
               </p>
               <Button
@@ -807,16 +904,15 @@ function MockInterviewStep() {
                 <Mic2 className="size-5" />
                 답변 시작
               </Button>
-              <div className="mt-6 flex items-center justify-center gap-2 text-xs opacity-50">
+              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-[var(--text-tertiary)]">
                 <ShieldCheck className="size-4" />
                 데모 음성은 기기에 저장하지 않습니다
               </div>
             </div>
           )}
         </div>
-      </Card>
-      {phase === "ready" ? <StudentCoachGuide stage="mock-interview" /> : null}
-    </div>
+      </div>
+    </MockInterviewSessionFrame>
   );
 }
 

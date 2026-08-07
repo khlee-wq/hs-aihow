@@ -194,6 +194,9 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(page).toHaveURL(/\/onboarding\/interest-school$/);
   await expect(page.getByTestId("interest-school-onboarding")).toBeVisible();
   await page.getByRole("searchbox").fill("민");
+  await page.getByRole("searchbox").press("Enter");
+  await expect(page.getByRole("searchbox")).toHaveValue("민족사관고등학교");
+  await expect(page).toHaveURL(/\/onboarding\/interest-school$/);
   await page.getByRole("button", { name: /민족사관고등학교/ }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(

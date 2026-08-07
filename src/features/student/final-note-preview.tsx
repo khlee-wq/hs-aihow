@@ -85,7 +85,7 @@ export function FinalNotePaper({
         "final-note-paper flex w-full flex-col",
         preview
           ? "final-note-paper-preview aspect-[210/297] bg-white px-10 py-11 text-[#142d29] shadow-[0_32px_90px_rgba(15,42,37,.18)] sm:px-14 sm:py-14"
-          : "practice-question-glass workspace-page-panel workspace-panel-scroll mx-auto mt-7 max-w-[58rem] flex-1 overflow-y-auto rounded-[1.7rem] p-5 sm:p-8 lg:mt-2 lg:max-w-none lg:px-4 lg:py-2",
+          : "practice-question-glass workspace-page-panel workspace-panel-scroll mx-auto mt-7 max-w-[58rem] flex-1 overflow-y-auto rounded-[1.7rem] p-5 sm:p-8 lg:mt-2 lg:max-w-none lg:px-4 lg:pt-2 lg:pb-5",
       )}
       data-testid="final-note-paper"
       data-motion-reveal={preview ? undefined : ""}

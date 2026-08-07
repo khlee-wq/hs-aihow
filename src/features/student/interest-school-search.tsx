@@ -45,8 +45,21 @@ export function InterestSchoolSearch({
               event.stopPropagation();
               clearQuery();
             }
+
+            // 한글 조합을 확정하는 Enter는 자동완성으로 취급하지 않습니다.
+            // 조합이 끝난 뒤 Enter를 누르면 첫 번째 추천 학교 이름만 검색창에
+            // 채웁니다. 학교 선택과 화면 전환은 결과를 직접 눌렀을 때만 일어납니다.
+            if (
+              event.key === "Enter" &&
+              !event.nativeEvent.isComposing &&
+              hasQuery &&
+              results[0]
+            ) {
+              event.preventDefault();
+              setQuery(results[0].name);
+            }
           }}
-          className={`${inputClass} pr-11 pl-11 text-base placeholder:text-xs sm:text-sm sm:placeholder:text-sm`}
+          className={`${inputClass} interest-school-search-input pr-11 pl-11 text-base placeholder:text-xs sm:text-sm sm:placeholder:text-sm`}
           placeholder="학교명을 입력해 보세요. 예: 민사고, 민족사관고"
           type="search"
         />

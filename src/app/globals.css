@@ -164,6 +164,12 @@ body {
       transparent;
     scrollbar-width: thin;
   }
+  /* 독립 모의면접은 전역 메뉴 대신 세션 헤더만 사용하므로 화면 높이를 온전히 활용한다. */
+  .mock-interview-session-frame {
+    height: calc(100svh - 5.125rem);
+    max-height: calc(100svh - 5.125rem);
+    padding-bottom: clamp(0.75rem, 1.7svh, 1rem);
+  }
 }
 @media (min-width: 1024px) and (max-height: 800px) {
   .learning-intro-hero {
@@ -196,6 +202,11 @@ body {
   font-size: clamp(1.05rem, 5.2vw, 3rem);
   text-wrap: nowrap;
   white-space: nowrap;
+}
+/* 검색 결과를 지우는 동작은 프로젝트 공통 X 버튼 하나로만 제공합니다. */
+.interest-school-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
 }
 @layer base {
   button,
@@ -470,7 +481,10 @@ body {
     font-size: clamp(0.625rem, 1.3svh, 0.75rem);
   }
   .mock-interview-intro-shell {
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .mock-interview-map {
+    min-height: 0;
   }
   .interview-flow li {
     padding-block: clamp(0.6rem, 1.3svh, 0.8rem);

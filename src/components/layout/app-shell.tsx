@@ -227,24 +227,37 @@ function StudentShell({
   session: DemoSession;
 }) {
   const isPracticeSession = pathname.endsWith("/practice/session");
+  const isMockInterviewSession = pathname.endsWith("/mock-interview/session");
+  const isFocusedSession = isPracticeSession || isMockInterviewSession;
   const isLearningIntro =
     pathname.endsWith("/practice") || pathname.endsWith("/mock-interview");
   const isCompactWorkspace =
     isLearningIntro ||
     pathname.endsWith("/essay") ||
     pathname.endsWith("/cheat-sheet");
-  if (isPracticeSession) {
+  if (isFocusedSession) {
+    const sessionTitle = isMockInterviewSession ? "모의면접" : "질문 연습";
+    const sessionDetail = isMockInterviewSession
+      ? "한 질문에 집중하기"
+      : "민사고 통합 패키지";
+    const sessionExitHref = isMockInterviewSession
+      ? "/applications/demo/mock-interview"
+      : "/applications/demo/practice";
     return (
       <div
         className="min-h-[100svh] overflow-x-clip bg-[var(--canvas)]"
-        data-testid="student-practice-session-shell"
+        data-testid={
+          isMockInterviewSession
+            ? "student-mock-interview-session-shell"
+            : "student-practice-session-shell"
+        }
       >
         <header className="pointer-events-none sticky top-3 z-40 px-[var(--space-page)]">
           <div className="liquid-glass pointer-events-auto mx-auto flex h-15 max-w-[88rem] items-center gap-3 rounded-[1.15rem] px-3.5 sm:h-17 sm:px-5">
             <Link
-              href="/dashboard"
+              href={sessionExitHref}
               className="flex shrink-0 items-center gap-2.5 leading-none"
-              aria-label="오늘의 준비로 돌아가기"
+              aria-label={`${sessionTitle} 선택 화면으로 돌아가기`}
             >
               <span className="grid size-7 place-items-center rounded-[var(--radius-xs)] bg-[var(--brand)] text-[10px] font-black text-[var(--text-on-brand)]">
                 A
@@ -256,22 +269,30 @@ function StudentShell({
             <span className="h-5 w-px bg-[var(--border)]" />
             <div className="min-w-0">
               <p className="truncate text-xs font-black sm:text-sm">
-                질문 연습
+                {sessionTitle}
               </p>
               <p className="hidden text-[10px] text-[var(--text-tertiary)] sm:block">
-                민사고 통합 패키지
+                {sessionDetail}
               </p>
             </div>
-            <span className="ml-auto hidden items-center gap-1.5 text-[10px] font-bold text-[var(--success)] sm:inline-flex">
-              <CloudCheck className="size-3.5" /> 입력 내용 자동 저장
-            </span>
+            {isPracticeSession ? (
+              <span className="ml-auto hidden items-center gap-1.5 text-[10px] font-bold text-[var(--success)] sm:inline-flex">
+                <CloudCheck className="size-3.5" /> 입력 내용 자동 저장
+              </span>
+            ) : null}
             <Link
-              href="/dashboard"
+              href={sessionExitHref}
               className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-[var(--radius-sm)] bg-[var(--brand-soft)] px-3 text-xs font-black text-[var(--brand)] shadow-[inset_0_1px_0_color-mix(in_srgb,white_52%,transparent)] transition-[transform,background] hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--brand-soft)_74%,var(--surface))] sm:px-4"
             >
               <BookmarkCheck className="size-3.5" />
-              <span className="sm:hidden">저장 후 나가기</span>
-              <span className="hidden sm:inline">저장하고 나중에 이어하기</span>
+              <span className="sm:hidden">
+                {isMockInterviewSession ? "중단" : "저장 후 나가기"}
+              </span>
+              <span className="hidden sm:inline">
+                {isMockInterviewSession
+                  ? "중단하고 방식 다시 고르기"
+                  : "저장하고 나중에 이어하기"}
+              </span>
             </Link>
           </div>
         </header>
@@ -302,17 +323,8 @@ function StudentShell({
               <span className="block text-[.9rem] font-black tracking-[-.045em]">
                 AIHOW
               </span>
-              <span className="mt-1 hidden font-mono text-[.5rem] font-bold tracking-[.14em] text-[var(--text-tertiary)] sm:block">
-                PREP OS
-              </span>
             </span>
           </Link>
-
-          <div className="hidden h-6 w-px bg-[var(--border)] xl:block" />
-          <div className="hidden items-center gap-2 text-[.7rem] font-bold text-[var(--text-secondary)] xl:flex">
-            <span className="size-1.5 rounded-full bg-[var(--success)]" />
-            민사고 · 2027
-          </div>
 
           <nav
             className="ml-auto hidden items-center gap-1 lg:flex"

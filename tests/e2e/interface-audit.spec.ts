@@ -522,8 +522,7 @@ test("작성 중인 답변은 자동 보관되고 같은 질문에서 이어진�
   await expect(page.getByRole("status")).toHaveText("임시 저장됨");
   await page.getByRole("link", { name: "저장 후 나가기" }).click();
 
-  await expect(page).toHaveURL(/\/dashboard$/);
-  await visit(page, "/applications/demo/practice");
+  await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
   await expect(
     page.getByRole("link", { name: "1번째 질문부터 이어하기" }),
   ).toBeVisible();
@@ -932,12 +931,39 @@ test("모의면접 방식 선택은 질문 화면으로 자연스럽게 이어�
   await panel.click();
   await expect(panel).toHaveAttribute("aria-pressed", "true");
   await page
-    .getByRole("button", { name: "학교 면접 위원으로 시작하기" })
+    .getByRole("link", { name: "학교 면접 위원으로 시작하기" })
     .click();
 
   await expect(page.getByRole("button", { name: "답변 시작" })).toBeVisible();
   await expectStepNavigationFitsItsContainer(page, "모의면접 진행 단계");
   await expectInterfaceFitsViewport(page);
+});
+
+test("모의면접을 중단하면 임시 음성 연습을 비우고 방식 선택으로 돌아간다", async ({
+  page,
+}) => {
+  await seedRoleSession(page, "user");
+  await page.setViewportSize({ width: 1280, height: 820 });
+  await page.goto("/applications/demo/mock-interview");
+
+  await page
+    .getByRole("link", { name: "차분한 코치로 시작하기" })
+    .click();
+  await expect(
+    page.getByTestId("student-mock-interview-session-shell"),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "답변 시작" }).click();
+  await expect(
+    page.getByRole("button", { name: "중단하고 돌아가기" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "중단하고 돌아가기" }).click();
+  await expect(page.getByTestId("mock-interview-intro")).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "오늘은 어떤 방식으로 말하기를 연습할까요?",
+    }),
+  ).toBeVisible();
 });
 
 test("교사 모바일 메뉴는 하단에 고정되고 여섯 작업 화면을 바로 잇는다", async ({
