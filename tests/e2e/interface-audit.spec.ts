@@ -665,6 +665,35 @@ test("학생 핵심 네 화면은 같은 헤더 토큰과 내부 스크롤을 �
   }
 });
 
+test("학생 핵심 작업 화면은 같은 캔버스 여백을 사용한다", async ({ page }) => {
+  await seedRoleSession(page, "user");
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  for (const [path, contentSelector] of [
+    ["/applications/demo/practice", ".practice-intro-map"],
+    ["/applications/demo/mock-interview", ".mock-interview-picker"],
+    ["/applications/demo/essay", ".workspace-page-panel"],
+    ["/applications/demo/cheat-sheet", "[data-testid=final-note-paper]"],
+  ]) {
+    await visit(page, path);
+    const gutters = await page.evaluate((selector) => {
+      const canvas = document.querySelector(".practice-session-canvas")!;
+      const content = document.querySelector(selector)!;
+      const canvasRect = canvas.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
+      return {
+        left: contentRect.left - canvasRect.left,
+        right: canvasRect.right - contentRect.right,
+      };
+    }, contentSelector);
+
+    expect(gutters.left).toBeGreaterThanOrEqual(30);
+    expect(gutters.left).toBeLessThanOrEqual(34);
+    expect(gutters.right).toBeGreaterThanOrEqual(30);
+    expect(gutters.right).toBeLessThanOrEqual(34);
+  }
+});
+
 test("자소서와 파이널 노트는 데스크톱 한 화면 안에서 완결된다", async ({
   page,
 }) => {
@@ -805,7 +834,7 @@ test("모바일 하단 메뉴는 이동 뒤 선택 위치를 유리 하이라이
   expect(visualState.viewportFits).toBe(true);
 });
 
-test("준비 현황은 상단 메뉴와 같은 작업공간 폭을 유지한다", async ({
+test("입시 지도는 상단 메뉴와 같은 작업공간 폭을 유지한다", async ({
   page,
 }) => {
   await seedRoleSession(page, "user");
@@ -814,11 +843,15 @@ test("준비 현황은 상단 메뉴와 같은 작업공간 폭을 유지한다"
 
   const desktopNavigation = page.getByTestId("student-desktop-nav");
   await expect(
-    desktopNavigation.getByRole("link", { name: "준비 현황" }),
+    desktopNavigation.getByRole("link", { name: "입시 지도" }),
   ).toBeVisible();
 
   const closeTour = page.getByRole("button", { name: "투어 닫기" });
   if (await closeTour.isVisible()) await closeTour.click();
+
+  // 로딩용 스켈레톤과 완료 화면의 정보 패널은 구조가 같지만, 실제 캔버스
+  // 여백 검수는 서버 스냅샷이 반영된 완료 화면에서만 측정한다.
+  await expect(page.getByTestId("admissions-outlook")).toBeVisible();
 
   const alignment = await page.evaluate(() => {
     const navigation = document.querySelector<HTMLElement>(
@@ -839,11 +872,34 @@ test("준비 현황은 상단 메뉴와 같은 작업공간 폭을 유지한다"
   expect(alignment?.leftDifference).toBeLessThanOrEqual(1);
   expect(alignment?.rightDifference).toBeLessThanOrEqual(1);
 
+  const canvasDensity = await page.evaluate(() => {
+    const canvas = document.querySelector<HTMLElement>(
+      "[data-testid=student-dashboard]",
+    );
+    const admissions = document.querySelector<HTMLElement>(
+      "[data-testid=admissions-outlook]",
+    );
+    if (!canvas || !admissions) return null;
+    const canvasRect = canvas.getBoundingClientRect();
+    const admissionsRect = admissions.getBoundingClientRect();
+    return {
+      left: admissionsRect.left - canvasRect.left,
+      right: canvasRect.right - admissionsRect.right,
+    };
+  });
+  expect(canvasDensity).not.toBeNull();
+  expect(canvasDensity?.left).toBeGreaterThanOrEqual(30);
+  expect(canvasDensity?.left).toBeLessThanOrEqual(34);
+  expect(canvasDensity?.right).toBeGreaterThanOrEqual(30);
+  expect(canvasDensity?.right).toBeLessThanOrEqual(34);
+
   await page.setViewportSize({ width: 390, height: 844 });
+  const mobileCloseTour = page.getByRole("button", { name: "투어 닫기" });
+  if (await mobileCloseTour.isVisible()) await mobileCloseTour.click();
   const mobileNavigation = page.getByTestId("student-mobile-nav");
   await expect(
-    mobileNavigation.getByRole("link", { name: "준비 현황" }),
-  ).toHaveText("준비");
+    mobileNavigation.getByRole("link", { name: "입시 지도" }),
+  ).toHaveText("지도");
   await expectInterfaceFitsViewport(page);
 });
 

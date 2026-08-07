@@ -177,8 +177,8 @@ function EssayStep() {
       </section>
     );
   return (
-    <section className="student-one-page-workspace practice-session-canvas liquid-glass-group relative flex flex-col overflow-hidden rounded-[2rem] px-4 py-7 sm:px-7 sm:py-9 lg:px-7">
-      <div className="workspace-page-content relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col">
+    <section className="student-one-page-workspace practice-session-canvas liquid-glass-group relative flex flex-col overflow-hidden rounded-[2rem] px-4 py-7 sm:px-7 sm:py-9 lg:px-8">
+      <div className="learning-canvas-content workspace-page-content relative z-10 mx-auto flex flex-1 flex-col">
         <LearningIntroHero
           icon={FileText}
           eyebrow="자소서 원문"
@@ -843,8 +843,8 @@ function CheatSheetStep() {
   };
 
   return (
-    <section className="student-one-page-workspace practice-session-canvas liquid-glass-group relative flex flex-col overflow-hidden rounded-[2rem] px-4 py-7 sm:px-7 sm:py-9 lg:px-7">
-      <div className="workspace-page-content relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col">
+    <section className="student-one-page-workspace practice-session-canvas liquid-glass-group relative flex flex-col overflow-hidden rounded-[2rem] px-4 py-7 sm:px-7 sm:py-9 lg:px-8">
+      <div className="learning-canvas-content workspace-page-content relative z-10 mx-auto flex flex-1 flex-col">
         <div className="no-print">
           <LearningIntroHero
             icon={BookOpenCheck}

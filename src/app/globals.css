@@ -118,6 +118,16 @@ body {
   font-size: var(--learning-intro-copy-size);
   line-height: var(--learning-intro-copy-leading);
 }
+/* 질문·자소서·파이널 노트는 같은 넓은 작업 캔버스를 공유한다. */
+.learning-canvas-content {
+  width: 100%;
+  /* 바깥 workspace의 폭 토큰 안에서만 채운다. 중첩 시 더 넓어지지 않는다. */
+  max-width: 100%;
+  margin-inline: auto;
+}
+.student-dashboard-canvas {
+  min-height: calc(100svh - 7.5rem);
+}
 .final-note-paper-preview {
   --canvas: #faf9f6;
   --surface: #ffffff;

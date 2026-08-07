@@ -3,34 +3,25 @@ import { cn } from "@/lib/utils";
 
 export function DashboardHeaderSkeleton() {
   return (
-    <>
-      <div role="status" data-testid="dashboard-header-skeleton">
-        <Skeleton className="h-3 w-32 rounded-full" />
-        <div className="mt-5 grid gap-3">
-          <Skeleton className="h-10 w-[min(40rem,88%)] rounded-[.65rem] sm:h-12" />
-          <Skeleton className="h-10 w-[min(30rem,68%)] rounded-[.65rem] sm:hidden" />
-        </div>
-        <div className="mt-5 grid max-w-2xl gap-2">
-          <Skeleton className="h-3.5 w-full rounded-full" />
-          <Skeleton className="h-3.5 w-[72%] rounded-full" />
-        </div>
-        <span className="sr-only">
-          학생의 다음 준비 정보를 불러오는 중입니다.
-        </span>
+    <div
+      className="mx-auto w-full max-w-5xl text-center"
+      role="status"
+      data-testid="dashboard-header-skeleton"
+    >
+      <Skeleton className="mx-auto h-12 w-12 rounded-[1rem]" />
+      <Skeleton className="mx-auto mt-4 h-3 w-20 rounded-full" />
+      <div className="mt-3 grid justify-items-center gap-3">
+        <Skeleton className="h-10 w-[min(40rem,88%)] rounded-[.65rem] sm:h-12" />
+        <Skeleton className="h-10 w-[min(30rem,68%)] rounded-[.65rem] sm:hidden" />
       </div>
-      <div
-        className="skeleton-glass-cluster grid grid-cols-2 overflow-hidden rounded-[var(--radius-md)] p-1 text-xs md:min-w-[17rem]"
-        data-testid="dashboard-workspace-skeleton"
-        aria-hidden
-      >
-        {Array.from({ length: 2 }).map((_, index) => (
-          <div key={index} className="px-3 py-3">
-            <Skeleton className="h-2.5 w-12 rounded-full" />
-            <Skeleton className="mt-3 h-4 w-20 max-w-full rounded-full" />
-          </div>
-        ))}
+      <div className="mx-auto mt-5 grid max-w-2xl justify-items-center gap-2">
+        <Skeleton className="h-3.5 w-full rounded-full" />
+        <Skeleton className="h-3.5 w-[72%] rounded-full" />
       </div>
-    </>
+      <span className="sr-only">
+        학생의 다음 준비 정보를 불러오는 중입니다.
+      </span>
+    </div>
   );
 }
 

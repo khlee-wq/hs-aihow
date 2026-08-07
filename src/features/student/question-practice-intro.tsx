@@ -114,7 +114,7 @@ export function QuestionPracticeIntro() {
       </LearningIntroHero>
 
       <div
-        className="practice-question-glass practice-intro-map relative z-10 mx-auto mt-8 w-full max-w-6xl overflow-hidden rounded-[1.6rem] sm:mt-10 lg:mt-4"
+        className="learning-canvas-content practice-question-glass practice-intro-map relative z-10 mx-auto mt-8 overflow-hidden rounded-[1.6rem] sm:mt-10 lg:mt-4"
         data-motion-reveal
       >
         <div className="practice-intro-map-head flex flex-col gap-2 border-b border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-5 lg:py-3">

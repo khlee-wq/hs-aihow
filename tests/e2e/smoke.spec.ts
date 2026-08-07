@@ -214,17 +214,17 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(page.getByTestId("admissions-outlook")).toBeVisible();
   await expect(page.getByTestId("admissions-insight-deck")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "민사고 상세 해석 보기" }),
+    page.getByRole("button", { name: "민사고 준비 지도 보기" }),
   ).toBeVisible();
   await dismissFirstVisitTour(page);
   const detailButton = page.getByRole("button", {
-    name: "민사고 상세 해석 보기",
+    name: "민사고 준비 지도 보기",
   });
   await detailButton.focus();
   await detailButton.press("Enter");
   await expect(
     page.getByRole("dialog", {
-      name: "학교별 해석과 반복 훈련을 한 흐름으로 이어가세요",
+      name: "민사고 준비 지도",
     }),
   ).toBeVisible();
   const overlayLayout = await page
@@ -248,9 +248,9 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   expect(
     Math.abs(overlayLayout.height - overlayLayout.viewportHeight),
   ).toBeLessThan(1);
-  const closeMembership = page.getByRole("button", { name: "확인했어요" });
-  await closeMembership.focus();
-  await closeMembership.press("Enter");
+  const closeAdmissionsMap = page.getByRole("button", { name: "닫기" });
+  await closeAdmissionsMap.focus();
+  await closeAdmissionsMap.press("Enter");
   if (testInfo.project.name === "mobile") {
     await expect(page.getByTestId("student-mobile-nav")).toBeVisible();
     await expect(page.getByTestId("student-desktop-nav")).toBeHidden();

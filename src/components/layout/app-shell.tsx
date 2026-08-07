@@ -30,8 +30,8 @@ import { ThemeToggle } from "./theme-toggle";
 const studentNav = [
   {
     href: "/dashboard",
-    label: "준비 현황",
-    mobileLabel: "준비",
+    label: "입시 지도",
+    mobileLabel: "지도",
     icon: LayoutDashboard,
   },
   { href: "/applications/demo/essay", label: "자소서", icon: FileText },

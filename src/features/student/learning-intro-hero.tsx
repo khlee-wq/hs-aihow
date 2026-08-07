@@ -6,6 +6,7 @@ export function LearningIntroHero({
   copy,
   eyebrow,
   icon: Icon,
+  motion = "hero",
   title,
   titleId,
 }: {
@@ -13,13 +14,16 @@ export function LearningIntroHero({
   copy: string;
   eyebrow: string;
   icon: LucideIcon;
+  motion?: "hero" | "waterfall";
   title: string;
   titleId: string;
 }) {
   return (
     <div
       className="learning-intro-hero relative z-10 mx-auto w-full max-w-5xl text-center"
-      data-motion-hero
+      {...(motion === "waterfall"
+        ? { "data-motion-hero-waterfall": true }
+        : { "data-motion-hero": true })}
     >
       <span
         className="learning-intro-icon mx-auto grid place-items-center bg-[color-mix(in_srgb,var(--surface-raised)_62%,transparent)] text-[var(--brand)] shadow-[inset_0_1px_0_color-mix(in_srgb,white_65%,transparent),var(--shadow-sm)] backdrop-blur-xl"

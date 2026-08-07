@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useAppStore } from "@/stores/app-store";
 import { dashboardSnapshot } from "./dashboard-model";
@@ -20,7 +20,6 @@ describe("StudentDashboard loading boundaries", () => {
       "true",
     );
     expect(screen.getByTestId("dashboard-header-skeleton")).toBeVisible();
-    expect(screen.getByTestId("dashboard-workspace-skeleton")).toBeVisible();
     expect(
       screen.getByRole("link", { name: "질문 연습 시작하기" }),
     ).toBeVisible();
@@ -42,18 +41,23 @@ describe("StudentDashboard loading boundaries", () => {
     );
     expect(screen.queryByTestId("dashboard-metric-skeleton")).toBeNull();
     expect(screen.queryByTestId("dashboard-header-skeleton")).toBeNull();
-    expect(screen.queryByTestId("dashboard-workspace-skeleton")).toBeNull();
     expect(screen.queryByTestId("readiness-data-skeleton")).toBeNull();
     expect(screen.queryByTestId("dashboard-insight-skeleton")).toBeNull();
     expect(screen.queryByTestId("weekly-activity-skeleton")).toBeNull();
     expect(screen.queryByTestId("admissions-outlook-skeleton")).toBeNull();
     expect(screen.getByText("48m")).toBeVisible();
-    expect(screen.getAllByText("D-42")).toHaveLength(2);
+    expect(screen.getByText("D-42")).toBeVisible();
     expect(screen.getByTestId("admissions-outlook")).toBeVisible();
     expect(screen.getByTestId("admissions-insight-deck")).toBeVisible();
-    expect(
-      screen.getByRole("button", { name: "민사고 상세 해석 보기" }),
-    ).toBeVisible();
+    expect(screen.getByText("입시 지도", { exact: true })).toBeVisible();
+    const schoolGuide = screen.getByRole("button", {
+      name: "민사고 준비 지도 보기",
+    });
+    expect(within(schoolGuide).getByText("민사고")).toBeVisible();
+    expect(within(schoolGuide).getByText("214명")).toBeVisible();
+    expect(within(schoolGuide).getByText("96명")).toBeVisible();
+    expect(screen.queryByText(/Prep control/)).toBeNull();
+    expect(screen.queryByText(/마지막 동기화/)).toBeNull();
   });
 
   it("shows explicit no-data fallbacks without replacing the page layout", () => {

@@ -28,6 +28,17 @@ const admissionsOutlookSchema = z.object({
   summary: z.string().trim().min(1),
   revealedCount: z.number().int().nonnegative(),
   totalCount: z.number().int().positive(),
+  latestAdmissions: z.object({
+    year: z.string().trim().min(1),
+    applicants: z.number().int().nonnegative(),
+    capacity: z.number().int().positive(),
+  }),
+  timeline: z.object({
+    fromYear: z.string().trim().min(1),
+    toYear: z.string().trim().min(1),
+    applicantIndex: z.array(z.number().int().min(0).max(140)).min(2).max(5),
+    recruitmentIndex: z.array(z.number().int().min(0).max(140)).min(2).max(5),
+  }),
   insights: z.array(admissionsInsightSchema).min(1).max(3),
 });
 
@@ -74,6 +85,17 @@ export const dashboardSnapshot = dashboardSnapshotSchema.parse({
       "중3 학생 수는 늘었지만 특목·자사고 모집 자리는 줄었습니다. 지원자 수 하나보다 학교 유형과 모집 인원을 함께 봐야 해요.",
     revealedCount: 1,
     totalCount: 3,
+    latestAdmissions: {
+      year: "2026",
+      applicants: 214,
+      capacity: 96,
+    },
+    timeline: {
+      fromYear: "2019",
+      toYear: "2026",
+      applicantIndex: [76, 83, 91, 100],
+      recruitmentIndex: [108, 105, 102, 96],
+    },
     insights: [
       {
         id: "capacity-window",
