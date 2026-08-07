@@ -22,7 +22,7 @@ beforeEach(() => {
 
 describe("StudentDashboard loading boundaries", () => {
   it("keeps actions visible while every server-backed region is loading", () => {
-    useAppStore.setState({ completedSteps: ["essay", "analysis"] });
+    useAppStore.setState({ completedSteps: ["essay", "practice"] });
     const { container } = render(<StudentDashboard />);
 
     expect(screen.getByTestId("student-dashboard")).toHaveAttribute(
@@ -31,7 +31,7 @@ describe("StudentDashboard loading boundaries", () => {
     );
     expect(screen.getByTestId("dashboard-header-skeleton")).toBeVisible();
     expect(
-      screen.getByRole("link", { name: "질문 연습 시작하기" }),
+      screen.getByRole("link", { name: "모의면접 시작하기" }),
     ).toBeVisible();
     expect(screen.getByRole("heading", { name: "준비 과정" })).toBeVisible();
     expect(screen.getAllByTestId("dashboard-metric-skeleton")).toHaveLength(2);
@@ -86,7 +86,7 @@ describe("StudentDashboard loading boundaries", () => {
       screen.getByText("지원 학교 미등록", { exact: false }),
     ).toBeVisible();
     expect(
-      screen.getByRole("link", { name: "질문 연습 시작하기" }),
+      screen.getByRole("link", { name: "모의면접 시작하기" }),
     ).toBeVisible();
     expect(screen.queryByTestId("admissions-outlook")).toBeNull();
   });

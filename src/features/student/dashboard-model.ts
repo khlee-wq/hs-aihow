@@ -139,13 +139,6 @@ export const nextStepCopy: Record<
     time: "약 8분",
     reason: "원문 확인 전에는 질문 근거를 정확히 연결할 수 없습니다.",
   },
-  analysis: {
-    title: "자소서에서 면접 답변의 근거가 될 경험을 찾아볼 차례예요.",
-    detail:
-      "강점과 보완점을 확인하고, 내가 꼭 설명하고 싶은 경험을 골라 주세요.",
-    time: "약 10분",
-    reason: "선택한 경험이 이후 예상 질문과 꼬리질문의 기준이 됩니다.",
-  },
   practice: {
     title: "자소서의 근거를 내 말로 바꾸는 연습이 필요해요.",
     detail:

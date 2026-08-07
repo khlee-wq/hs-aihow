@@ -1,16 +1,13 @@
 "use client";
 
 import {
-  ArrowLeft,
   ArrowRight,
   BookOpenCheck,
   Check,
   CheckCircle2,
   ChevronLeft,
-  ChevronRight,
   FileText,
   Eye,
-  Lightbulb,
   Mic2,
   ScanSearch,
   Scale,
@@ -23,14 +20,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { analysisPoints, journeySteps } from "@/lib/mock-data";
 import { cn, sleep } from "@/lib/utils";
 import { type JourneyStep, useAppStore } from "@/stores/app-store";
-import { StudentCoachGuide } from "@/features/video-guides/student-coach-guide";
 import { QuestionPracticeIntro } from "./question-practice-intro";
 import { LearningIntroHero } from "./learning-intro-hero";
 import {
@@ -41,81 +35,11 @@ import {
 
 export function StudentWorkspace({ step }: { step: JourneyStep }) {
   const normalizedStep = step;
-  const completed = useAppStore((state) => state.completedSteps);
-  const meta = journeySteps.find((item) => item.id === normalizedStep)!;
-
   if (normalizedStep === "essay") return <EssayStep />;
   if (normalizedStep === "practice") return <QuestionPracticeIntro />;
   if (normalizedStep === "mock-interview") return <MockInterviewStep />;
   if (normalizedStep === "cheat-sheet") return <CheatSheetStep />;
-
-  return (
-    <div className="grid gap-6 xl:grid-cols-[13rem_minmax(0,1fr)]">
-      <aside className="no-print hidden xl:block">
-        <div className="sticky top-24">
-          <Link
-            href="/dashboard"
-            className="mb-6 inline-flex items-center gap-2 text-xs font-extrabold text-[var(--text-secondary)]"
-          >
-            <ArrowLeft className="size-4" />
-            오늘의 준비
-          </Link>
-          <nav className="grid gap-1" aria-label="준비 단계">
-            {journeySteps.map((item, index) => {
-              const active = item.id === normalizedStep;
-              const done = completed.includes(item.id);
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-3 text-xs font-bold",
-                    active
-                      ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]",
-                  )}
-                  aria-current={active ? "step" : undefined}
-                >
-                  <span
-                    className={cn(
-                      "grid size-6 shrink-0 place-items-center rounded-full text-[10px] font-black",
-                      done
-                        ? "bg-[var(--mint-soft)] text-[var(--success)]"
-                        : "bg-[var(--surface-muted)] text-[var(--text-tertiary)]",
-                    )}
-                  >
-                    {done ? <Check className="size-3.5" /> : index + 1}
-                  </span>
-                  {item.title}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      </aside>
-      <div className="min-w-0 float-in">
-        <header className="mb-7">
-          <div className="mb-3 flex items-center gap-2 text-xs font-bold text-[var(--text-tertiary)]">
-            <span>민사고 통합 패키지</span>
-            <ChevronRight className="size-3" />
-            <span className="text-[var(--brand)]">{meta.title}</span>
-          </div>
-          <h1 className="heading-lg">{meta.title}</h1>
-          <div className="mt-4 xl:hidden">
-            <Progress
-              value={
-                (journeySteps.findIndex((item) => item.id === normalizedStep) +
-                  1) *
-                20
-              }
-              label={`${journeySteps.findIndex((item) => item.id === normalizedStep) + 1}/5 단계`}
-            />
-          </div>
-        </header>
-        <AnalysisStep />
-      </div>
-    </div>
-  );
+  return null;
 }
 
 function EssayStep() {
@@ -184,7 +108,7 @@ function EssayStep() {
           icon={FileText}
           eyebrow="자소서 원문"
           title="자소서 문장을 면접의 근거로 바꿔볼게요"
-          copy="추출된 원문을 먼저 확인하고, 설명이 더 필요한 표현은 다음 분석과 질문 연습으로 연결합니다."
+          copy="추출된 원문을 먼저 확인하고, 설명이 더 필요한 표현은 다음 질문 연습으로 연결합니다."
           titleId="essay-workspace-title"
         />
 
@@ -243,14 +167,14 @@ function EssayStep() {
             </div>
             <aside className="border-t border-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] bg-[color-mix(in_srgb,var(--brand-soft)_32%,transparent)] p-6 lg:border-l lg:border-t-0 lg:p-6">
               <p className="student-kicker text-[9px] text-[var(--brand)]">
-                다음 준비
+                다음 질문 연습
               </p>
               <h2 className="mt-3 text-lg font-black">
-                한 문장만 더 구체적으로
+                이 경험을 내 말로 설명해 볼게요
               </h2>
               <p className="mt-3 text-xs leading-6 text-[var(--text-secondary)]">
-                “다양한 탐구 활동”이 내 경험과 어떻게 이어지는지 다음 분석
-                단계에서 살펴볼게요.
+                이 경험을 바탕으로 답변의 흐름을 만들고, 이어지는 질문까지
+                차분히 연습해 볼게요.
               </p>
               <dl className="mt-7 divide-y divide-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] border-y border-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] text-xs lg:mt-4">
                 {[
@@ -268,10 +192,10 @@ function EssayStep() {
           </div>
           <footer className="flex flex-col items-center gap-3 border-t border-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] px-5 py-5 text-center sm:px-7 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:py-3">
             <p className="max-w-xl text-[11px] leading-5 text-[var(--text-secondary)] lg:text-left">
-              표시된 문장은 다음 분석에서 질문의 근거로 사용됩니다.
+              표시된 문장은 다음 질문 연습에서 답변의 근거로 사용됩니다.
             </p>
             <Link
-              href="/applications/demo/analysis"
+              href="/applications/demo/practice"
               onClick={() => completeStep("essay")}
               className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-[var(--text-on-brand)]"
             >
@@ -282,109 +206,6 @@ function EssayStep() {
         </article>
       </div>
     </section>
-  );
-}
-
-function AnalysisStep() {
-  const completeStep = useAppStore((state) => state.completeStep);
-  return (
-    <div className="space-y-5">
-      <Card className="surface-contrast border-0">
-        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-xs font-black uppercase tracking-wider text-[var(--mint)]">
-              Attention map
-            </p>
-            <h2 className="mt-3 text-2xl font-black tracking-[-.04em]">
-              면접 질문으로 이어질 포인트 3개
-            </h2>
-            <p className="mt-2 text-sm leading-6 opacity-60">
-              자소서 문장과 전문가 기준을 함께 보고 우선순위를 정했어요.
-            </p>
-          </div>
-          <div className="grid size-24 shrink-0 place-items-center rounded-full border-[10px] border-[var(--mint)] text-center">
-            <div>
-              <strong className="text-2xl">78</strong>
-              <p className="text-[10px] opacity-60">준비도</p>
-            </div>
-          </div>
-        </div>
-      </Card>
-      <div className="grid gap-4">
-        {analysisPoints.map((point, index) => (
-          <Card
-            key={point.title}
-            className="grid gap-5 md:grid-cols-[3rem_1fr_auto] md:items-center"
-          >
-            <span
-              className={cn(
-                "grid size-11 place-items-center rounded-full font-black",
-                point.type === "강점"
-                  ? "bg-[var(--mint-soft)] text-[var(--success)]"
-                  : "bg-[var(--warning-soft)] text-[var(--warning)]",
-              )}
-            >
-              {index + 1}
-            </span>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-black">{point.title}</h3>
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-[10px] font-black",
-                    point.type === "강점"
-                      ? "bg-[var(--mint-soft)] text-[var(--success)]"
-                      : "bg-[var(--warning-soft)] text-[var(--warning)]",
-                  )}
-                >
-                  {point.type}
-                </span>
-              </div>
-              <p className="mt-3 rounded-[var(--radius-sm)] bg-[var(--surface-muted)] p-3 text-xs leading-6 text-[var(--text-secondary)]">
-                “{point.evidence}”
-              </p>
-            </div>
-            <div className="text-right">
-              <strong className="text-2xl font-black">{point.score}</strong>
-              <p className="text-[10px] text-[var(--text-tertiary)]">
-                근거 명확도
-              </p>
-            </div>
-          </Card>
-        ))}
-      </div>
-      <Card className="border-[color-mix(in_srgb,var(--brand)_35%,var(--border))] bg-[var(--brand-soft)]">
-        <div className="flex gap-4">
-          <Lightbulb className="mt-0.5 size-5 shrink-0 text-[var(--brand)]" />
-          <div>
-            <h3 className="font-extrabold">
-              다음 질문 연습에서 이렇게 연결해요
-            </h3>
-            <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">
-              탐구 과정의 강점은 유지하고, 학교 선택과 협업 경험은 구체적인
-              행동을 묻는 꼬리질문으로 보완합니다.
-            </p>
-          </div>
-        </div>
-      </Card>
-      <StudentCoachGuide stage="analysis" />
-      <div className="flex justify-between">
-        <Link
-          href="/applications/demo/essay"
-          className="inline-flex items-center gap-2 text-sm font-bold text-[var(--text-secondary)]"
-        >
-          <ChevronLeft className="size-4" />
-          이전
-        </Link>
-        <Link
-          href="/applications/demo/practice"
-          onClick={() => completeStep("analysis")}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-[var(--text-on-brand)]"
-        >
-          질문 연습 시작 <ArrowRight className="size-4" />
-        </Link>
-      </div>
-    </div>
   );
 }
 

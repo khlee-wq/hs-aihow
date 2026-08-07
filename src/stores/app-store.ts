@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type JourneyStep =
-  "essay" | "analysis" | "practice" | "mock-interview" | "cheat-sheet";
+  "essay" | "practice" | "mock-interview" | "cheat-sheet";
 
 type AppState = {
   completedSteps: JourneyStep[];
@@ -22,7 +22,13 @@ type AppState = {
   resetDemo: () => void;
 };
 
-const initialSteps: JourneyStep[] = ["essay", "analysis"];
+const initialSteps: JourneyStep[] = ["essay"];
+const supportedSteps: JourneyStep[] = [
+  "essay",
+  "practice",
+  "mock-interview",
+  "cheat-sheet",
+];
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -79,14 +85,21 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "aihow-demo-progress",
-      version: 2,
-      migrate: (persistedState) => ({
-        ...(persistedState as Partial<AppState>),
-        practiceDrafts:
-          (persistedState as Partial<AppState>)?.practiceDrafts ?? {},
-        practiceDraftUpdatedAt:
-          (persistedState as Partial<AppState>)?.practiceDraftUpdatedAt ?? {},
-      }),
+      version: 3,
+      migrate: (persistedState) => {
+        const state = persistedState as Partial<AppState>;
+        const persistedSteps = (state.completedSteps as string[] | undefined) ??
+          initialSteps;
+
+        return {
+          ...state,
+          completedSteps: persistedSteps.filter((step): step is JourneyStep =>
+            supportedSteps.includes(step as JourneyStep),
+          ),
+          practiceDrafts: state.practiceDrafts ?? {},
+          practiceDraftUpdatedAt: state.practiceDraftUpdatedAt ?? {},
+        };
+      },
     },
   ),
 );

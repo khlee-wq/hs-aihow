@@ -4,7 +4,6 @@ import { encodeSession, SESSION_COOKIE } from "../../src/lib/session-shared";
 const studentPaths = [
   "/dashboard",
   "/applications/demo/essay",
-  "/applications/demo/analysis",
   "/applications/demo/practice",
   "/applications/demo/practice/session",
   "/applications/demo/mock-interview",

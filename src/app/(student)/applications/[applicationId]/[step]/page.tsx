@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { StudentWorkspace } from "@/features/student/student-workspace";
 import { journeySteps } from "@/lib/mock-data";
 import type { JourneyStep } from "@/stores/app-store";
@@ -11,10 +11,8 @@ export default async function ApplicationStepPage({
   params: Promise<{ applicationId: string; step: string }>;
 }) {
   const { applicationId, step } = await params;
-  if (
-    applicationId !== "demo" ||
-    !journeySteps.some((item) => item.id === step)
-  )
-    notFound();
+  if (applicationId !== "demo") notFound();
+  if (step === "analysis") redirect("/applications/demo/practice");
+  if (!journeySteps.some((item) => item.id === step)) notFound();
   return <StudentWorkspace step={step as JourneyStep} />;
 }

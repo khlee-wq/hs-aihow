@@ -301,7 +301,7 @@ export function QuestionPracticeSession({
 
   return (
     <section
-      className="practice-session-canvas liquid-glass-group relative mx-auto flex min-h-[calc(100svh-3.75rem)] max-w-[100rem] flex-col overflow-hidden px-[var(--space-page)] sm:min-h-[calc(100svh-4.25rem)]"
+      className="practice-session-canvas liquid-glass-group relative mx-auto flex min-h-[calc(100svh-3.75rem)] max-w-[100rem] flex-col overflow-hidden rounded-[2rem] px-[var(--space-page)] sm:min-h-[calc(100svh-4.25rem)]"
       aria-labelledby="practice-session-question"
       aria-busy={!isProgressReady}
       data-progress-ready={isProgressReady}
