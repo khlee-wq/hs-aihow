@@ -19,7 +19,7 @@ import { Field, inputClass } from "@/components/ui/field";
 const schema = z.object({
   name: z.string().trim().min(2, "이름을 2자 이상 입력해 주세요."),
   email: z.email("이메일 형식을 확인해 주세요."),
-  password: z.string().min(4, "데모 비밀번호는 4자 이상 입력해 주세요."),
+  password: z.string().min(4, "비밀번호는 4자 이상 입력해 주세요."),
   role: z.enum(["user", "admin"]),
 });
 type FormValues = z.infer<typeof schema>;
@@ -109,7 +109,7 @@ export function AuthForm({
         </p>
         <ul className="mt-8 grid gap-4 text-sm font-bold">
           {[
-            "어떤 이메일이든 데모 가입 가능",
+            "이메일로 바로 가입 가능",
             "학생·교사 인터페이스 역할별 확인",
             "이 기기에 진행 상태 자동 저장",
           ].map((item) => (
@@ -132,14 +132,14 @@ export function AuthForm({
         </Link>
         <Card className="p-6 sm:p-8">
           <div>
-            <p className="eyebrow">AIHOW Demo</p>
+            <p className="eyebrow">AIHOW</p>
             <h1 className="mt-3 text-2xl font-black tracking-[-.04em]">
               {mode === "signup" ? "회원가입" : "로그인"}
             </h1>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
               {mode === "signup"
                 ? "역할을 선택하면 전체 제품을 바로 둘러볼 수 있어요."
-                : "데모 계정이 미리 채워져 있어 바로 시작할 수 있어요."}
+                : "입력한 정보로 준비하던 흐름을 바로 이어갈 수 있어요."}
             </p>
           </div>
           {plan ? (
@@ -231,7 +231,7 @@ export function AuthForm({
             <Field
               label="비밀번호"
               error={errors.password?.message}
-              hint="데모에서는 실제 계정이나 비밀번호를 저장하지 않습니다."
+              hint="입력한 비밀번호는 안전하게 보호됩니다."
             >
               <input
                 {...register("password")}

@@ -140,7 +140,7 @@ export function QuestionPractice() {
   const closeFocusMode = () => {
     setIsFocusModeOpen(false);
     if (searchParams.get("focus") === "1") {
-      router.replace("/applications/demo/practice", { scroll: false });
+      router.replace("/applications/practice", { scroll: false });
     }
   };
 
@@ -466,7 +466,7 @@ export function QuestionPractice() {
               </Button>
               {isLastQuestion && isLastTrack ? (
                 <Link
-                  href="/applications/demo/mock-interview"
+                  href="/applications/mock-interview"
                   onClick={() => completeStep("practice")}
                   aria-disabled={!currentSaved}
                   className={cn(
@@ -657,7 +657,7 @@ export function QuestionPractice() {
             </Button>
             {isLastQuestion && isLastTrack ? (
               <Link
-                href="/applications/demo/mock-interview"
+                href="/applications/mock-interview"
                 onClick={() => completeStep("practice")}
                 aria-disabled={!currentSaved}
                 className={cn(

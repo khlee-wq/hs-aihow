@@ -33,15 +33,15 @@ const studentNav = [
     mobileLabel: "지도",
     icon: LayoutDashboard,
   },
-  { href: "/applications/demo/essay", label: "자소서", icon: FileText },
+  { href: "/applications/essay", label: "자소서", icon: FileText },
   {
-    href: "/applications/demo/practice",
+    href: "/applications/practice",
     label: "질문 연습",
     icon: MessageSquareText,
   },
-  { href: "/applications/demo/mock-interview", label: "모의면접", icon: Mic2 },
+  { href: "/applications/mock-interview", label: "모의면접", icon: Mic2 },
   {
-    href: "/applications/demo/cheat-sheet",
+    href: "/applications/cheat-sheet",
     label: "파이널 노트",
     icon: BookOpenText,
   },
@@ -240,8 +240,8 @@ function StudentShell({
       ? "한 질문에 집중하기"
       : "민사고 통합 패키지";
     const sessionExitHref = isMockInterviewSession
-      ? "/applications/demo/mock-interview"
-      : "/applications/demo/practice";
+      ? "/applications/mock-interview"
+      : "/applications/practice";
     return (
       <div
         className="min-h-[100svh] overflow-x-clip bg-[var(--canvas)]"

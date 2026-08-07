@@ -7,7 +7,7 @@ export function PublicHeader() {
     <header className="pointer-events-none sticky top-3 z-40 px-[var(--space-page)]">
       <div className="public-navigation-glass pointer-events-auto mx-auto flex h-16 max-w-[90rem] items-center justify-between gap-2 rounded-[1.25rem] px-3 sm:gap-4 sm:px-5">
         <div className="shrink-0">
-          <Logo />
+          <Logo variant="workspace" />
         </div>
         <nav
           className="hidden items-center gap-1 rounded-full bg-[color-mix(in_srgb,var(--surface-muted)_62%,transparent)] p-1 text-sm font-bold text-[var(--text-secondary)] lg:flex"

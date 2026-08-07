@@ -389,7 +389,7 @@ export function StudentDashboard({
                 질문을 받아보세요.
               </p>
               <Link
-                href="/applications/demo/essay"
+                href="/applications/essay"
                 className="mt-5 inline-flex min-h-10 items-center gap-2 bg-[var(--brand)] px-4 text-sm font-bold text-[var(--text-on-brand)]"
               >
                 무료 분석 시작하기 <ArrowUpRight className="size-4" />

@@ -3,6 +3,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -131,12 +132,22 @@ describe("StudentDashboard loading boundaries", () => {
     fireEvent.click(
       within(dialog).getByRole("button", { name: /민족사관고등학교/ }),
     );
+    const confirmation = await screen.findByRole("dialog", {
+      name: "민족사관고등학교를 선택할까요?",
+    });
+    fireEvent.click(
+      within(confirmation).getByRole("button", { name: "민사고 선택" }),
+    );
     expect(
       await screen.findByRole("button", { name: "민사고 준비 지도 보기" }),
     ).toBeVisible();
     expect(window.localStorage.getItem("aihow:interest-school:v1")).toBe(
       "minsago",
     );
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
 
     fireEvent.click(screen.getByRole("button", { name: "관심 학교 변경" }));
     const reopenedDialog = await screen.findByRole("dialog", {

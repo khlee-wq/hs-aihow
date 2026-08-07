@@ -16,14 +16,10 @@ export function ThemeToggle({ expanded = false }: { expanded?: boolean }) {
     const timer = window.setTimeout(() => setMounted(true), 0);
     return () => window.clearTimeout(timer);
   }, []);
-  if (!mounted)
-    return (
-      <div
-        className="h-10 w-16 rounded-[var(--radius-sm)] bg-[var(--surface-muted)]"
-        aria-hidden
-      />
-    );
-  const currentTheme = theme ?? "system";
+  // 학생/교사 공간을 오갈 때 토글을 빈 배경 블록으로 교체하면 우측
+  // '시스템' 영역만 잠깐 색이 튀어 보입니다. 서버와 첫 클라이언트 렌더는
+  // 같은 "시스템" 버튼을 유지하고, 마운트 후에만 저장된 선택을 반영합니다.
+  const currentTheme = mounted ? (theme ?? "system") : "system";
 
   if (expanded) {
     return (

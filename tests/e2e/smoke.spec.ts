@@ -195,9 +195,16 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(page.getByTestId("interest-school-onboarding")).toBeVisible();
   await page.getByRole("searchbox").fill("민");
   await page.getByRole("searchbox").press("Enter");
-  await expect(page.getByRole("searchbox")).toHaveValue("민족사관고등학교");
+  const confirmation = page.getByRole("dialog", {
+    name: /민족사관고등학교를 선택할까요/,
+  });
+  await expect(confirmation).toBeVisible();
   await expect(page).toHaveURL(/\/onboarding\/interest-school$/);
+  await confirmation.getByRole("button", { name: "다시 고르기" }).click();
+  await expect(confirmation).toBeHidden();
   await page.getByRole("button", { name: /민족사관고등학교/ }).click();
+  await expect(confirmation).toBeVisible();
+  await confirmation.getByRole("button", { name: "민사고 선택" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
     page.getByRole("heading", { name: "김하우님, 다음은 질문 연습입니다." }),
@@ -308,7 +315,7 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   });
   if (testInfo.project.name === "mobile") await practiceLink.tap();
   else await practiceLink.click();
-  await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
+  await expect(page).toHaveURL(/\/applications\/practice$/);
   await expect(page.getByTestId("question-practice-intro")).toBeVisible();
   await expect(
     page.getByRole("heading", {
@@ -323,7 +330,7 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   });
   if (testInfo.project.name === "mobile") await sessionLink.tap();
   else await sessionLink.click();
-  await expect(page).toHaveURL(/\/applications\/demo\/practice\/session$/);
+  await expect(page).toHaveURL(/\/applications\/practice\/session$/);
   await expect(
     page.getByTestId("student-practice-session-shell"),
   ).toBeVisible();
@@ -348,7 +355,7 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   ).toBeVisible();
   const forbiddenApi = await page.request.get("/api/question-rules");
   expect(forbiddenApi.status()).toBe(403);
-  await visit(page, "/applications/demo/not-a-step");
+  await visit(page, "/applications/not-a-step");
   await expect(
     page.getByRole("heading", { name: "찾으시는 화면이 없어요" }),
   ).toBeVisible();

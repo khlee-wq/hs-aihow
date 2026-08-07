@@ -195,7 +195,7 @@ function EssayStep() {
               표시된 문장은 다음 질문 연습에서 답변의 근거로 사용됩니다.
             </p>
             <Link
-              href="/applications/demo/practice"
+              href="/applications/practice"
               onClick={() => completeStep("essay")}
               className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-6 text-sm font-black text-[var(--text-on-brand)]"
             >
@@ -409,7 +409,7 @@ function MockInterviewStep({
     setSeconds(0);
     setRound("core");
     if (focused) {
-      router.push("/applications/demo/mock-interview");
+      router.push("/applications/mock-interview");
       return;
     }
     setPhase("select");
@@ -525,7 +525,7 @@ function MockInterviewStep({
                 선택한 방식으로 핵심 질문 1개와 이어지는 질문 1개를 연습합니다.
               </p>
               <Link
-                href="/applications/demo/mock-interview/session"
+                href="/applications/mock-interview/session"
                 className="hairline-top inline-flex min-h-13 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--brand)] px-7 text-base font-bold text-[var(--text-on-brand)] shadow-[var(--shadow-brand)] transition-[transform,background] hover:-translate-y-0.5 hover:bg-[var(--brand-strong)]"
               >
                 {withInstrumentalParticle(persona.name)} 시작하기
@@ -587,7 +587,7 @@ function MockInterviewStep({
                 다시 연습
               </Button>
               <Link
-                href="/applications/demo/cheat-sheet"
+                href="/applications/cheat-sheet"
                 onClick={() => completeStep("mock-interview")}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)]"
               >

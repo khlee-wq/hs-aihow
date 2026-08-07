@@ -3,11 +3,11 @@ import { encodeSession, SESSION_COOKIE } from "../../src/lib/session-shared";
 
 const studentPaths = [
   "/dashboard",
-  "/applications/demo/essay",
-  "/applications/demo/practice",
-  "/applications/demo/practice/session",
-  "/applications/demo/mock-interview",
-  "/applications/demo/cheat-sheet",
+  "/applications/essay",
+  "/applications/practice",
+  "/applications/practice/session",
+  "/applications/mock-interview",
+  "/applications/cheat-sheet",
   "/settings",
 ];
 
@@ -435,7 +435,7 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
     for (const path of studentPaths) {
       await visit(page, path);
       await expectPrimaryTitle(page);
-      if (path === "/applications/demo/practice") {
+      if (path === "/applications/practice") {
         await expect(page.getByTestId("question-practice-intro")).toBeVisible();
         await expect(
           page.getByRole("link", {
@@ -452,7 +452,7 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
           page.getByText("협업 경험", { exact: true }),
         ).toBeVisible();
       }
-      if (path === "/applications/demo/practice/session") {
+      if (path === "/applications/practice/session") {
         await expect(
           page.getByTestId("student-practice-session-shell"),
         ).toBeVisible();
@@ -461,7 +461,7 @@ test("학생 준비 전 단계는 모바일·태블릿·데스크톱에서 완�
           page.getByRole("button", { name: "답변 저장" }),
         ).toBeVisible();
       }
-      if (path === "/applications/demo/mock-interview") {
+      if (path === "/applications/mock-interview") {
         await expect(page.getByTestId("mock-interview-intro")).toBeVisible();
         await expect(
           page.getByRole("heading", {
@@ -481,7 +481,7 @@ test("질문 집중 화면은 움직임 축소 설정에서도 즉시 읽을 수
   await seedRoleSession(page, "user");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 390, height: 844 });
-  await visit(page, "/applications/demo/practice/session");
+  await visit(page, "/applications/practice/session");
 
   const scene = page.getByTestId("question-practice-scene");
   await expect(scene).toBeVisible();
@@ -506,7 +506,7 @@ test("작성 중인 답변은 자동 보관되고 같은 질문에서 이어진�
 }) => {
   await seedRoleSession(page, "user");
   await page.setViewportSize({ width: 390, height: 844 });
-  await visit(page, "/applications/demo/practice/session");
+  await visit(page, "/applications/practice/session");
 
   const answer =
     "실험 결과가 예상과 달라 기록 기준을 다시 살펴보던 장면입니다.";
@@ -543,7 +543,7 @@ test("질문 연습 시작 화면은 데스크톱 한 화면 안에서 완결된
     { width: 1680, height: 1050 },
   ]) {
     await page.setViewportSize(viewport);
-    await visit(page, "/applications/demo/practice");
+    await visit(page, "/applications/practice");
     await expect(page.getByTestId("question-practice-intro")).toBeVisible();
 
     const layout = await page.evaluate(() => {
@@ -580,7 +580,7 @@ test("모의면접 시작 화면은 데스크톱 한 화면 안에서 완결된�
     { width: 1680, height: 1050 },
   ]) {
     await page.setViewportSize(viewport);
-    await visit(page, "/applications/demo/mock-interview");
+    await visit(page, "/applications/mock-interview");
     await expect(page.getByTestId("mock-interview-intro")).toBeVisible();
 
     const layout = await page.evaluate(() => {
@@ -618,10 +618,10 @@ test("학생 핵심 네 화면은 같은 헤더 토큰과 내부 스크롤을 �
     const reports = [];
 
     for (const [path, scrollRegion] of [
-      ["/applications/demo/practice", ".practice-intro-stages"],
-      ["/applications/demo/mock-interview", ".mock-interview-options"],
-      ["/applications/demo/essay", ".workspace-panel-scroll"],
-      ["/applications/demo/cheat-sheet", ".workspace-panel-scroll"],
+      ["/applications/practice", ".practice-intro-stages"],
+      ["/applications/mock-interview", ".mock-interview-options"],
+      ["/applications/essay", ".workspace-panel-scroll"],
+      ["/applications/cheat-sheet", ".workspace-panel-scroll"],
     ]) {
       await visit(page, path);
       reports.push(
@@ -664,10 +664,10 @@ test("학생 핵심 작업 화면은 같은 캔버스 여백을 사용한다", a
   await page.setViewportSize({ width: 1440, height: 900 });
 
   for (const [path, contentSelector] of [
-    ["/applications/demo/practice", ".practice-intro-map"],
-    ["/applications/demo/mock-interview", ".mock-interview-picker"],
-    ["/applications/demo/essay", ".workspace-page-panel"],
-    ["/applications/demo/cheat-sheet", "[data-testid=final-note-paper]"],
+    ["/applications/practice", ".practice-intro-map"],
+    ["/applications/mock-interview", ".mock-interview-picker"],
+    ["/applications/essay", ".workspace-page-panel"],
+    ["/applications/cheat-sheet", "[data-testid=final-note-paper]"],
   ]) {
     await visit(page, path);
     const gutters = await page.evaluate((selector) => {
@@ -702,8 +702,8 @@ test("자소서와 파이널 노트는 데스크톱 한 화면 안에서 완결�
     await page.setViewportSize(viewport);
 
     for (const path of [
-      "/applications/demo/essay",
-      "/applications/demo/cheat-sheet",
+      "/applications/essay",
+      "/applications/cheat-sheet",
     ]) {
       await visit(page, path);
       await expectPrimaryTitle(page);
@@ -748,7 +748,7 @@ test("파이널 노트는 A4 미리보기에서 규격을 확인한 뒤 저장�
     { width: 1280, height: 800 },
   ]) {
     await page.setViewportSize(viewport);
-    await visit(page, "/applications/demo/cheat-sheet");
+    await visit(page, "/applications/cheat-sheet");
 
     const workspacePaper = page.getByTestId("final-note-paper");
     await expect(workspacePaper).toBeVisible();
@@ -797,7 +797,7 @@ test("모바일 하단 메뉴는 이동 뒤 선택 위치를 유리 하이라이
   test.skip(testInfo.project.name !== "mobile", "모바일 내비게이션 전용 검사");
   await seedRoleSession(page, "user");
   await page.setViewportSize({ width: 390, height: 844 });
-  await visit(page, "/applications/demo/essay");
+  await visit(page, "/applications/essay");
 
   const navigation = page.getByTestId("student-mobile-nav");
   const highlight = navigation.locator(".liquid-nav-highlight");
@@ -904,7 +904,7 @@ test("학생 작업공간은 스크롤 유무와 관계없이 같은 화면 폭�
   await page.setViewportSize({ width: 1280, height: 800 });
 
   const viewportWidths: number[] = [];
-  for (const path of ["/dashboard", "/applications/demo/practice"]) {
+  for (const path of ["/dashboard", "/applications/practice"]) {
     await visit(page, path);
     const layout = await page.evaluate(() => ({
       clientWidth: document.documentElement.clientWidth,
@@ -923,7 +923,7 @@ test("모의면접 방식 선택은 질문 화면으로 자연스럽게 이어�
 }) => {
   await seedRoleSession(page, "user");
   await page.setViewportSize({ width: 390, height: 844 });
-  await visit(page, "/applications/demo/mock-interview");
+  await visit(page, "/applications/mock-interview");
 
   const picker = page.getByRole("group", { name: "연습 방식 선택" });
   const panel = picker.getByRole("button", { name: /학교 면접 위원/ });
@@ -943,7 +943,7 @@ test("모의면접을 중단하면 임시 음성 연습을 비우고 방식 선�
 }) => {
   await seedRoleSession(page, "user");
   await page.setViewportSize({ width: 1280, height: 820 });
-  await page.goto("/applications/demo/mock-interview");
+  await page.goto("/applications/mock-interview");
 
   await page
     .getByRole("link", { name: "차분한 코치로 시작하기" })

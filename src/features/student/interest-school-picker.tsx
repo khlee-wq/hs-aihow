@@ -1,9 +1,10 @@
 "use client";
 
-import { Compass, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AppDialog } from "@/components/ui/app-dialog";
 import type { InterestSchool } from "./interest-school-directory";
+import { InterestSchoolConfirmationContent } from "./interest-school-confirmation";
 import { InterestSchoolSearch } from "./interest-school-search";
 
 export function InterestSchoolPicker({
@@ -16,6 +17,8 @@ export function InterestSchoolPicker({
   onLater: () => void;
 }) {
   const [isChoosing, setIsChoosing] = useState(false);
+  const [schoolToConfirm, setSchoolToConfirm] =
+    useState<InterestSchool | null>(null);
   const chooseTimer = useRef<number | null>(null);
 
   useEffect(
@@ -32,13 +35,19 @@ export function InterestSchoolPicker({
       "(prefers-reduced-motion: reduce)",
     ).matches;
     const duration = reducedMotion ? 0 : 420;
-    chooseTimer.current = window.setTimeout(() => onChoose(school), duration);
+    chooseTimer.current = window.setTimeout(() => {
+      chooseTimer.current = null;
+      setSchoolToConfirm(null);
+      setIsChoosing(false);
+      onChoose(school);
+    }, duration);
   };
 
   const closePicker = () => {
     if (chooseTimer.current) window.clearTimeout(chooseTimer.current);
     chooseTimer.current = null;
     setIsChoosing(false);
+    setSchoolToConfirm(null);
     onLater();
   };
 
@@ -47,54 +56,56 @@ export function InterestSchoolPicker({
       open={open}
       onClose={closePicker}
       eyebrow="관심 학교 설정"
-      title="가장 먼저 준비할 학교를 골라볼까요?"
+      title={
+        schoolToConfirm
+          ? `${schoolToConfirm.name}를 선택할까요?`
+          : "가장 먼저 준비할 학교를 골라볼까요?"
+      }
       className="max-w-2xl"
       dismissible
     >
-      <div
-        className={`relative mt-6 transition-[opacity,transform,filter] duration-300 ease-out motion-reduce:transition-none ${
-          isChoosing
-            ? "pointer-events-none -translate-y-2 scale-[.985] opacity-0 blur-sm"
-            : "opacity-100"
-        }`}
-      >
-        <p className="max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
-          학교 이름을 검색해 보세요. 선택한 학교의 지원 흐름과 모집 인원을 준비
-          지도에 먼저 보여드려요.
-        </p>
+      {schoolToConfirm ? (
+        <InterestSchoolConfirmationContent
+          school={schoolToConfirm}
+          confirming={isChoosing}
+          onCancel={() => setSchoolToConfirm(null)}
+          onConfirm={() => chooseSchool(schoolToConfirm)}
+        />
+      ) : (
+        <>
+          <div
+            className={`relative mt-6 transition-[opacity,transform,filter] duration-300 ease-out motion-reduce:transition-none ${
+              isChoosing
+                ? "pointer-events-none -translate-y-2 scale-[.985] opacity-0 blur-sm"
+                : "opacity-100"
+            }`}
+          >
+            <p className="max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
+              학교 이름을 검색해 보세요. 선택한 학교의 지원 흐름과 모집 인원을 준비
+              지도에 먼저 보여드려요.
+            </p>
 
-        <div className="mt-5">
-          <InterestSchoolSearch
-            autoFocus
-            dialogInitialFocus
-            onChoose={chooseSchool}
-          />
-        </div>
-      </div>
+            <div className="mt-5">
+              <InterestSchoolSearch
+                autoFocus
+                dialogInitialFocus
+                onChoose={setSchoolToConfirm}
+              />
+            </div>
+          </div>
 
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 flex-col items-center justify-center gap-3 text-center transition-[opacity,transform] duration-300 motion-reduce:transition-none ${
-          isChoosing ? "opacity-100" : "translate-y-2 opacity-0"
-        }`}
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <span className="grid size-12 place-items-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)] shadow-[var(--shadow-sm)]">
-          <Compass className="size-5" />
-        </span>
-        <p className="text-sm font-bold">준비 지도를 여는 중이에요</p>
-      </div>
-
-      <div className="mt-6 flex justify-end border-t border-[var(--border)] pt-4">
-        <button
-          type="button"
-          onClick={closePicker}
-          disabled={isChoosing}
-          className="min-h-10 px-3 text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-        >
-          나중에 선택하기
-        </button>
-      </div>
+          <div className="mt-6 flex justify-end border-t border-[var(--border)] pt-4">
+            <button
+              type="button"
+              onClick={closePicker}
+              disabled={isChoosing}
+              className="min-h-10 px-3 text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            >
+              나중에 선택하기
+            </button>
+          </div>
+        </>
+      )}
     </AppDialog>
   );
 }

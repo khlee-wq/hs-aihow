@@ -73,7 +73,7 @@ export function QuestionPracticeIntro() {
           data-motion-reveal
         >
           <Link
-            href="/applications/demo/practice/session"
+            href="/applications/practice/session"
             className={`group inline-flex min-h-13 items-center gap-3 rounded-[var(--radius-md)] px-7 text-sm font-black text-[var(--canvas)] transition-[transform,background,box-shadow] hover:-translate-y-1 hover:bg-[var(--brand)] hover:shadow-[0_22px_44px_color-mix(in_srgb,var(--brand)_22%,transparent)] lg:min-h-11 lg:px-6 lg:text-xs ${
               hasStarted
                 ? "bg-[var(--brand)] shadow-[0_18px_42px_color-mix(in_srgb,var(--brand)_26%,transparent)]"

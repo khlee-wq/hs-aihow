@@ -4,7 +4,9 @@ import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { AppDialog } from "@/components/ui/app-dialog";
 import type { InterestSchool } from "./interest-school-directory";
+import { InterestSchoolConfirmationContent } from "./interest-school-confirmation";
 import { InterestSchoolSearch } from "./interest-school-search";
 import {
   loadInterestSchoolPreference,
@@ -14,6 +16,8 @@ import {
 export function InterestSchoolOnboarding() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const [schoolToConfirm, setSchoolToConfirm] =
+    useState<InterestSchool | null>(null);
   const [selectedSchool, setSelectedSchool] = useState<InterestSchool | null>(
     null,
   );
@@ -48,6 +52,11 @@ export function InterestSchoolOnboarding() {
       () => router.replace("/dashboard"),
       reducedMotion ? 0 : 620,
     );
+  };
+
+  const requestSchoolConfirmation = (school: InterestSchool) => {
+    if (selectedSchool) return;
+    setSchoolToConfirm(school);
   };
 
   const chooseLater = () => router.replace("/dashboard");
@@ -99,7 +108,10 @@ export function InterestSchoolOnboarding() {
           </div>
 
           <div className="mx-auto mt-9 max-w-xl">
-            <InterestSchoolSearch autoFocus onChoose={chooseSchool} />
+            <InterestSchoolSearch
+              autoFocus
+              onChoose={requestSchoolConfirmation}
+            />
             <p className="mt-4 text-center text-xs leading-5 text-[var(--text-tertiary)]">
               학교명 일부만 입력해도 찾을 수 있어요. 선택은 언제든 입시 지도에서
               바꿀 수 있습니다.
@@ -125,6 +137,26 @@ export function InterestSchoolOnboarding() {
           </p>
         </div>
       </section>
+
+      <AppDialog
+        open={schoolToConfirm !== null}
+        onClose={() => setSchoolToConfirm(null)}
+        eyebrow="관심 학교 확인"
+        title={schoolToConfirm ? `${schoolToConfirm.name}를 선택할까요?` : ""}
+        purpose="confirmation"
+      >
+        {schoolToConfirm ? (
+          <InterestSchoolConfirmationContent
+            school={schoolToConfirm}
+            confirming={selectedSchool !== null}
+            onCancel={() => setSchoolToConfirm(null)}
+            onConfirm={() => {
+              setSchoolToConfirm(null);
+              chooseSchool(schoolToConfirm);
+            }}
+          />
+        ) : null}
+      </AppDialog>
     </main>
   );
 }

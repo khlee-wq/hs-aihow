@@ -232,7 +232,7 @@ export function AdmissionsMapDialog({
               </p>
             </div>
             <Link
-              href="/applications/demo/practice"
+              href="/applications/practice"
               onClick={onClose}
               className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-[var(--brand)] px-5 text-sm font-bold text-[var(--text-on-brand)] transition-transform hover:-translate-y-0.5"
             >
