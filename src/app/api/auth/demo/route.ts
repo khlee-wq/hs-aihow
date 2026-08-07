@@ -7,7 +7,7 @@ const payloadSchema = z.object({
   name: z.string().trim().min(2),
   email: z.email(),
   password: z.string().min(4),
-  // 로그인은 학생과 교사 화면의 첫 진입만 구분합니다.
+  // 로그인은 학생과 어드민 화면의 첫 진입만 구분합니다.
   role: z.enum(["user", "admin"]),
   next: z.string().optional(),
 });

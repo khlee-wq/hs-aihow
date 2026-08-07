@@ -169,7 +169,7 @@ async function seedRoleSession(page: Page, role: "user" | "admin") {
     {
       name: SESSION_COOKIE,
       value: encodeSession({
-        name: role === "user" ? "모바일학생" : "운영교사",
+        name: role === "user" ? "모바일학생" : "운영어드민",
         email: `${role}@example.com`,
         role,
       }),
@@ -521,7 +521,7 @@ test("작성 중인 답변은 자동 보관되고 같은 질문에서 이어진�
   await expect(page.getByRole("status")).toHaveText("임시 저장됨");
   await page.getByRole("link", { name: "저장 후 나가기" }).click();
 
-  await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
+  await expect(page).toHaveURL(/\/applications\/practice$/);
   await expect(
     page.getByRole("link", { name: "1번째 질문부터 이어하기" }),
   ).toBeVisible();
@@ -701,10 +701,7 @@ test("자소서와 파이널 노트는 데스크톱 한 화면 안에서 완결�
   ]) {
     await page.setViewportSize(viewport);
 
-    for (const path of [
-      "/applications/essay",
-      "/applications/cheat-sheet",
-    ]) {
+    for (const path of ["/applications/essay", "/applications/cheat-sheet"]) {
       await visit(page, path);
       await expectPrimaryTitle(page);
       await expect(page.locator(".learning-intro-icon")).toBeVisible();
@@ -806,7 +803,7 @@ test("모바일 하단 메뉴는 이동 뒤 선택 위치를 유리 하이라이
   await expect(navigation).toHaveAttribute("data-active-index", "1");
 
   await navigation.getByRole("link", { name: "질문 연습" }).click();
-  await expect(page).toHaveURL(/\/applications\/demo\/practice$/);
+  await expect(page).toHaveURL(/\/applications\/practice$/);
   await expect(navigation).toHaveAttribute("data-active-index", "2");
   await expect
     .poll(() => navigation.getAttribute("data-nav-motion"))
@@ -926,12 +923,10 @@ test("모의면접 방식 선택은 질문 화면으로 자연스럽게 이어�
   await visit(page, "/applications/mock-interview");
 
   const picker = page.getByRole("group", { name: "연습 방식 선택" });
-  const panel = picker.getByRole("button", { name: /학교 면접 위원/ });
+  const panel = picker.getByRole("button", { name: /탐구 위원/ });
   await panel.click();
   await expect(panel).toHaveAttribute("aria-pressed", "true");
-  await page
-    .getByRole("link", { name: "학교 면접 위원으로 시작하기" })
-    .click();
+  await page.getByRole("link", { name: "탐구 위원으로 시작하기" }).click();
 
   await expect(page.getByRole("button", { name: "답변 시작" })).toBeVisible();
   await expectStepNavigationFitsItsContainer(page, "모의면접 진행 단계");
@@ -945,9 +940,7 @@ test("모의면접을 중단하면 임시 음성 연습을 비우고 방식 선�
   await page.setViewportSize({ width: 1280, height: 820 });
   await page.goto("/applications/mock-interview");
 
-  await page
-    .getByRole("link", { name: "차분한 코치로 시작하기" })
-    .click();
+  await page.getByRole("link", { name: "진행 위원으로 시작하기" }).click();
   await expect(
     page.getByTestId("student-mock-interview-session-shell"),
   ).toBeVisible();
@@ -965,7 +958,7 @@ test("모의면접을 중단하면 임시 음성 연습을 비우고 방식 선�
   ).toBeVisible();
 });
 
-test("교사 모바일 메뉴는 하단에 고정되고 여섯 작업 화면을 바로 잇는다", async ({
+test("어드민 모바일 메뉴는 하단에 고정되고 여섯 작업 화면을 바로 잇는다", async ({
   page,
 }) => {
   await seedRoleSession(page, "admin");

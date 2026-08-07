@@ -31,7 +31,7 @@ const tours: Record<UserRole, TourStep[]> = {
   admin: [
     {
       selector: "[data-tour='admin-guide']",
-      title: "교사의 기준을 수업에 적용하는 흐름입니다",
+      title: "운영 기준을 학생 연습에 적용하는 흐름입니다",
       detail:
         "개별 결과를 확인하지 않고, 단계·학교별 코칭 레시피를 승인해 학생별 상황에 자동 적용합니다.",
     },

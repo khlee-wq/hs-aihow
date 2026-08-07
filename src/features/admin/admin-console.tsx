@@ -79,9 +79,9 @@ function AdminHome() {
   return (
     <div className="space-y-8 float-in">
       <PageHeader
-        eyebrow="교사 워크스페이스"
+        eyebrow="어드민 워크스페이스"
         title="수업 기준이 학생의 연습을 이끕니다"
-        description="교사의 노하우를 질문과 피드백 기준으로 정리하고, 학교 자료를 학생의 준비 흐름에 맞게 연결하세요."
+        description="운영 노하우를 질문과 피드백 기준으로 정리하고, 학교 자료를 학생의 준비 흐름에 맞게 연결하세요."
         action={
           <Link href="/admin/prompts" className={buttonVariants()}>
             <Plus className="size-4" />새 수업 기준
@@ -118,7 +118,7 @@ function AdminHome() {
             <div>
               <h2 className="font-black">내 수업에 적용 중인 기준</h2>
               <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                교사가 정한 기준은 학생 수와 관계없이 각 준비 단계에 자동
+                어드민이 정한 기준은 학생 수와 관계없이 각 준비 단계에 자동
                 적용됩니다.
               </p>
             </div>
@@ -267,10 +267,10 @@ const coachGuideSteps = [
     eyebrow: "01 · 수업 기준",
     title: "반복할 판단 기준을 수업에 담으세요",
     description:
-      "개별 학생의 결과를 하나씩 확인하지 않습니다. 자소서·질문·면접 단계별로 교사의 판단 방식을 수업 기준으로 정하면 학생 상황에 맞춰 적용됩니다.",
+      "개별 학생의 결과를 하나씩 확인하지 않습니다. 자소서·질문·면접 단계별 운영 기준을 정하면 학생 상황에 맞춰 적용됩니다.",
     action: "수업 기준 열기",
     href: "/admin/prompts",
-    note: "교사의 노하우 → 단계별 수업 기준 → 학생별 적용",
+    note: "운영 노하우 → 단계별 수업 기준 → 학생별 적용",
   },
   {
     eyebrow: "02 · 학교 데이터",
@@ -304,7 +304,7 @@ function CoachStartGuide() {
     >
       <div className="bg-[var(--brand-soft)] p-5 sm:p-7">
         <p className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[.14em] text-[var(--brand)]">
-          <BookOpenCheck className="size-4" /> 교사 수업 도구
+          <BookOpenCheck className="size-4" /> 어드민 운영 도구
         </p>
         <h2
           id="coach-start-title"
@@ -417,7 +417,7 @@ function Schools() {
       <PageHeader
         eyebrow="학교 데이터"
         title="자료를 기준으로 바꾸는 곳"
-        description="모집요강 PDF와 경쟁률 파일을 가져오면, 학교·학년도·전형별로 나누어 추출 초안을 만듭니다. 교사는 필요한 부분만 확인해 적용합니다."
+        description="모집요강 PDF와 경쟁률 파일을 가져오면, 학교·학년도·전형별로 나누어 추출 초안을 만듭니다. 어드민은 필요한 부분만 확인해 적용합니다."
         action={
           <label className={buttonVariants()}>
             <FileUp className="size-4" /> 자료 가져오기
@@ -465,7 +465,7 @@ function Schools() {
             [
               "01",
               "원본 보관",
-              "비공개 자료는 권한 있는 교사만 볼 수 있는 저장소에 보관",
+              "비공개 자료는 권한 있는 어드민만 볼 수 있는 저장소에 보관",
             ],
             [
               "02",

@@ -356,10 +356,10 @@ function StudentShell({
             <Link
               href="/admin"
               className="inline-flex min-h-9 items-center gap-1.5 px-2.5 text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
-              aria-label="교사 워크스페이스로 전환"
+              aria-label="어드민 워크스페이스로 전환"
             >
               <ShieldCheck className="size-[16px]" />
-              <span className="hidden sm:inline">교사 공간</span>
+              <span className="hidden sm:inline">어드민 공간</span>
             </Link>
             <ThemeToggle />
             <ProfileMenu session={session} />
@@ -404,7 +404,7 @@ function ExpertShell({
           <Link
             href="/admin"
             className="flex shrink-0 items-center gap-2.5 leading-none"
-            aria-label="AIHOW 교사 홈"
+            aria-label="AIHOW 어드민 홈"
           >
             <span className="grid size-7 place-items-center rounded-[var(--radius-xs)] bg-[var(--brand)] text-[10px] font-black text-[var(--text-on-brand)] shadow-[0_6px_14px_color-mix(in_srgb,var(--brand)_24%,transparent)]">
               A
@@ -417,7 +417,7 @@ function ExpertShell({
           </Link>
           <nav
             className="ml-auto hidden items-center gap-0.5 lg:flex"
-            aria-label="교사 메뉴"
+            aria-label="어드민 메뉴"
             data-testid="expert-desktop-nav"
             data-tour="admin-menu"
           >
@@ -458,7 +458,7 @@ function ExpertShell({
         <div className="mx-auto max-w-[92rem]">{children}</div>
       </main>
       <MobileBottomNavigation
-        ariaLabel="모바일 교사 메뉴"
+        ariaLabel="모바일 어드민 메뉴"
         items={adminNav}
         pathname={pathname}
         testId="expert-mobile-nav"

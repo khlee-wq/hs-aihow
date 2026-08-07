@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn, sleep } from "@/lib/utils";
@@ -32,6 +32,10 @@ import {
   FinalNotePaper,
   FinalNotePreviewDialog,
 } from "./final-note-preview";
+import {
+  interviewPersonas as personas,
+  minsagoInterviewQuestions,
+} from "./mock-interview-model";
 
 export function StudentWorkspace({ step }: { step: JourneyStep }) {
   const normalizedStep = step;
@@ -209,36 +213,6 @@ function EssayStep() {
   );
 }
 
-type PersonaId = "coach" | "panel" | "pressure";
-const personas: {
-  id: PersonaId;
-  name: string;
-  description: string;
-  pace: string;
-  tone: string;
-}[] = [
-  {
-    id: "coach",
-    name: "차분한 코치",
-    description: "답변을 끝까지 듣고 생각을 정리하도록 기다려 줘요.",
-    pace: "여유",
-    tone: "격려형",
-  },
-  {
-    id: "panel",
-    name: "학교 면접 위원",
-    description: "근거와 구체성을 중심으로 균형 있게 질문해요.",
-    pace: "보통",
-    tone: "표준형",
-  },
-  {
-    id: "pressure",
-    name: "깊이 묻는 위원",
-    description: "답변의 빈틈을 짚고 여러 단계의 꼬리질문을 해요.",
-    pace: "빠름",
-    tone: "집중형",
-  },
-];
 const personaIcons = [Waves, Scale, ScanSearch] as const;
 
 function withInstrumentalParticle(value: string) {
@@ -251,37 +225,18 @@ function withInstrumentalParticle(value: string) {
 }
 
 type InterviewPhase =
-  "select" | "ready" | "recording" | "follow-up" | "feedback";
-type InterviewRound = "core" | "follow-up";
-
-const interviewFlow = [
-  ["준비 확인", "방식과 질문 확인"],
-  ["핵심 질문", "첫 답변 말하기"],
-  ["꼬리질문", "근거 한 단계 더"],
-  ["말하기 점검", "구조와 전달 확인"],
-  ["피드백", "다음 연습 결정"],
-] as const;
+  "select" | "ready" | "asking" | "recording" | "follow-up" | "feedback";
+type InterviewRound = "main" | "follow-up";
 
 function InterviewFlow({
-  phase,
-  round,
+  questionIndex,
+  completedCount,
   className,
 }: {
-  phase: InterviewPhase;
-  round: InterviewRound;
+  questionIndex: number;
+  completedCount: number;
   className?: string;
 }) {
-  const current =
-    phase === "select" || phase === "ready"
-      ? 0
-      : phase === "recording" && round === "core"
-        ? 1
-        : phase === "follow-up" ||
-            (phase === "recording" && round === "follow-up")
-          ? 2
-          : phase === "feedback"
-            ? 4
-            : 3;
   return (
     <nav
       aria-label="모의면접 진행 단계"
@@ -291,31 +246,35 @@ function InterviewFlow({
       )}
     >
       <ol className="grid grid-cols-5">
-        {interviewFlow.map(([title, description], index) => (
+        {minsagoInterviewQuestions.map((question, index) => (
           <li
-            key={title}
-            aria-current={index === current ? "step" : undefined}
+            key={question.id}
+            aria-current={index === questionIndex ? "step" : undefined}
             className={cn(
               "relative min-w-0 border-r border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] px-2 py-3 last:border-r-0 sm:px-4",
-              index === current &&
+              index === questionIndex &&
                 "bg-[color-mix(in_srgb,var(--brand-soft)_72%,transparent)] shadow-[inset_0_1px_0_color-mix(in_srgb,white_54%,transparent)]",
             )}
           >
             <span
               className={cn(
                 "grid size-6 place-items-center rounded-full font-mono text-[9px] font-black",
-                index <= current
+                index <= completedCount
                   ? "bg-[var(--brand)] text-[var(--text-on-brand)]"
                   : "bg-[color-mix(in_srgb,var(--surface-raised)_60%,transparent)] text-[var(--text-tertiary)]",
               )}
             >
-              {index < current ? <Check className="size-3" /> : index + 1}
+              {index < completedCount ? (
+                <Check className="size-3" />
+              ) : (
+                index + 1
+              )}
             </span>
             <strong className="mt-2 block break-keep text-[10px] leading-4 sm:text-xs">
-              {title}
+              {question.type}
             </strong>
             <span className="mt-1 hidden text-[11px] text-[var(--text-secondary)] sm:block">
-              {description}
+              {question.year} 유형
             </span>
           </li>
         ))}
@@ -327,17 +286,19 @@ function InterviewFlow({
 function MockInterviewSessionFrame({
   children,
   phase,
-  round,
+  questionIndex,
+  completedCount,
   personaName,
   onAbort,
 }: {
   children: ReactNode;
   phase: InterviewPhase;
-  round: InterviewRound;
+  questionIndex: number;
+  completedCount: number;
   personaName: string;
   onAbort: () => void;
 }) {
-  const isRecording = phase === "recording";
+  const hasActiveAnswer = phase === "asking" || phase === "recording";
 
   return (
     <section
@@ -349,10 +310,10 @@ function MockInterviewSessionFrame({
         <header className="flex items-center justify-between gap-3 px-1 sm:px-2">
           <div>
             <p className="font-mono text-[10px] font-black tracking-[.16em] text-[var(--brand)]">
-              SPEAKING PRACTICE
+              실전 대화 연습
             </p>
             <p className="mt-1 text-xs font-bold text-[var(--text-secondary)]">
-              {personaName}와 한 질문씩 이어가고 있어요
+              {personaName}과 한 질문씩 이어가고 있어요
             </p>
           </div>
           <button
@@ -361,14 +322,14 @@ function MockInterviewSessionFrame({
             className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[color-mix(in_srgb,var(--text-primary)_9%,transparent)] bg-[color-mix(in_srgb,var(--surface-raised)_56%,transparent)] px-3 text-xs font-bold text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
           >
             <ChevronLeft className="size-4" />
-            {isRecording ? "중단하고 돌아가기" : "방식 다시 고르기"}
+            {hasActiveAnswer ? "중단하고 돌아가기" : "방식 다시 고르기"}
           </button>
         </header>
 
         <div className="practice-question-glass mt-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.7rem]">
           <InterviewFlow
-            phase={phase}
-            round={round}
+            questionIndex={questionIndex}
+            completedCount={completedCount}
             className="rounded-none border-x-0 border-t-0 bg-transparent shadow-none backdrop-blur-none"
           />
           {children}
@@ -394,20 +355,99 @@ function MockInterviewStep({
   const selectPersona = useAppStore((state) => state.selectPersona);
   const completeStep = useAppStore((state) => state.completeStep);
   const [phase, setPhase] = useState<InterviewPhase>(initialPhase);
-  const [round, setRound] = useState<InterviewRound>("core");
-  const [seconds, setSeconds] = useState(0);
+  const [round, setRound] = useState<InterviewRound>("main");
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [remainingSeconds, setRemainingSeconds] = useState(120);
+  const question = minsagoInterviewQuestions[questionIndex];
+  const persona = personas.find((item) => item.id === question.personaId)!;
+  const selectedPersona =
+    personas.find((item) => item.id === selected) ?? personas[0];
+
+  const advanceAfterFollowUp = useCallback(() => {
+    const nextCompletedCount = completedCount + 1;
+    setCompletedCount(nextCompletedCount);
+    if (questionIndex === minsagoInterviewQuestions.length - 1) {
+      setPhase("feedback");
+      return;
+    }
+    setQuestionIndex((value) => value + 1);
+    setRound("main");
+    setRemainingSeconds(120);
+    setPhase("ready");
+  }, [completedCount, questionIndex]);
+
+  const finishCurrentAnswer = useCallback(() => {
+    if (round === "main") {
+      setPhase("follow-up");
+      return;
+    }
+    advanceAfterFollowUp();
+  }, [advanceAfterFollowUp, round]);
+
   useEffect(() => {
     if (phase !== "recording") return;
-    const timer = window.setInterval(
-      () => setSeconds((value) => value + 1),
-      1000,
-    );
+    const timer = window.setInterval(() => {
+      setRemainingSeconds((value) => {
+        if (value <= 1) {
+          window.clearInterval(timer);
+          window.setTimeout(finishCurrentAnswer, 0);
+          return 0;
+        }
+        return value - 1;
+      });
+    }, 1000);
     return () => window.clearInterval(timer);
-  }, [phase]);
-  const persona = personas.find((item) => item.id === selected)!;
+  }, [finishCurrentAnswer, phase]);
+
+  useEffect(
+    () => () => {
+      window.speechSynthesis?.cancel();
+    },
+    [],
+  );
+
+  const speakQuestion = useCallback(
+    (nextRound: InterviewRound) => {
+      const prompt =
+        nextRound === "main" ? question.prompt : question.followUp.prompt;
+      setRound(nextRound);
+      setRemainingSeconds(question.timeLimitSeconds);
+      setPhase("asking");
+
+      if (!("speechSynthesis" in window)) {
+        setPhase("recording");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(prompt);
+      utterance.lang = "ko-KR";
+      utterance.rate = persona.voiceRate;
+      utterance.pitch = persona.voicePitch;
+      const koreanVoices = window.speechSynthesis
+        .getVoices()
+        .filter((voice) => voice.lang.toLowerCase().startsWith("ko"));
+      if (koreanVoices.length === 0) {
+        setPhase("recording");
+        return;
+      }
+      const personaIndex = personas.findIndex((item) => item.id === persona.id);
+      utterance.voice =
+        koreanVoices[personaIndex % koreanVoices.length] ?? null;
+      utterance.onend = () => setPhase("recording");
+      utterance.onerror = () => setPhase("recording");
+      window.speechSynthesis.speak(utterance);
+    },
+    [persona, question],
+  );
+
   const discardInterview = () => {
-    setSeconds(0);
-    setRound("core");
+    window.speechSynthesis?.cancel();
+    setRemainingSeconds(120);
+    setRound("main");
+    setQuestionIndex(0);
+    setCompletedCount(0);
     if (focused) {
       router.push("/applications/mock-interview");
       return;
@@ -434,8 +474,8 @@ function MockInterviewStep({
           data-motion-reveal
         >
           <InterviewFlow
-            phase={phase}
-            round={round}
+            questionIndex={0}
+            completedCount={0}
             className="rounded-none border-x-0 border-t-0 bg-transparent shadow-none backdrop-blur-none"
           />
 
@@ -448,7 +488,7 @@ function MockInterviewStep({
                 </p>
               </div>
               <span className="shrink-0 font-mono text-[10px] font-black text-[var(--brand)]">
-                {persona.name} 선택
+                {selectedPersona.name} 선택
               </span>
             </div>
 
@@ -522,13 +562,14 @@ function MockInterviewStep({
 
             <div className="mock-interview-picker-footer flex flex-col gap-3 border-t border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <p className="break-keep text-[11px] leading-5 text-[var(--text-secondary)]">
-                선택한 방식으로 핵심 질문 1개와 이어지는 질문 1개를 연습합니다.
+                2024~2026년 민사고 유형을 재구성한 다섯 질문을, 서로 다른 위원과
+                2분씩 이어갑니다.
               </p>
               <Link
                 href="/applications/mock-interview/session"
                 className="hairline-top inline-flex min-h-13 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--brand)] px-7 text-base font-bold text-[var(--text-on-brand)] shadow-[var(--shadow-brand)] transition-[transform,background] hover:-translate-y-0.5 hover:bg-[var(--brand-strong)]"
               >
-                {withInstrumentalParticle(persona.name)} 시작하기
+                {withInstrumentalParticle(selectedPersona.name)} 시작하기
                 <ArrowRight className="size-4" />
               </Link>
             </div>
@@ -540,46 +581,77 @@ function MockInterviewStep({
     return (
       <MockInterviewSessionFrame
         phase={phase}
-        round={round}
+        questionIndex={questionIndex}
+        completedCount={completedCount}
         personaName={persona.name}
         onAbort={discardInterview}
       >
-        <div className="grid min-h-0 flex-1 place-items-center overflow-y-auto px-5 py-7 sm:px-8 sm:py-10">
-          <section className="practice-context-glass w-full max-w-4xl rounded-[1.6rem] px-5 py-8 text-center sm:px-10 sm:py-10">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-7 sm:px-8 sm:py-10">
+          <section className="practice-context-glass mx-auto w-full max-w-5xl rounded-[1.6rem] px-5 py-8 text-center sm:px-10 sm:py-10">
             <span className="mx-auto grid size-16 place-items-center rounded-full bg-[var(--mint-soft)] text-[var(--success)]">
               <CheckCircle2 className="size-8" />
             </span>
             <p className="eyebrow mt-6">연습 마무리</p>
             <h2 className="mt-3 text-2xl font-black">
-              첫 답변을 끝까지 잘 말했어요
+              다섯 번의 대화를 끝까지 이어갔어요
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-[var(--text-secondary)]">
-              핵심 경험은 분명했어요. 지원 학교와의 연결을 한 문장만 더 구체적으로
-              만들면 더 설득력 있어집니다.
+              메인 질문과 이어지는 질문을 함께 살펴, 답변마다 잘된 점과 다음
+              연습 포인트를 정리했어요.
             </p>
-            <div className="mt-8 grid gap-3 text-left lg:grid-cols-[1.1fr_.9fr]">
-              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-                <Metric title="근거 구체성" value="86" />
-                <Metric title="답변 구조" value="78" />
-                <Metric title="전달 안정성" value="82" />
-              </div>
-              <aside className="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--brand)_12%,transparent)] bg-[color-mix(in_srgb,var(--brand-soft)_40%,transparent)] p-5">
-                <p className="font-mono text-[10px] font-black tracking-[.12em] text-[var(--brand)]">
-                  다음 답변에서 이어갈 점
-                </p>
-                <ul className="mt-3 space-y-2.5 text-xs leading-5 text-[var(--text-secondary)]">
-                  <li>결과보다 판단 기준을 먼저 꺼내기</li>
-                  <li>지원 학교와 맞닿는 장면 한 줄 덧붙이기</li>
-                  <li>답변 뒤 스스로 질문 하나 더 만들어 보기</li>
-                </ul>
-              </aside>
+            <div className="mt-8 grid gap-3 text-left sm:grid-cols-3">
+              <Metric title="근거 구체성" value="86" />
+              <Metric title="판단 선명도" value="84" />
+              <Metric title="전달 안정성" value="83" />
+            </div>
+            <div className="mt-6 space-y-3 text-left">
+              {minsagoInterviewQuestions.map((item, index) => (
+                <article
+                  key={item.id}
+                  className="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--text-primary)_7%,transparent)] bg-[color-mix(in_srgb,var(--surface-raised)_48%,transparent)] p-4 sm:p-5"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <strong>
+                      {index + 1}. {item.type}
+                    </strong>
+                    <span className="font-mono text-[10px] font-black text-[var(--brand)]">
+                      {item.year} 유형 ·{" "}
+                      {
+                        personas.find((entry) => entry.id === item.personaId)
+                          ?.name
+                      }
+                    </span>
+                  </div>
+                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                    <div>
+                      <p className="text-[10px] font-black text-[var(--brand)]">
+                        첫 답변
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+                        {item.feedback.summary} {item.feedback.next}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-[var(--brand)]">
+                        이어지는 답변
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+                        {item.followUp.feedback.summary}{" "}
+                        {item.followUp.feedback.next}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              ))}
             </div>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Button
                 variant="secondary"
                 onClick={() => {
-                  setSeconds(0);
-                  setRound("core");
+                  setRemainingSeconds(120);
+                  setRound("main");
+                  setQuestionIndex(0);
+                  setCompletedCount(0);
                   setPhase("ready");
                 }}
               >
@@ -602,21 +674,22 @@ function MockInterviewStep({
     return (
       <MockInterviewSessionFrame
         phase={phase}
-        round={round}
+        questionIndex={questionIndex}
+        completedCount={completedCount}
         personaName={persona.name}
         onAbort={discardInterview}
       >
         <section className="grid min-h-0 flex-1 overflow-y-auto lg:grid-cols-[.8fr_1.2fr]">
           <div className="border-b border-[color-mix(in_srgb,var(--text-primary)_6%,transparent)] bg-[color-mix(in_srgb,var(--brand-soft)_64%,transparent)] p-6 sm:p-8 lg:border-b-0 lg:border-r">
             <p className="font-mono text-[10px] font-black text-[var(--brand)]">
-              ANSWER CAPTURED
+              첫 답변 확인
             </p>
             <h2 className="mt-4 text-xl font-black tracking-[-.04em]">
               첫 답변에서 다음 질문을 찾았어요
             </h2>
             <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">
-              처음부터 다시 묻지 않습니다. 방금 말한 “기록 기준”을 더 구체적으로
-              설명하면 답변의 깊이가 드러납니다.
+              {question.followUp.triggerQuote} 처음부터 다시 묻지 않고, 방금
+              답한 장면에서 한 걸음 더 들어갑니다.
             </p>
           </div>
           <div className="flex flex-col justify-center p-6 sm:p-8">
@@ -624,18 +697,16 @@ function MockInterviewStep({
               {persona.name} · 꼬리질문
             </p>
             <p className="mt-4 text-xl font-black leading-8 sm:text-2xl">
-              그때 기록 기준을 바꾼 결정이 결과에 어떤 차이를 만들었나요?
+              {question.followUp.prompt}
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs leading-5 text-[var(--text-secondary)]">
-                완료 기준 · 변화 전후를 한 문장씩 설명하기
+                말해 볼 순서 · {question.followUp.answerGuide.join(" · ")}
               </p>
               <Button
                 size="lg"
                 onClick={() => {
-                  setRound("follow-up");
-                  setSeconds(0);
-                  setPhase("recording");
+                  speakQuestion("follow-up");
                 }}
               >
                 <Mic2 className="size-5" /> 꼬리질문 답변 시작
@@ -648,7 +719,8 @@ function MockInterviewStep({
   return (
     <MockInterviewSessionFrame
       phase={phase}
-      round={round}
+      questionIndex={questionIndex}
+      completedCount={completedCount}
       personaName={persona.name}
       onAbort={discardInterview}
     >
@@ -657,52 +729,48 @@ function MockInterviewStep({
           <div
             className={cn(
               "mx-auto grid size-24 place-items-center rounded-full border border-[color-mix(in_srgb,var(--text-primary)_10%,transparent)] bg-[color-mix(in_srgb,var(--surface-raised)_54%,transparent)] text-3xl font-black shadow-[inset_0_1px_0_color-mix(in_srgb,white_58%,transparent)]",
-              phase === "recording" &&
+              (phase === "asking" || phase === "recording") &&
                 "ring-8 ring-[color-mix(in_srgb,var(--coral)_18%,transparent)]",
             )}
           >
             {persona.name.slice(0, 1)}
           </div>
           <p className="mt-5 text-xs font-black text-[var(--brand)]">
-            {phase === "recording"
-              ? round === "core"
-                ? "핵심 답변을 듣고 있어요"
-                : "꼬리질문 답변을 듣고 있어요"
-              : `${persona.name} · 첫 질문`}
+            {phase === "asking"
+              ? `${persona.name}이 질문하고 있어요`
+              : phase === "recording"
+                ? round === "main"
+                  ? "핵심 답변을 듣고 있어요"
+                  : "꼬리질문 답변을 듣고 있어요"
+                : `${question.year} 유형 · ${persona.name}`}
           </p>
           <h2 className="mt-5 text-balance text-xl font-black leading-8 sm:text-2xl">
-            {round === "core"
-              ? "과학 동아리의 실험 결과가 예상과 달랐을 때, 무엇을 기준으로 다음 행동을 결정했나요?"
-              : "그때 기록 기준을 바꾼 결정이 결과에 어떤 차이를 만들었나요?"}
+            {round === "main" ? question.prompt : question.followUp.prompt}
           </h2>
-          {phase === "recording" ? (
+          {phase === "asking" ? (
+            <div className="mt-9">
+              <VoiceWave label={`${persona.name} 질문 재생 중`} />
+              <p className="mt-4 text-xs text-[var(--text-secondary)]">
+                질문이 끝나면 답변 시간이 자동으로 시작됩니다.
+              </p>
+            </div>
+          ) : phase === "recording" ? (
             <div className="mt-10">
               <div
                 className="mx-auto flex h-14 max-w-sm items-center justify-center gap-1"
                 aria-label="음성 입력 중"
               >
-                {Array.from({ length: 19 }).map((_, index) => (
-                  <span
-                    key={index}
-                    className="w-1 rounded-full bg-[var(--mint)]"
-                    style={{
-                      height: `${18 + ((index * 17) % 36)}px`,
-                      animation: `pulse-soft ${0.5 + (index % 4) * 0.14}s ease-in-out infinite`,
-                    }}
-                  />
-                ))}
+                <VoiceWave label="학생 답변 입력 중" />
               </div>
               <p className="mt-5 font-mono text-2xl font-black tabular-nums">
-                {String(Math.floor(seconds / 60)).padStart(2, "0")}:
-                {String(seconds % 60).padStart(2, "0")}
+                {String(Math.floor(remainingSeconds / 60)).padStart(2, "0")}:
+                {String(remainingSeconds % 60).padStart(2, "0")}
               </p>
               <Button
                 variant="secondary"
                 size="lg"
                 className="mt-8"
-                onClick={() =>
-                  setPhase(round === "core" ? "follow-up" : "feedback")
-                }
+                onClick={finishCurrentAnswer}
               >
                 <Square className="size-4 fill-current" />
                 답변 마치기
@@ -717,9 +785,7 @@ function MockInterviewStep({
                 size="lg"
                 className="mt-7 bg-[var(--coral)] hover:bg-[var(--coral)]"
                 onClick={() => {
-                  setRound("core");
-                  setSeconds(0);
-                  setPhase("recording");
+                  speakQuestion("main");
                 }}
               >
                 <Mic2 className="size-5" />
@@ -727,13 +793,33 @@ function MockInterviewStep({
               </Button>
               <div className="mt-6 flex items-center justify-center gap-2 text-xs text-[var(--text-tertiary)]">
                 <ShieldCheck className="size-4" />
-                데모 음성은 기기에 저장하지 않습니다
+                연습 음성은 이 기기에 저장하지 않습니다
               </div>
             </div>
           )}
         </div>
       </div>
     </MockInterviewSessionFrame>
+  );
+}
+
+function VoiceWave({ label }: { label: string }) {
+  return (
+    <div
+      className="mx-auto flex h-14 max-w-sm items-center justify-center gap-1"
+      aria-label={label}
+    >
+      {Array.from({ length: 19 }).map((_, index) => (
+        <span
+          key={index}
+          className="w-1 rounded-full bg-[var(--mint)]"
+          style={{
+            height: `${18 + ((index * 17) % 36)}px`,
+            animation: `pulse-soft ${0.5 + (index % 4) * 0.14}s ease-in-out infinite`,
+          }}
+        />
+      ))}
+    </div>
   );
 }
 

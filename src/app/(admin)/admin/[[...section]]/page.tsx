@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { AdminConsole } from "@/features/admin/admin-console";
 
-export const metadata: Metadata = { title: "교사 워크스페이스" };
+export const metadata: Metadata = { title: "어드민 워크스페이스" };
 const sections = new Set([
   "home",
   "questions",

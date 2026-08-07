@@ -13,7 +13,7 @@ describe("PromptStudio", () => {
     fireEvent.change(screen.getByLabelText("학생에게 적용할 최종 코칭 답변"), {
       target: { value: "전문가가 직접 다듬은 코칭 답변" },
     });
-    expect(screen.getByText("교사 조정본")).toBeVisible();
+    expect(screen.getByText("어드민 조정본")).toBeVisible();
 
     fireEvent.click(screen.getByRole("button", { name: "승인하고 적용" }));
 

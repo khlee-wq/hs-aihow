@@ -359,7 +359,7 @@ test("학생이 가입하고 준비 화면으로 진입한다", async ({ page },
   await expect(
     page.getByRole("heading", { name: "찾으시는 화면이 없어요" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "교사 워크스페이스로 전환" }).click();
+  await page.getByRole("link", { name: "어드민 워크스페이스로 전환" }).click();
   await expect(page).toHaveURL(/\/admin$/);
   await expect(
     page.getByRole("heading", {
@@ -383,7 +383,7 @@ test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 �
 }, testInfo) => {
   await visit(page, "/signup");
   await expectPublicThemeToggleRemoved(page);
-  await page.getByRole("radio", { name: "교사" }).click();
+  await page.getByRole("radio", { name: "어드민" }).click();
   await page.getByLabel("이름", { exact: true }).fill("이소장");
   await page.getByLabel("이메일", { exact: true }).fill("expert@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
@@ -418,7 +418,7 @@ test("로그인 역할은 첫 화면만 정하고 두 작업 공간을 오갈 �
 
 test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", async ({ page }) => {
   await visit(page, "/signup");
-  await page.getByRole("radio", { name: "교사" }).click();
+  await page.getByRole("radio", { name: "어드민" }).click();
   await page.getByLabel("이름", { exact: true }).fill("김소장");
   await page.getByLabel("이메일", { exact: true }).fill("prompt@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
@@ -438,7 +438,7 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
 
   const expertAnswer = page.getByLabel("학생에게 적용할 최종 코칭 답변");
   await expertAnswer.fill("소장님이 직접 수정한 모의면접 코칭 기준입니다.");
-  await expect(page.getByText("교사 조정본")).toBeVisible();
+  await expect(page.getByText("어드민 조정본")).toBeVisible();
   await page.getByRole("button", { name: "승인하고 적용" }).click();
   await expect(page.getByRole("status")).toContainText("승인했습니다");
 
@@ -449,9 +449,9 @@ test("전문가가 코칭 규칙과 최종 답변을 수정해 승인한다", as
   ).toBe(true);
 });
 
-test("교사가 수업 기준을 설정하고 승인한다", async ({ page }) => {
+test("어드민이 수업 기준을 설정하고 승인한다", async ({ page }) => {
   await visit(page, "/signup");
-  await page.getByRole("radio", { name: "교사" }).click();
+  await page.getByRole("radio", { name: "어드민" }).click();
   await page.getByLabel("이름", { exact: true }).fill("박소장");
   await page.getByLabel("이메일", { exact: true }).fill("review@example.com");
   await page.getByPlaceholder("4자 이상").fill("demo1234");
@@ -465,7 +465,7 @@ test("교사가 수업 기준을 설정하고 승인한다", async ({ page }) =>
     }),
   ).toBeVisible();
   await page
-    .getByLabel("교사 지침")
+    .getByLabel("운영 지침")
     .fill("학생의 판단 근거를 먼저 확인하고, 다음 행동을 한 가지 제안합니다.");
   await page.getByRole("button", { name: "승인하고 적용" }).click();
   await expect(page.getByRole("status")).toContainText("승인했습니다");
@@ -480,7 +480,7 @@ test("교사가 수업 기준을 설정하고 승인한다", async ({ page }) =>
 test("전문가가 질문 기준을 생성·수정·삭제한다", async ({ page }, testInfo) => {
   const title = `브라우저 CRUD ${testInfo.project.name} ${Date.now()}`;
   await visit(page, "/signup");
-  await page.getByRole("radio", { name: "교사" }).click();
+  await page.getByRole("radio", { name: "어드민" }).click();
   await page.getByLabel("이름", { exact: true }).fill("이소장");
   await page
     .getByLabel("이메일", { exact: true })

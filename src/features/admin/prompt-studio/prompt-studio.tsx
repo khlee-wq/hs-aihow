@@ -164,7 +164,7 @@ export function PromptStudio() {
             학생에게 건넬 코칭 기준을 정하세요
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            학교와 단계에 맞는 교사 지침을 정하면, AI가 같은 기준으로 학생의
+            학교와 단계에 맞는 운영 지침을 정하면, AI가 같은 기준으로 학생의
             답변을 돕습니다. 확인한 기준만 학생 화면에 반영됩니다.
           </p>
         </div>
@@ -182,13 +182,13 @@ export function PromptStudio() {
 
       <section
         className="grid overflow-hidden border-y border-[var(--border)] sm:grid-cols-3"
-        aria-label="교사 코칭 기준 적용 흐름"
+        aria-label="어드민 코칭 기준 적용 흐름"
       >
         {[
           ["01", "수업 기준 고르기", "단계와 학교에 맞는 기준을 선택합니다."],
           [
             "02",
-            "교사 지침 더하기",
+            "운영 지침 더하기",
             "말투와 확인할 이야기를 수업에 맞게 정합니다.",
           ],
           [
@@ -329,10 +329,10 @@ export function PromptStudio() {
               className="mt-5 block text-sm font-bold"
               htmlFor="coaching-instruction"
             >
-              교사 지침
+              운영 지침
             </label>
             <p className="mt-1 text-[11px] leading-5 text-[var(--text-tertiary)]">
-              공통 원칙에 더해, 이 단계와 학교에 맞춰 덧붙일 교사 기준입니다.
+              공통 원칙에 더해, 이 단계와 학교에 맞춰 덧붙일 운영 기준입니다.
             </p>
             <textarea
               id="coaching-instruction"
@@ -459,7 +459,7 @@ export function PromptStudio() {
               </div>
               {hasExpertEdit ? (
                 <span className="rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-black text-[var(--mint)]">
-                  교사 조정본
+                  어드민 조정본
                 </span>
               ) : null}
             </div>
@@ -527,12 +527,12 @@ export function PromptStudio() {
               승인한 기준이 다음 코칭에 이어집니다
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-              교사 지침 → AI 미리보기 → 수업 기준 확인 → 학생별 적용 순서로
-              교사의 판단 방식을 수업 안에 쌓아 갑니다.
+              운영 지침 → AI 미리보기 → 수업 기준 확인 → 학생별 적용 순서로 운영
+              판단 방식을 수업 안에 쌓아 갑니다.
             </p>
           </div>
           <ol className="flex flex-wrap items-center gap-2 text-[10px] font-black text-[var(--text-secondary)]">
-            {["교사 지침", "AI 미리보기", "기준 확인", "학생에게 적용"].map(
+            {["운영 지침", "AI 미리보기", "기준 확인", "학생에게 적용"].map(
               (item, index) => (
                 <li key={item} className="flex items-center gap-2">
                   <span className="grid size-7 place-items-center rounded-full bg-[var(--surface)] text-[var(--brand)]">

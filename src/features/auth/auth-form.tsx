@@ -110,7 +110,7 @@ export function AuthForm({
         <ul className="mt-8 grid gap-4 text-sm font-bold">
           {[
             "이메일로 바로 가입 가능",
-            "학생·교사 인터페이스 역할별 확인",
+            "학생·어드민 인터페이스 역할별 확인",
             "이 기기에 진행 상태 자동 저장",
           ].map((item) => (
             <li key={item} className="flex items-center gap-3">
@@ -157,7 +157,8 @@ export function AuthForm({
               role="status"
               className="mt-5 border border-[color-mix(in_srgb,var(--warning)_30%,var(--border))] bg-[var(--warning-soft)] p-3 text-xs font-bold leading-5 text-[var(--text-primary)]"
             >
-              보호를 위해 장시간 활동이 없는 세션을 종료했어요. 다시 로그인하면 준비하던 화면으로 돌아갈 수 있습니다.
+              보호를 위해 장시간 활동이 없는 세션을 종료했어요. 다시 로그인하면
+              준비하던 화면으로 돌아갈 수 있습니다.
             </div>
           ) : null}
           {mode === "signup" ? (
@@ -201,7 +202,7 @@ export function AuthForm({
                 className="absolute inset-0 z-10 size-full cursor-pointer opacity-0"
               />
               <ShieldCheck className="size-4" />
-              교사
+              어드민
             </label>
           </div>
           <form
